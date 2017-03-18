@@ -21,6 +21,10 @@ public class Filer {
         path = activity.getPath();
     }
 
+    public boolean exists(String path) {
+        return new File(path).exists();
+    }
+
     public void writeToFile(String path, String data) {
         try {
             File file = new File(path);

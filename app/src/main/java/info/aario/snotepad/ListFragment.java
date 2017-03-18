@@ -13,7 +13,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,12 +69,12 @@ public class ListFragment extends Fragment {
         svSearch.setQuery("", true);
     }
 
-    public String proposeNewFilePath() {
-        int i = 1;
+    public String proposeNewFilePath(String prefix) {
+        int i = 0;
         String result;
         do {
-            result = path + "/Note" + (i > 1 ? " " + String.valueOf(i) : "");
-        } while (searchFiles(result).contains(result));
+            result = path + "/"+ prefix + (++i > 1 ? " " + String.valueOf(i): "") + extension;
+        } while (activity.filer.exists(result));
         return result;
     }
 
@@ -112,7 +111,7 @@ public class ListFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.editFile(proposeNewFilePath());
+                activity.editFile(proposeNewFilePath("Note"));
             }
         });
         path = activity.getPath();

@@ -33,7 +33,12 @@ public class EditorFragment extends Fragment {
             }
         });
         etEditor = (EditText) view.findViewById(R.id.etEditor);
-        etEditor.setText(activity.filer.getStringFromFile(path));
+        if (activity.filer.exists(path)) {
+            String text = activity.filer.getStringFromFile(path);
+            activity.toast(text);
+            etEditor.setText(text);
+        } else
+            etEditor.getText().clear();
         return view;
     }
 
