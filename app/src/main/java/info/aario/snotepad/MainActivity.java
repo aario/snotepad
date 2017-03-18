@@ -16,7 +16,6 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
     ListFragment listFragment = new ListFragment();
-    EditorFragment editorFragment = new EditorFragment();
     public Filer filer;
 
     public String getPath() {
@@ -64,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void editFile(String filePath) {
-        changeFragment(editorFragment, true);
-        editorFragment.open(filePath);
+        EditorFragment ef =  new EditorFragment();
+        changeFragment(ef, true);
+        ef.open(filePath);
     }
 
     @Override
