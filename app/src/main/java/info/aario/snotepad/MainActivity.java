@@ -3,7 +3,9 @@ package info.aario.snotepad;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -15,6 +17,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
+    CoordinatorLayout coordinatorLayoutForSnackBar;
     ListFragment listFragment = new ListFragment();
     public Filer filer;
 
@@ -24,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void toast(String text) {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    public void makeSnackBar(String text) {
+        Snackbar.make(coordinatorLayoutForSnackBar, text, Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
     }
 
     private void changeFragment(Fragment f, boolean allowBack) {
@@ -47,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        coordinatorLayoutForSnackBar=(CoordinatorLayout)findViewById(R.id.co_ordinated_layout_main);
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         filer = new Filer(this);
         changeFragment(listFragment, false);
@@ -63,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void editFile(String filePath) {
-        EditorFragment ef =  new EditorFragment();
+        EditorFragment ef = new EditorFragment();
         changeFragment(ef, true);
         ef.open(filePath);
     }

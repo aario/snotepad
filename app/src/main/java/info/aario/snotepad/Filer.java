@@ -1,5 +1,7 @@
 package info.aario.snotepad;
 
+import android.content.Context;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,27 +15,60 @@ import java.io.InputStreamReader;
  */
 
 public class Filer {
-    private String path;
     private MainActivity activity;
 
     public Filer(MainActivity mainActivity) {
         activity = mainActivity;
-        path = activity.getPath();
     }
 
     public boolean exists(String path) {
         return new File(path).exists();
     }
 
-    public void writeToFile(String path, String data) {
+    public String getFilePath(String path) {
+        return new File(path).getParent();
+    }
+
+    public String getFileExtension(String path) {
+        int lastPeriodPos = path.lastIndexOf('.');
+        if (lastPeriodPos > 0)
+            return path.substring(path.lastIndexOf('.'));
+        return "";
+    }
+
+    public String getFileName(String path) {
+        return new File(path).getName();
+    }
+
+    public String getFileNameWithoutExtension(String path) {
+        String fileName = getFileName(path);
+        int lastPeriodPos = fileName.lastIndexOf('.');
+        if (lastPeriodPos > 0)
+            return fileName.substring(0, lastPeriodPos);
+        return fileName;
+    }
+
+    public boolean writeToFile(String path, String data) {
         try {
             File file = new File(path);
             FileWriter writer = new FileWriter(file);
             writer.append(data);
             writer.flush();
             writer.close();
+            return true;
         } catch (IOException e) {
             activity.toast("File write failed: " + e.toString());
+            return false;
+        }
+    }
+
+    public boolean delete(String path) {
+        try {
+            new File(path).delete();
+            return true;
+        } catch (RuntimeException e) {
+            activity.toast("File remove failed: " + e.toString());
+            return false;
         }
     }
 

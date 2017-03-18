@@ -16,7 +16,10 @@ import android.widget.EditText;
 public class EditorFragment extends Fragment {
     private MainActivity activity;
     private String path;
+    private String name;
     private EditText etEditor;
+    private EditText etTitle;
+    private boolean modified;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,13 +32,35 @@ public class EditorFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                activity.filer.writeToFile(path,etEditor.getText().toString());
+                save();
             }
         });
+        etTitle = (EditText) view.findViewById(R.id.etTitle);
+        name = activity.filer.getFileNameWithoutExtension(path);
+        etTitle.setText(name);
         etEditor = (EditText) view.findViewById(R.id.etEditor);
         if (activity.filer.exists(path))
             etEditor.setText(activity.filer.getStringFromFile(path));
         return view;
+    }
+
+    private void save() {
+        String newName = etTitle.getText().toString();
+        String oldPath = path;
+        boolean rename = (!newName.equals(name));
+        if (rename) {
+            path = activity.listFragment.proposeNewFilePath(newName);
+            name = activity.filer.getFileNameWithoutExtension(path);
+            modified = true;
+        }
+        if (!modified)
+            return;
+
+        if (activity.filer.writeToFile(path, etEditor.getText().toString())) {
+            activity.makeSnackBar("Changes saved to "+path);
+            if (rename)
+                activity.filer.delete(oldPath);
+        }
     }
 
     public void open(String filePath) {
