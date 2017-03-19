@@ -64,6 +64,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 activity.setPath(tvPath.getText().toString());
+                getFragmentManager().popBackStack();
             }
         });
 
