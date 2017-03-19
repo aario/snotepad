@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,22 @@ public class EditorFragment extends Fragment {
         etEditor = (EditText) view.findViewById(R.id.etEditor);
         if (activity.filer.exists(path))
             etEditor.setText(activity.filer.getStringFromFile(path));
+        etEditor.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                modified = true;
+            }
+        });
         return view;
     }
 
@@ -60,6 +78,7 @@ public class EditorFragment extends Fragment {
             activity.makeSnackBar("Changes saved to "+path);
             if (rename)
                 activity.filer.delete(oldPath);
+            modified = false;
         }
     }
 
