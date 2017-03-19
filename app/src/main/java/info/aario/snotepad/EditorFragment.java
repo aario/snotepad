@@ -69,10 +69,7 @@ public class EditorFragment extends Fragment {
         if (rename) {
             path = activity.listFragment.proposeNewFilePath(newName);
             name = activity.filer.getFileNameWithoutExtension(path);
-            modified = true;
         }
-        if (!modified)
-            return;
 
         if (activity.filer.writeToFile(path, etEditor.getText().toString())) {
             activity.makeSnackBar("Changes saved to "+path);
