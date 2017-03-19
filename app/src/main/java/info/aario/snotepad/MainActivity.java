@@ -104,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.action_about) {
+            changeFragment(new AboutFragment(), true);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
