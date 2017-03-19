@@ -5,17 +5,11 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.TextViewCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 
 /**
  * Created by aario on 3/16/17.
@@ -39,9 +33,6 @@ public class SettingsFragment extends Fragment {
         btChangePath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("abcd/*");
-                startActivityForResult(intent, 1);
             }
         });
         FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
