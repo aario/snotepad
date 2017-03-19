@@ -21,7 +21,7 @@
                 can have all your notes backed up by OwnCloud.&lt;br/&gt;
                 &lt;br/&gt;
                 It takes a lot of time and effort to write a software. If you found SNotepad usefull,
-                please consider making a donation by clicking this button here.&lt;br/&gt;
+                please consider making a donation by clicking the button on bottom right.&lt;br/&gt;
                 Thanks.</string>
     <string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=UJTM2GDGPEFHA</string>
     <string name="save_dialog_question">You have unsaved changes. Do you want to save them?</string>
