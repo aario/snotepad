@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void setPath(String path) {
         sharedPrefEditor.putString("PATH", path);
+        sharedPrefEditor.commit();
         listFragment.refresh();
     }
 
