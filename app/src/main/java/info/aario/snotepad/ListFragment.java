@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,12 @@ public class ListFragment extends Fragment {
 
     private ArrayList<String> searchFiles(String text) {
         File directory = new File(path);
-        File[] files = directory.listFiles();
+        File[] files = directory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return file.isFile() && file.getName().endsWith(extension);
+            }
+        });
         ArrayList<String> filePathList = new ArrayList<String>();
         filePathList.clear();
         for (int i = 0; i < files.length; i++)
