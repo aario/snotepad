@@ -11,7 +11,7 @@
         android:id="@+id/tvVersion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="version here"
+        android:text="@string/tvVersion_text"
         android:textSize="14sp" />
 
     <TextView

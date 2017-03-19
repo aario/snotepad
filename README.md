@@ -1,6 +1,6 @@
 SNotepad
 	SNotepad is simple yet professional notepad app for android.
-	The S	stands for Suckless/Simple.
+	The S stands for Suckless/Simple.
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
