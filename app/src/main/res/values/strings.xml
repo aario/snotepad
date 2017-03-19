@@ -8,4 +8,6 @@
     <string name="action_delete">Delete</string>
     <string name="btUndo_title">Undo</string>
     <string name="btRedo_text">Redo</string>
+    <string name="saving_path">Saving path:</string>
+    <string name="btChangePath_title">Select Folder</string>
 </resources>

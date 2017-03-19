@@ -67,6 +67,7 @@ public class ListFragment extends Fragment {
     }
 
     public void refresh() {
+        path = activity.getPath();
         contentsCache.clear();
         svSearch.setQuery("", true);
     }
@@ -117,8 +118,7 @@ public class ListFragment extends Fragment {
                 activity.editFile(proposeNewFilePath("Note"));
             }
         });
-        path = activity.getPath();
-        search("");
+        refresh();
         return view;
     }
 

@@ -17,9 +17,15 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
+    private SharedPreferences.Editor sharedPrefEditor;
     CoordinatorLayout coordinatorLayoutForSnackBar;
     ListFragment listFragment = new ListFragment();
     public Filer filer;
+
+    public void setPath(String path) {
+        sharedPrefEditor.putString("PATH", path);
+        listFragment.refresh();
+    }
 
     public String getPath() {
         return sharedPref.getString("PATH", getExternalFilesDir(null).getAbsolutePath());
@@ -57,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         coordinatorLayoutForSnackBar=(CoordinatorLayout)findViewById(R.id.co_ordinated_layout_main);
         sharedPref = getPreferences(Context.MODE_PRIVATE);
+        sharedPrefEditor = sharedPref.edit();
         filer = new Filer(this);
         changeFragment(listFragment, false);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            changeFragment(new SettingsFragment(), true);
             return true;
         }
 
