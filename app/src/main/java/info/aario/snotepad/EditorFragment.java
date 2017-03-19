@@ -24,7 +24,6 @@ public class EditorFragment extends Fragment {
     private String name;
     private EditText etEditor;
     private EditText etTitle;
-    private boolean modified;
     ArrayList<String> textUndoHistory = new ArrayList<String>();
     ArrayList<Integer> selectionStartUndoHistory = new ArrayList<Integer>();
     ArrayList<Integer> selectionEndUndoHistory = new ArrayList<Integer>();
@@ -43,7 +42,7 @@ public class EditorFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            modified = true;
+            activity.editor_modified = true;
         }
     };
 
@@ -135,7 +134,7 @@ public class EditorFragment extends Fragment {
             activity.makeSnackBar("Changes saved to " + path);
             if (rename)
                 activity.filer.delete(oldPath);
-            modified = false;
+            activity.editor_modified = false;
         }
     }
 

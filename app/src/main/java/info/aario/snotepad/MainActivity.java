@@ -1,6 +1,8 @@
 package info.aario.snotepad;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -18,9 +20,11 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedPrefEditor;
+    private FloatingActionButton fab;
     CoordinatorLayout coordinatorLayoutForSnackBar;
     ListFragment listFragment = new ListFragment();
     public Filer filer;
+    public boolean editor_modified;
 
     public void setPath(String path) {
         sharedPrefEditor.putString("PATH", path);
@@ -62,14 +66,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        coordinatorLayoutForSnackBar=(CoordinatorLayout)findViewById(R.id.co_ordinated_layout_main);
+        coordinatorLayoutForSnackBar = (CoordinatorLayout) findViewById(R.id.co_ordinated_layout_main);
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         sharedPrefEditor = sharedPref.edit();
         filer = new Filer(this);
         changeFragment(listFragment, false);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
     }
 
     @Override
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         EditorFragment ef = new EditorFragment();
         changeFragment(ef, true);
         ef.open(filePath);
+        editor_modified = false;
     }
 
     @Override
@@ -112,4 +117,39 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            super.onBackPressed();
+            //additional code
+        } else if (editor_modified) {
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //Yes button clicked
+                            fab.callOnClick();//Save document
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            getSupportFragmentManager().popBackStack();
+                        case DialogInterface.BUTTON_NEUTRAL:
+                            //Cancel button clicked
+                            return;
+                    }
+                }
+            };
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(getResources().getString(R.string.save_dialog_question))
+                    .setPositiveButton(getResources().getString(R.string.yes), dialogClickListener)
+                    .setNegativeButton(getResources().getString(R.string.no), dialogClickListener)
+                    .setNeutralButton(getResources().getString(R.string.cancel), dialogClickListener)
+                    .show();
+        } else {
+            getSupportFragmentManager().popBackStack();
+        }
+    }
 }

@@ -24,4 +24,8 @@
                 please consider making a donation by clicking this button here.&lt;br/&gt;
                 Thanks.</string>
     <string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=UJTM2GDGPEFHA</string>
+    <string name="save_dialog_question">You have unsaved changes. Do you want to save them?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="cancel">Cancel</string>
 </resources>
