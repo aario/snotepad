@@ -5,4 +5,5 @@
     <string name="action_about">About</string>
     <string name="etTitle_hint">Title is mandatory</string>
     <string name="etTitle_label">Title (File Name)</string>
+    <string name="action_delete">Delete</string>
 </resources>

@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -73,7 +75,7 @@ public class ListFragment extends Fragment {
         int i = 0;
         String result;
         do {
-            result = path + "/"+ prefix + (++i > 1 ? " " + String.valueOf(i): "") + extension;
+            result = path + "/" + prefix + (++i > 1 ? " " + String.valueOf(i) : "") + extension;
         } while (activity.filer.exists(result));
         return result;
     }
@@ -89,9 +91,10 @@ public class ListFragment extends Fragment {
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                activity.editFile(path+"/"+filePathList.get(arg2));
+                activity.editFile(path + "/" + filePathList.get(arg2));
             }
         });
+        registerForContextMenu(lvFiles);
         svSearch = (SearchView) view.findViewById(R.id.searchView);
         svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -117,5 +120,26 @@ public class ListFragment extends Fragment {
         path = activity.getPath();
         search("");
         return view;
+    }
+
+    public void onCreateContextMenu(final ContextMenu menu,
+                                    final View v, final ContextMenu.ContextMenuInfo menuInfo) {
+        activity.getMenuInflater().inflate(R.menu.list_menu, menu);
+    }
+
+    public boolean onContextItemSelected(final MenuItem item) {
+        int id = item.getItemId();
+        AdapterView.AdapterContextMenuInfo itemInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_delete) {
+            String filename = filePathList.get(itemInfo.position);
+            if (activity.filer.delete(path + "/" + filename)) {
+                search(svSearch.getQuery().toString());
+                activity.makeSnackBar("File " + filename + " successfully deleted.");
+            }
+        }
+
+        return true;
     }
 }
