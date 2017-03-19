@@ -7,6 +7,29 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/editorToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <Button
+            android:id="@+id/btUndo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/btUndo_title" />
+
+        <Button
+            android:id="@+id/btRedo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/btRedo_text" />
+
+    </android.support.v7.widget.Toolbar>
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"

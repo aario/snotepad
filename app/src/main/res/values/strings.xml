@@ -6,4 +6,6 @@
     <string name="etTitle_hint">Title is mandatory</string>
     <string name="etTitle_label">Title (File Name)</string>
     <string name="action_delete">Delete</string>
+    <string name="btUndo_title">Undo</string>
+    <string name="btRedo_text">Redo</string>
 </resources>
