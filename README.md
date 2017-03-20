@@ -2,8 +2,8 @@
 SNotepad is simple yet professional notepad app for android.
 The S stands for Suckless/Simple.
 
-<img src='screenshots/Screenshot_1489958851.png?raw=true'><img src='screenshots/Screenshot_1489958875.png?raw=true'><br/>
-<img src='screenshots/Screenshot_1489958882.png?raw=true'><img src='screenshots/Screenshot_1489958894.png?raw=true'><br/>
+<img src='screenshots/Screenshot_1489958851.png?raw=true'> <img src='screenshots/Screenshot_1489958875.png?raw=true'><br/>
+<img src='screenshots/Screenshot_1489958882.png?raw=true'> <img src='screenshots/Screenshot_1489958894.png?raw=true'><br/>
 <img src='screenshots/Screenshot_1489958932.png?raw=true'>
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
