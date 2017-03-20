@@ -11,7 +11,7 @@
     <string name="saving_path">Saving path:</string>
     <string name="btChangePath_title">Select Folder</string>
     <string name="tvVersion_text">Version: 1.0.0</string>
-    <string name="tvAbout_text">Copyright Aario Shahbany 2017<br/><br/>
+    <string name="tvAbout_text">Copyright (C) 2017 Aario Shahbany<br/><br/>
                 SNotepad is simple yet professional notepad app for android. The S
                 stands for Suckless/Simple.&lt;br/&gt;
                 While you enjoy the features of top modern notepad apps like multiple notes management
