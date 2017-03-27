@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 /**
  * Created by aario on 3/16/17.
@@ -97,6 +98,14 @@ public class Filer {
         } finally {
             return ret;
         }
+    }
+
+    public String getModifiedTimestamp(String filePath) {
+        File fl = new File(filePath);
+        String ret = "";
+        if (fl.exists())
+            ret = new Date(fl.lastModified()).toString();
+        return ret;
     }
 
 }

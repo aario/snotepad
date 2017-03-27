@@ -13,11 +13,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.SimpleAdapter;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +32,7 @@ public class ListFragment extends Fragment {
     private final String extension = ".txt";
     ListView lvFiles;
     SearchView svSearch;
-    ArrayList<String> filePathList = new ArrayList<String>();
+    ArrayList<String> fileNameList = new ArrayList<String>();
 
     Map<String, String> contentsCache = new HashMap<String, String>();
 
@@ -63,12 +65,23 @@ public class ListFragment extends Fragment {
     }
 
     private void populateFilesList() {
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, filePathList);
-        lvFiles.setAdapter(arrayAdapter);
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+        for (String fileName : fileNameList) {
+            Map<String, String> item = new HashMap<String, String>(2);
+            item.put("title", fileName);
+            item.put("date", activity.filer.getModifiedTimestamp(path + "/" + fileName));
+            data.add(item);
+        }
+        SimpleAdapter adapter = new SimpleAdapter(activity, data,
+                android.R.layout.simple_list_item_2,
+                new String[]{"title", "date"},
+                new int[]{android.R.id.text1,
+                        android.R.id.text2});
+        lvFiles.setAdapter(adapter);
     }
 
     private void search(String text) {
-        filePathList = searchFiles(text);
+        fileNameList = searchFiles(text);
         populateFilesList();
     }
 
@@ -98,7 +111,7 @@ public class ListFragment extends Fragment {
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                activity.editFile(path + "/" + filePathList.get(arg2));
+                activity.editFile(path + "/" + fileNameList.get(arg2));
             }
         });
         registerForContextMenu(lvFiles);
@@ -139,7 +152,7 @@ public class ListFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_delete) {
-            String filename = filePathList.get(itemInfo.position);
+            String filename = fileNameList.get(itemInfo.position);
             if (activity.filer.delete(path + "/" + filename)) {
                 search(svSearch.getQuery().toString());
                 activity.makeSnackBar("File " + filename + " successfully deleted.");
