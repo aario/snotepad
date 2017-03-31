@@ -98,6 +98,18 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        if (id == R.id.action_sort_by_name) {
+            listFragment.sort(false);
+            return true;
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_sort_by_date) {
+            listFragment.sort(true);
+            return true;
+        }
+
+        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             changeFragment(new SettingsFragment(), true);
             return true;

@@ -1,6 +1,7 @@
 package info.aario.snotepad;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -38,6 +39,14 @@ public class AboutFragment extends Fragment {
         } else {
             tvAbout.setText(Html.fromHtml(aboutHtml));
         }
+
+        TextView tvVersion = (TextView) view.findViewById(R.id.tvVersion);
+        try {
+            tvVersion.setText(tvVersion.getText() + activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            tvVersion.setVisibility(View.INVISIBLE);
+        }
+
         FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
         fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_dialog_info));
         fab.setOnClickListener(new View.OnClickListener() {

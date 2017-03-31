@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleAdapter;
@@ -18,6 +17,8 @@ import android.widget.SimpleAdapter;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class ListFragment extends Fragment {
     private MainActivity activity;
     private String path;
     private final String extension = ".txt";
+    private boolean sortByDate = false;
     ListView lvFiles;
     SearchView svSearch;
     ArrayList<String> fileNameList = new ArrayList<String>();
@@ -72,6 +74,21 @@ public class ListFragment extends Fragment {
             item.put("date", activity.filer.getModifiedTimestamp(path + "/" + fileName));
             data.add(item);
         }
+        Collections.sort(data, new Comparator<Map<String, String>>() {
+            @Override
+            public int compare(Map<String, String> o1, Map<String, String> o2) {
+                if (sortByDate)
+                    try {
+                        return activity.filer.dateFormat.parse(o2.get("date")).compareTo(
+                                activity.filer.dateFormat.parse(o1.get("date"))
+                        );
+                    } catch (Exception e) {
+                        return 0;
+                    }
+
+                return o2.get("title").compareTo(o1.get("title"));
+            }
+        });
         SimpleAdapter adapter = new SimpleAdapter(activity, data,
                 android.R.layout.simple_list_item_2,
                 new String[]{"title", "date"},
@@ -89,6 +106,11 @@ public class ListFragment extends Fragment {
         path = activity.getPath();
         contentsCache.clear();
         svSearch.setQuery("", true);
+    }
+
+    public void sort(boolean byDate) {
+        sortByDate = byDate;
+        populateFilesList();
     }
 
     public String proposeNewFilePath(String prefix) {

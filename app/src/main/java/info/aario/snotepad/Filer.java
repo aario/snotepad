@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -17,6 +18,7 @@ import java.util.Date;
 
 public class Filer {
     private MainActivity activity;
+    public SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public Filer(MainActivity mainActivity) {
         activity = mainActivity;
@@ -102,10 +104,9 @@ public class Filer {
 
     public String getModifiedTimestamp(String filePath) {
         File fl = new File(filePath);
-        String ret = "";
         if (fl.exists())
-            ret = new Date(fl.lastModified()).toString();
-        return ret;
+            return dateFormat.format(new Date(fl.lastModified()));
+        return "";
     }
 
 }
