@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -133,7 +134,7 @@ public class ListFragment extends Fragment {
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                activity.editFile(path + "/" + fileNameList.get(arg2));
+                activity.editFile(path + "/" + ((TextView) arg1.findViewById(android.R.id.text1)).getText().toString());
             }
         });
         registerForContextMenu(lvFiles);
@@ -174,7 +175,7 @@ public class ListFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_delete) {
-            String filename = fileNameList.get(itemInfo.position);
+            String filename = ((TextView) itemInfo.targetView.findViewById(android.R.id.text1)).getText().toString();
             if (activity.filer.delete(path + "/" + filename)) {
                 search(svSearch.getQuery().toString());
                 activity.makeSnackBar("File " + filename + " successfully deleted.");
