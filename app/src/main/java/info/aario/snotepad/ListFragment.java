@@ -31,7 +31,7 @@ public class ListFragment extends Fragment {
     private MainActivity activity;
     private String path;
     private final String extension = ".txt";
-    private boolean sortByDate = false;
+    private boolean sortByDate = true;
     ListView lvFiles;
     SearchView svSearch;
     ArrayList<String> fileNameList = new ArrayList<String>();
