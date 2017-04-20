@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">SNotepad</string>
+    <string name="action_refresh">更新</string>
+    <string name="action_sort_by_name">名前でソート</string>
+    <string name="action_sort_by_date">日付でソート</string>
+    <string name="action_settings">設定</string>
+    <string name="action_about">アプリについて</string>
+    <string name="etTitle_hint">タイトルは必須です</string>
+    <string name="etTitle_label">タイトル (ファイル名)</string>
+    <string name="action_delete">削除</string>
+    <string name="btUndo_title">元に戻す</string>
+    <string name="btRedo_text">繰り返し</string>
+    <string name="saving_path">保存パス:</string>
+    <string name="btChangePath_title">フォルダーを選択</string>
+    <string name="tvVersion_text">バージョン: </string>
+    <string name="tvAbout_text">Copyright (C) 2017 Aario Shahbany&lt;br/&gt;&lt;br/&gt;
+                SNotepad は シンプルながらプロフェッショナル向けの Android 用メモ帳アプリです。 The S
+                S は Suckless/Simple に由来します。&lt;br/&gt;
+                SNotepad は、複数のメモ管理や検索などの最新のメモ帳アプリの機能を提供していますが、
+                メモを特別なデータベースに保存するのではなく、直接内部ストレージや SD カードに保存します。
+                これは、電話を交換した場合や紛失した場合に備えて、貴重なメモをバックアップしたり、
+                毎回エクスポートする心配が必要なくなることを意味します。
+                設定ダイアログで保存パスを定義することもできます。 OwnCloud アプリをインストールしている場合は、
+                自分の owncloud フォルダーのアドレスを指定することもできます。したがって、
+                すべてのノートを OwnCloud でバックアップすることができます。&lt;br/&gt;
+                &lt;br/&gt;
+                SNotepad はオープンソースです。 ソフトウェアを書くには多くの時間と労力がかかります。
+                SNotepad が役に立つと思った場合は、右下のボタンをクリックして寄付していただくことを
+                検討してください。&lt;br/&gt;
+                ありがとうございます。</string>
+    <string name="donate_url">https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=UJTM2GDGPEFHA</string>
+    <string name="save_dialog_question">保存されていない変更があります。 保存しますか?</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="cancel">キャンセル</string>
+</resources>
