@@ -36,6 +36,15 @@ public class MainActivity extends AppCompatActivity {
         return sharedPref.getString("PATH", getExternalFilesDir(null).getAbsolutePath());
     }
 
+    public void open(String filePath) {
+        sharedPrefEditor.putString("CURRENT_OPENED_FILE_PATH", filePath);
+        sharedPrefEditor.commit();
+    }
+
+    public String getOpenedFilePath() {
+        return sharedPref.getString("CURRENT_OPENED_FILE_PATH", "");
+    }
+
     public void toast(String text) {
         Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
@@ -70,7 +79,13 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         sharedPrefEditor = sharedPref.edit();
         filer = new Filer(this);
-        changeFragment(listFragment, false);
+        String last_opened_file_path = getOpenedFilePath();
+        if (filer.exists(last_opened_file_path)) {
+            editFile(last_opened_file_path);
+        } else {
+            open("");//Clear last opened file path
+            changeFragment(listFragment, false); //Show list of files to open
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -86,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     public void editFile(String filePath) {
         EditorFragment ef = new EditorFragment();
         changeFragment(ef, true);
-        ef.open(filePath);
+        open(filePath);
         editor_modified = false;
     }
 

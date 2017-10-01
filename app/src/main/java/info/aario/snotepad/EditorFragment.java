@@ -21,10 +21,10 @@ import java.util.ArrayList;
 
 public class EditorFragment extends Fragment {
     private MainActivity activity;
-    private String path;
     private String name;
     private EditText etEditor;
     private EditText etTitle;
+    private String path;
     ArrayList<String> textUndoHistory = new ArrayList<String>();
     ArrayList<Integer> selectionStartUndoHistory = new ArrayList<Integer>();
     ArrayList<Integer> selectionEndUndoHistory = new ArrayList<Integer>();
@@ -89,6 +89,7 @@ public class EditorFragment extends Fragment {
         FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
         fab.setVisibility(View.INVISIBLE);
         etTitle = (EditText) view.findViewById(R.id.etTitle);
+        path = activity.getOpenedFilePath();
         name = activity.filer.getFileNameWithoutExtension(path);
         etTitle.setText(name);
         etEditor = (EditText) view.findViewById(R.id.etEditor);
@@ -161,7 +162,4 @@ public class EditorFragment extends Fragment {
         startActivity(sendIntent);
     }
 
-    public void open(String filePath) {
-        path = filePath;
-    }
 }
