@@ -1,5 +1,6 @@
 package info.aario.snotepad;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -30,6 +31,7 @@ public class EditorFragment extends Fragment {
     private Button btUndo;
     private Button btRedo;
     private Button btSave;
+    private Button btShare;
     private int undoHistoryCursor = 0;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -120,7 +122,18 @@ public class EditorFragment extends Fragment {
                 save();
             }
         });
+        btShare = (Button) view.findViewById(R.id.btShare);
+        btShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                share();
+            }
+        });
         return view;
+    }
+
+    private String getEditorText() {
+        return etEditor.getText().toString();
     }
 
     private void save() {
@@ -132,12 +145,20 @@ public class EditorFragment extends Fragment {
             name = activity.filer.getFileNameWithoutExtension(path);
         }
 
-        if (activity.filer.writeToFile(path, etEditor.getText().toString())) {
+        if (activity.filer.writeToFile(path, getEditorText())) {
             activity.makeSnackBar("Changes saved to " + path);
             if (rename)
                 activity.filer.delete(oldPath);
             activity.editor_modified = false;
         }
+    }
+
+    private void share() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, getEditorText());
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
     }
 
     public void open(String filePath) {

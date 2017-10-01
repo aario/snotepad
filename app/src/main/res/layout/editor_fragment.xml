@@ -36,6 +36,13 @@
             android:background="@android:drawable/ic_menu_save"
             android:enabled="true" />
 
+        <Button
+            android:id="@+id/btShare"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/ic_menu_share"
+            android:enabled="true" />
+
     </android.support.v7.widget.Toolbar>
 
     <TextView
