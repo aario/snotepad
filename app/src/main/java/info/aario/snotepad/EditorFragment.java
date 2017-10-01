@@ -29,6 +29,7 @@ public class EditorFragment extends Fragment {
     ArrayList<Integer> selectionEndUndoHistory = new ArrayList<Integer>();
     private Button btUndo;
     private Button btRedo;
+    private Button btSave;
     private int undoHistoryCursor = 0;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -84,13 +85,7 @@ public class EditorFragment extends Fragment {
         activity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.editor_fragment, container, false);
         FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
-        fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_menu_save));
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                save();
-            }
-        });
+        fab.setVisibility(View.INVISIBLE);
         etTitle = (EditText) view.findViewById(R.id.etTitle);
         name = activity.filer.getFileNameWithoutExtension(path);
         etTitle.setText(name);
@@ -118,6 +113,13 @@ public class EditorFragment extends Fragment {
             }
         });
         saveUndoRedo();
+        btSave = (Button) view.findViewById(R.id.btSave);
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                save();
+            }
+        });
         return view;
     }
 

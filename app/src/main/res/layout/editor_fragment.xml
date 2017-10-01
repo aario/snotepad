@@ -12,21 +12,29 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        android:weightSum="1">
 
         <Button
             android:id="@+id/btUndo"
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="@string/btUndo_title" />
+            android:background="@drawable/ic_undo"
+            android:enabled="false" />
 
         <Button
             android:id="@+id/btRedo"
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="@string/btRedo_text" />
+            android:background="@drawable/ic_redo"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btSave"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/ic_menu_save"
+            android:enabled="true" />
 
     </android.support.v7.widget.Toolbar>
 

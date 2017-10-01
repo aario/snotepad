@@ -153,6 +153,7 @@ public class ListFragment extends Fragment {
             }
         });
         FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
+        fab.setVisibility(View.VISIBLE);
         fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_input_add));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
