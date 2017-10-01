@@ -48,7 +48,8 @@ public class ListFragment extends Fragment {
     }
 
     private Boolean searchFile(String filename, String text) {
-        return filename.contains(text) || readFile(filename).contains(text);
+        String lower = text.toLowerCase();
+        return filename.toLowerCase().contains(lower) || readFile(filename).toLowerCase().contains(lower);
     }
 
     private ArrayList<String> searchFiles(String text) {
