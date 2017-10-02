@@ -1,18 +1,24 @@
 package info.aario.snotepad;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -20,6 +26,7 @@ import android.widget.Toast;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "SNOTEPAD";
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedPrefEditor;
     private FloatingActionButton fab;
@@ -39,10 +46,48 @@ public class MainActivity extends AppCompatActivity {
         return getExternalFilesDir(null).getAbsolutePath();
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if ((grantResults.length > 0)&&(grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            Log.v(TAG, "Permission: " + permissions[0] + "was " + grantResults[0]);
+            //resume tasks needing this permission
+        }
+    }
+
+    private boolean isInExternalStorage(String path) {
+        return path.startsWith(Environment.getExternalStorageDirectory().getAbsolutePath());
+    }
+
+    private boolean isPermissionGrantedForStorage() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.v(TAG, "Permission is granted");
+                return true;
+            } else {
+
+                Log.v(TAG, "Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                return false;
+            }
+        } else {
+            //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG, "Permission is granted");
+            return true;
+        }
+    }
+
     public String getPath() {
         String path = sharedPref.getString("PATH", getDefaultPath());
         File file = new File(path);
-        if (!file.canWrite()) {
+        if (
+                (
+                        (isInExternalStorage(path))
+                                && (!isPermissionGrantedForStorage())
+                )
+                        || (!file.canWrite())
+                ) {
             String old_path = path;
             path = getDefaultPath();
             toast("The path " + old_path + " was not writable. Falling back to default path: " + path);

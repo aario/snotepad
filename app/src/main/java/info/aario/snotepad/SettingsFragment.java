@@ -39,6 +39,7 @@ public class SettingsFragment extends Fragment {
         btChangePath.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                activity.isPermissionGrantedForStorage();
                 // This always works
                 Intent i = new Intent(activity, FilePickerActivity.class);
                 // This works if you defined the intent filter
