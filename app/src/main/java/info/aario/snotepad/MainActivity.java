@@ -17,6 +17,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedPrefEditor;
@@ -33,8 +35,20 @@ public class MainActivity extends AppCompatActivity {
         listFragment.refresh();
     }
 
+    private String getDefaultPath() {
+        return getExternalFilesDir(null).getAbsolutePath();
+    }
+
     public String getPath() {
-        return sharedPref.getString("PATH", getExternalFilesDir(null).getAbsolutePath());
+        String path = sharedPref.getString("PATH", getDefaultPath());
+        File file = new File(path);
+        if (!file.canWrite()) {
+            String old_path = path;
+            path = getDefaultPath();
+            toast("The path " + old_path + " was not writable. Falling back to default path: " + path);
+            setPath(path);
+        }
+        return path;
     }
 
     public void setLastOpenedFilePath(String filePath) {
