@@ -59,12 +59,21 @@
         android:hint="@string/etTitle_hint"
         android:inputType="textCapWords|textPersonName" />
 
-    <EditText
-        android:id="@+id/etEditor"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:ems="10"
-        android:gravity="top"
-        android:inputType="textCapSentences|textMultiLine"
-        android:scrollbars="horizontal|vertical" />
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fadingEdge="none"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etEditor"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:ems="10"
+            android:gravity="top"
+            android:inputType="textCapSentences|textMultiLine"
+            android:overScrollMode="always"
+            android:scrollbars="horizontal|vertical" />
+    </ScrollView>
 </LinearLayout>
