@@ -137,7 +137,7 @@ public class EditorFragment extends Fragment {
         return etEditor.getText().toString();
     }
 
-    private void save() {
+    public void save() {
         String newName = etTitle.getText().toString();
         String oldPath = path;
         boolean rename = (!newName.equals(name));

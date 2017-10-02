@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedPrefEditor;
     private FloatingActionButton fab;
+    private EditorFragment currentEditorFragment;
     CoordinatorLayout coordinatorLayoutForSnackBar;
     ListFragment listFragment = new ListFragment();
     public Filer filer;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         return sharedPref.getString("PATH", getExternalFilesDir(null).getAbsolutePath());
     }
 
-    public void open(String filePath) {
+    public void setLastOpenedFilePath(String filePath) {
         sharedPrefEditor.putString("CURRENT_OPENED_FILE_PATH", filePath);
         sharedPrefEditor.commit();
     }
@@ -79,12 +80,12 @@ public class MainActivity extends AppCompatActivity {
         sharedPref = getPreferences(Context.MODE_PRIVATE);
         sharedPrefEditor = sharedPref.edit();
         filer = new Filer(this);
+        changeFragment(listFragment, false); //Show list of files to setLastOpenedFilePath
         String last_opened_file_path = getOpenedFilePath();
         if (filer.exists(last_opened_file_path)) {
             editFile(last_opened_file_path);
         } else {
-            open("");//Clear last opened file path
-            changeFragment(listFragment, false); //Show list of files to open
+            setLastOpenedFilePath("");//Clear last opened file path
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -99,9 +100,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void editFile(String filePath) {
-        EditorFragment ef = new EditorFragment();
-        changeFragment(ef, true);
-        open(filePath);
+        currentEditorFragment = new EditorFragment();
+        changeFragment(currentEditorFragment, true);
+        setLastOpenedFilePath(filePath);
         editor_modified = false;
     }
 
@@ -151,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (count == 0) {
             super.onBackPressed();
-            //additional code
         } else if (editor_modified) {
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
@@ -159,14 +159,18 @@ public class MainActivity extends AppCompatActivity {
                     switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             //Yes button clicked
-                            fab.callOnClick();//Save document
+                            currentEditorFragment.save();
+                            break;
                         case DialogInterface.BUTTON_NEGATIVE:
                             //No button clicked
                             getSupportFragmentManager().popBackStack();
+                            break;
                         case DialogInterface.BUTTON_NEUTRAL:
                             //Cancel button clicked
                             return;
                     }
+                    setLastOpenedFilePath("");//Clear last opened file path
+                    getSupportFragmentManager().popBackStack();
                 }
             };
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -176,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     .setNeutralButton(getResources().getString(R.string.cancel), dialogClickListener)
                     .show();
         } else {
+            setLastOpenedFilePath("");//Clear last opened file path
             getSupportFragmentManager().popBackStack();
         }
     }
