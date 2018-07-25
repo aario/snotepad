@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -129,8 +131,16 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         activity = (MainActivity) getActivity();
-        View view = inflater.inflate(R.layout.list_fragment, container, false);
         // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.list_fragment, container, false);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.listToolbar);
+
+        //Set global action bar to this fragment's actions
+        AppCompatActivity rootActivity = (AppCompatActivity) getActivity();
+        rootActivity.setSupportActionBar(toolbar);
+        rootActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         lvFiles = (ListView) view.findViewById(R.id.filesList);
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

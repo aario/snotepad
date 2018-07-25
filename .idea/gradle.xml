@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="/data/aario-debian-8-home/Documents/Projects/Computer/Android/snotepad" />
-            <option value="/data/aario-debian-8-home/Documents/Projects/Computer/Android/snotepad/app" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

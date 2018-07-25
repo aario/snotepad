@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,6 +89,15 @@ public class EditorFragment extends Fragment {
         setHasOptionsMenu(true);
         activity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.editor_fragment, container, false);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+
+        //Set global action bar to this fragment's actions
+        AppCompatActivity rootActivity = (AppCompatActivity) getActivity();
+        rootActivity.setSupportActionBar(toolbar);
+        rootActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        rootActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
         fab.setVisibility(View.INVISIBLE);
         etTitle = (EditText) view.findViewById(R.id.etTitle);
@@ -99,7 +111,8 @@ public class EditorFragment extends Fragment {
         textUndoHistory.clear();
         selectionStartUndoHistory.clear();
         selectionEndUndoHistory.clear();
-        btUndo = (Button) view.findViewById(R.id.btUndo);
+        View rootView = view.getRootView();
+        btUndo = (Button) rootView.findViewById(R.id.btUndo);
         btUndo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
