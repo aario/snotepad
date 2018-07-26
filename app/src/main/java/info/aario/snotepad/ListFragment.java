@@ -2,7 +2,7 @@ package info.aario.snotepad;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +35,7 @@ public class ListFragment extends Fragment {
     private String path;
     private final String extension = ".txt";
     private boolean sortByDate = true;
+    private FloatingActionButton fab;
     ListView lvFiles;
     SearchView svSearch;
     ArrayList<String> fileNameList = new ArrayList<String>();
@@ -106,10 +107,14 @@ public class ListFragment extends Fragment {
         populateFilesList();
     }
 
-    public void refresh() {
-        path = activity.getPath();
+    public void refresh(boolean requestPermissions) {
+        path = activity.getPath(requestPermissions);
         contentsCache.clear();
         svSearch.setQuery("", true);
+    }
+
+    public void refresh(){
+        refresh(true);
     }
 
     public void sort(boolean byDate) {
@@ -163,7 +168,8 @@ public class ListFragment extends Fragment {
                 return true;
             }
         });
-        FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
+        activity = (MainActivity) getActivity();
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setVisibility(View.VISIBLE);
         fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_input_add));
         fab.setOnClickListener(new View.OnClickListener() {
@@ -195,5 +201,11 @@ public class ListFragment extends Fragment {
         }
 
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
     }
 }

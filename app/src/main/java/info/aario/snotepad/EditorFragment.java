@@ -3,7 +3,7 @@ package info.aario.snotepad;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 public class EditorFragment extends Fragment {
     private MainActivity activity;
     private String name;
+    private View view;
     private EditText etEditor;
     private EditText etTitle;
     private String path;
@@ -88,7 +89,7 @@ public class EditorFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         activity = (MainActivity) getActivity();
-        View view = inflater.inflate(R.layout.editor_fragment, container, false);
+        view = inflater.inflate(R.layout.editor_fragment, container, false);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
 
@@ -98,8 +99,7 @@ public class EditorFragment extends Fragment {
         rootActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         rootActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
-        fab.setVisibility(View.INVISIBLE);
+
         etTitle = (EditText) view.findViewById(R.id.etTitle);
         path = activity.getOpenedFilePath();
         name = activity.filer.getFileNameWithoutExtension(path);
