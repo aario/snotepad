@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,7 +172,6 @@ public class ListFragment extends Fragment {
         activity = (MainActivity) getActivity();
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setVisibility(View.VISIBLE);
-        fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_input_add));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -201,6 +201,15 @@ public class ListFragment extends Fragment {
         }
 
         return true;
+    }
+
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (menu != null) {
+            menu.findItem(R.id.action_refresh).setVisible(true);
+            menu.findItem(R.id.action_sort_by_name).setVisible(true);
+            menu.findItem(R.id.action_sort_by_date).setVisible(true);
+            activity.invalidateOptionsMenu();
+        }
     }
 
     @Override

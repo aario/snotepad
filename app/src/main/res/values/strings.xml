@@ -39,6 +39,7 @@
     <string name="pref_title_settings">Settings</string>
     <string name="pref_title_system_settings">System Settings</string>
     <string name="save_location">Save Location</string>
+    <string name="donate_call_to_action">Donate now via PayPal</string>
     <string-array
         name="save_location_names">
         <item>internal (deleted with uninstall)</item>

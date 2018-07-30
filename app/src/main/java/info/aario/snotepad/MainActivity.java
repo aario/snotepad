@@ -199,7 +199,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_about) {
-            changeFragment(new AboutFragment(), true);
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
             return true;
         }
 

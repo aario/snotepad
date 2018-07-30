@@ -11,6 +11,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -84,6 +86,15 @@ public class EditorFragment extends Fragment {
         btRedo.setEnabled(textUndoHistory.size() > 0 && undoHistoryCursor < textUndoHistory.size() - 1);
     }
 
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (menu != null) {
+            menu.findItem(R.id.action_refresh).setVisible(false);
+            menu.findItem(R.id.action_sort_by_name).setVisible(false);
+            menu.findItem(R.id.action_sort_by_date).setVisible(false);
+            activity.invalidateOptionsMenu();
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -99,6 +110,7 @@ public class EditorFragment extends Fragment {
         rootActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         rootActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        setHasOptionsMenu(true);
 
         etTitle = (EditText) view.findViewById(R.id.etTitle);
         path = activity.getOpenedFilePath();
