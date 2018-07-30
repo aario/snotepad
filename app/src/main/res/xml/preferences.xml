@@ -1,37 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/pref_title_system_settings">
-        <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/saving_path" />-->
-
-        <!--<TextView-->
-        <!--android:id="@+id/tvPath"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:fontFamily="serif-monospace"-->
-        <!--android:text="saving path here"-->
-        <!--android:textSize="24sp" />-->
-
-        <!--<Button-->
-        <!--android:id="@+id/btChangePath"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/btChangePath_title" />-->
-        <!--<ListPreference-->
-        <!--android:defaultValue="night"-->
-        <!--android:entries="@array/app_theme_names"-->
-        <!--android:entryValues="@array/app_theme_values"-->
-        <!--android:key="appTheme"-->
-        <!--android:summary="%s"-->
-        <!--android:title="@string/pref_title_app_theme" />-->
-
-        <!--<com.keylesspalace.tusky.EmojiPreference-->
-        <!--android:defaultValue="@string/system_default"-->
-        <!--android:key="emojiCompat"-->
-        <!--android:summary="@string/system_default"-->
-        <!--android:title="@string/emoji_style"/>-->
         <ListPreference
             android:defaultValue="internal"
             android:entries="@array/save_location_names"
@@ -39,33 +8,11 @@
             android:key="saveLocation"
             android:summary="%s"
             android:title="@string/save_location" />
-
         <Preference
             android:defaultValue="@string/default_shared_path"
             android:key="PATH"
+            android:enabled="false"
             android:summary="@string/default_shared_path"
             android:title="@string/saving_path" />
-
-        <!--<CheckBoxPreference-->
-        <!--android:defaultValue="false"-->
-        <!--android:key="fabHide"-->
-        <!--android:title="@string/pref_title_hide_follow_button" />-->
-
-        <!--<CheckBoxPreference-->
-        <!--android:defaultValue="true"-->
-        <!--android:key="mediaPreviewEnabled"-->
-        <!--android:title="@string/pref_title_show_media_preview" />-->
-
-        <!--<CheckBoxPreference-->
-        <!--android:defaultValue="false"-->
-        <!--android:dependency="mediaPreviewEnabled"-->
-        <!--android:key="alwaysShowSensitiveMedia"-->
-        <!--android:title="@string/pref_title_alway_show_sensitive_media" />-->
-
     </PreferenceCategory>
-
-    <!--<PreferenceCategory android:title="@string/pref_test">-->
-
-    <!--</PreferenceCategory>-->
-
 </PreferenceScreen>

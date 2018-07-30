@@ -30,15 +30,24 @@ public class SettingsFragment extends PreferenceFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activity = (AppCompatActivity) getActivity();
-        Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
-        activity.setSupportActionBar(toolbar);
-
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
 
+        activity = (AppCompatActivity) getActivity();
+        Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
+        activity.setSupportActionBar(toolbar);
+        final Preference pathPref = findPreference("PATH");
+        Preference saveLocation = (Preference) findPreference("saveLocation");
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         Preference savePathPref = (Preference) findPreference("PATH");
+
+        //check if path to save notes should be enabled
+        if (preferences.getString("saveLocation", "internal").equals("internal")){
+            pathPref.setEnabled(false);
+        } else {
+            pathPref.setEnabled(true);
+        }
 
         savePathPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -66,65 +75,21 @@ public class SettingsFragment extends PreferenceFragment {
             }
         });
 
-        Preference saveLocation = (Preference) findPreference("saveLocation");
-
-        saveLocation.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        saveLocation.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference){
-
-
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                if (newValue.equals("shared")) {
+                    pathPref.setEnabled(true);
+                } else {
+                    pathPref.setEnabled(false);
+                }
                 return true;
             }
         });
 
-        Preference pref = findPreference("PATH");
-        pref.setSummary(preferences.getString("PATH", activity.getString(R.string.default_shared_path)));
+        pathPref.setSummary(preferences.getString("PATH", activity.getString(R.string.default_shared_path)));
 
     }
-
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        setHasOptionsMenu(true);
-//        activity = (MainActivity) getActivity();
-//        View view = inflater.inflate(R.layout.settings_fragment, container, false);
-//        tvPath = (TextView) view.findViewById(R.id.tvPath);
-//        tvPath.setText(activity.getPath());
-//        btChangePath = (Button) view.findViewById(R.id.btChangePath);
-//        btChangePath.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // This always works
-//                Intent i = new Intent(activity, FilePickerActivity.class);
-//                // This works if you defined the intent filter
-//                // Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-//
-//                // Set these depending on your use case. These are the defaults.
-//                i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
-//                i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
-//                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
-//
-//                // Configure initial directory by specifying a String.
-//                // You could specify a String like "/storage/emulated/0/", but that can
-//                // dangerous. Always use Android's API calls to get paths to the SD-card or
-//                // internal memory.
-//                i.putExtra(FilePickerActivity.EXTRA_START_PATH, activity.getPath());
-//
-//                startActivityForResult(i, FILE_CODE);
-//            }
-//        });
-//        FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
-//        fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_menu_save));
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                activity.setPath(tvPath.getText().toString());
-//                getFragmentManager().popBackStack();
-//            }
-//        });
-//
-//        return view;
-//    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -151,9 +116,5 @@ public class SettingsFragment extends PreferenceFragment {
     public void onPause() {
         super.onPause();
         AppCompatActivity rootActivity = (AppCompatActivity) getActivity();
-//        Toolbar toolbar = (Toolbar) rootActivity.findViewById(R.id.toolbar);
-//        rootActivity.getSupportActionBar().hide();
-//        rootActivity.setSupportActionBar(toolbar);
-//        rootActivity.getSupportActionBar().show();
     }
 }
