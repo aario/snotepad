@@ -219,33 +219,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (count == 0) {
             super.onBackPressed();
-        } else if (editor_modified) {
-            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    switch (which) {
-                        case DialogInterface.BUTTON_POSITIVE:
-                            //Yes button clicked
-                            currentEditorFragment.save();
-                            break;
-                        case DialogInterface.BUTTON_NEGATIVE:
-                            //No button clicked
-                            getFragmentManager().popBackStack();
-                            break;
-                        case DialogInterface.BUTTON_NEUTRAL:
-                            //Cancel button clicked
-                            return;
-                    }
-                    setLastOpenedFilePath("");//Clear last opened file path
-                    getFragmentManager().popBackStack();
-                }
-            };
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(getResources().getString(R.string.save_dialog_question))
-                    .setPositiveButton(getResources().getString(R.string.yes), dialogClickListener)
-                    .setNegativeButton(getResources().getString(R.string.no), dialogClickListener)
-                    .setNeutralButton(getResources().getString(R.string.cancel), dialogClickListener)
-                    .show();
         } else {
             setLastOpenedFilePath("");//Clear last opened file path
             getFragmentManager().popBackStack();
@@ -253,8 +226,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-
-//TODO disable settings
-//TODO fix icons
-//TODO Refresh list after location change
-//TODO move from internal to shared
