@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,16 +39,22 @@ public class EditorFragment extends Fragment {
     private Button btRedo;
     private Button btSave;
     private Button btShare;
+    private long tLastEdit;
     private int undoHistoryCursor = 0;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (System.currentTimeMillis() - tLastEdit > 1000 ||
+                Math.abs(etEditor.getText().length() - textUndoHistory.get(undoHistoryCursor).toString().length()) > 8 ||
+                charSequence.charAt(charSequence.length() - 2) == ' '   ) {
+
+                saveUndoRedo();
+            }
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            saveUndoRedo();
+            tLastEdit = System.currentTimeMillis();
         }
 
         @Override
@@ -122,6 +129,13 @@ public class EditorFragment extends Fragment {
         if (activity.filer.exists(path))
             etEditor.setText(activity.filer.getStringFromFile(path));
         etEditor.addTextChangedListener(textWatcher);
+        etEditor.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                Log.i("KEY", Integer.toString(keyCode));
+                if(event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_SPACE) saveUndoRedo();
+                return false;
+            }
+        });
         textUndoHistory.clear();
         selectionStartUndoHistory.clear();
         selectionEndUndoHistory.clear();
@@ -142,6 +156,7 @@ public class EditorFragment extends Fragment {
                 retrieveUndoRedo();
             }
         });
+        tLastEdit = System.currentTimeMillis();
         saveUndoRedo();
         return view;
     }
