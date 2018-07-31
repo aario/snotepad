@@ -39,16 +39,6 @@
             android:layout_marginLeft="20dp"
             android:background="@drawable/ic_share_white_24dp"
             android:enabled="true" />
-        <Button
-            android:id="@+id/btSave"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="4dp"
-            android:layout_gravity="right"
-            android:background="@drawable/ic_save_white_24dp"
-            android:enabled="true" />
-
-
 
     </android.support.v7.widget.Toolbar>
 

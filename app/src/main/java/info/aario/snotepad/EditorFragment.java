@@ -46,12 +46,14 @@ public class EditorFragment extends Fragment {
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
             saveUndoRedo();
         }
 
         @Override
         public void afterTextChanged(Editable editable) {
             activity.editor_modified = true;
+            save();
         }
     };
 
@@ -141,20 +143,6 @@ public class EditorFragment extends Fragment {
             }
         });
         saveUndoRedo();
-        btSave = (Button) view.findViewById(R.id.btSave);
-        btSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                save();
-            }
-        });
-        btShare = (Button) view.findViewById(R.id.btShare);
-        btShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                share();
-            }
-        });
         return view;
     }
 
@@ -172,7 +160,6 @@ public class EditorFragment extends Fragment {
         }
 
         if (activity.filer.writeToFile(path, getEditorText())) {
-            activity.makeSnackBar("Changes saved to " + path);
             if (rename)
                 activity.filer.delete(oldPath);
             activity.editor_modified = false;
