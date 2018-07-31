@@ -40,21 +40,23 @@ public class EditorFragment extends Fragment {
     private Button btSave;
     private Button btShare;
     private long tLastEdit;
+    private String previousText;
     private int undoHistoryCursor = 0;
     TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             if (System.currentTimeMillis() - tLastEdit > 1000 ||
-                Math.abs(etEditor.getText().length() - textUndoHistory.get(undoHistoryCursor).toString().length()) > 8 ||
-                charSequence.charAt(charSequence.length() - 2) == ' '   ) {
-
+                Math.abs(etEditor.getText().length() - textUndoHistory.get(undoHistoryCursor).toString().length()) > 8 ) {
                 saveUndoRedo();
             }
+            previousText = new String(charSequence.toString());
         }
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             tLastEdit = System.currentTimeMillis();
+//            activity.toast(lastChar(previousText,charSequence.toString()) + "");
+            if (lastChar(previousText, charSequence.toString()) == ' ') saveUndoRedo();
         }
 
         @Override
@@ -95,6 +97,31 @@ public class EditorFragment extends Fragment {
         btRedo.setEnabled(textUndoHistory.size() > 0 && undoHistoryCursor < textUndoHistory.size() - 1);
     }
 
+    public char lastChar(String oldStr, String newStr){
+        String shorter, longer;
+//        Log.d("string",oldStr+"");
+//        Log.d("string",newStr+"");
+
+        //find which string is shorter so that we don't end up out of bounds
+        if (oldStr.length()<newStr.length() ) {
+            shorter = oldStr;
+            longer = newStr;
+        } else {
+            shorter = newStr;
+            longer = oldStr;
+        }
+
+        //find the first character that is different and return it
+        for (int i = 0; i < shorter.length(); i++) {
+            if (longer.charAt(i) != shorter.charAt(i)) return longer.charAt(i);
+        }
+
+        //if no characters are different then return the last char of the longer string
+        //this means that the undo will be saved if the last char the user erased is a space
+        Log.d("longer",longer);
+        return(longer.charAt(longer.length()-1));
+    }
+
     public void onPrepareOptionsMenu(Menu menu) {
         if (menu != null) {
             menu.findItem(R.id.action_refresh).setVisible(false);
@@ -129,13 +156,7 @@ public class EditorFragment extends Fragment {
         if (activity.filer.exists(path))
             etEditor.setText(activity.filer.getStringFromFile(path));
         etEditor.addTextChangedListener(textWatcher);
-        etEditor.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                Log.i("KEY", Integer.toString(keyCode));
-                if(event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_SPACE) saveUndoRedo();
-                return false;
-            }
-        });
+
         textUndoHistory.clear();
         selectionStartUndoHistory.clear();
         selectionEndUndoHistory.clear();
@@ -144,6 +165,10 @@ public class EditorFragment extends Fragment {
         btUndo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //due to grouping the last few keystrokes might not have been saved
+                //save them now except if we are in the middle of an undo streak
+                //(we don't want to reset the undo stack on every undo)
+                if (undoHistoryCursor == textUndoHistory.size() - 1) saveUndoRedo();
                 undoHistoryCursor--;
                 retrieveUndoRedo();
             }
@@ -158,6 +183,7 @@ public class EditorFragment extends Fragment {
         });
         tLastEdit = System.currentTimeMillis();
         saveUndoRedo();
+        previousText = (String)etEditor.getText().toString();
         return view;
     }
 
