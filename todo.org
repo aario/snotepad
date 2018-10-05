@@ -1,0 +1,6 @@
+** tasks
+* autosave
+* themes
+* pygments
+* open intent
+* save as

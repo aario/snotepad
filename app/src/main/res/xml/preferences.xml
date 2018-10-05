@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_title_system_settings">
+        <ListPreference
+            android:defaultValue="internal"
+            android:entries="@array/save_location_names"
+            android:entryValues="@array/save_location_values"
+            android:key="saveLocation"
+            android:summary="%s"
+            android:title="@string/save_location" />
+        <Preference
+            android:defaultValue="@string/default_shared_path"
+            android:key="PATH"
+            android:enabled="false"
+            android:summary="@string/default_shared_path"
+            android:title="@string/saving_path" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -2,10 +2,13 @@ package info.aario.snotepad;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +36,7 @@ public class ListFragment extends Fragment {
     private String path;
     private final String extension = ".txt";
     private boolean sortByDate = true;
+    private FloatingActionButton fab;
     ListView lvFiles;
     SearchView svSearch;
     ArrayList<String> fileNameList = new ArrayList<String>();
@@ -104,10 +108,14 @@ public class ListFragment extends Fragment {
         populateFilesList();
     }
 
-    public void refresh() {
-        path = activity.getPath();
+    public void refresh(boolean requestPermissions) {
+        path = activity.getPath(requestPermissions);
         contentsCache.clear();
         svSearch.setQuery("", true);
+    }
+
+    public void refresh(){
+        refresh(true);
     }
 
     public void sort(boolean byDate) {
@@ -129,8 +137,16 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         activity = (MainActivity) getActivity();
-        View view = inflater.inflate(R.layout.list_fragment, container, false);
         // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.list_fragment, container, false);
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.listToolbar);
+
+        //Set global action bar to this fragment's actions
+        AppCompatActivity rootActivity = (AppCompatActivity) getActivity();
+        rootActivity.setSupportActionBar(toolbar);
+        rootActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         lvFiles = (ListView) view.findViewById(R.id.filesList);
         lvFiles.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -153,9 +169,9 @@ public class ListFragment extends Fragment {
                 return true;
             }
         });
-        FloatingActionButton fab = (FloatingActionButton) activity.findViewById(R.id.fab);
+        activity = (MainActivity) getActivity();
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
         fab.setVisibility(View.VISIBLE);
-        fab.setImageDrawable(ContextCompat.getDrawable(activity, android.R.drawable.ic_input_add));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -185,5 +201,20 @@ public class ListFragment extends Fragment {
         }
 
         return true;
+    }
+
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (menu != null) {
+            menu.findItem(R.id.action_refresh).setVisible(true);
+            menu.findItem(R.id.action_sort_by_name).setVisible(true);
+            menu.findItem(R.id.action_sort_by_date).setVisible(true);
+            activity.invalidateOptionsMenu();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
     }
 }

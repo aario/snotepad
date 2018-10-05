@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:key="@string/preferences_file_key">
+
+    <PreferenceCategory android:title="@string/pref_title_appearance_settings">
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/saving_path" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/tvPath"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:fontFamily="serif-monospace"-->
+        <!--android:text="saving path here"-->
+        <!--android:textSize="24sp" />-->
+
+        <!--<Button-->
+        <!--android:id="@+id/btChangePath"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/btChangePath_title" />-->
+        <!--<ListPreference-->
+        <!--android:defaultValue="night"-->
+        <!--android:entries="@array/app_theme_names"-->
+        <!--android:entryValues="@array/app_theme_values"-->
+        <!--android:key="appTheme"-->
+        <!--android:summary="%s"-->
+        <!--android:title="@string/pref_title_app_theme" />-->
+
+        <!--<com.keylesspalace.tusky.EmojiPreference-->
+        <!--android:defaultValue="@string/system_default"-->
+        <!--android:key="emojiCompat"-->
+        <!--android:summary="@string/system_default"-->
+        <!--android:title="@string/emoji_style"/>-->
+
+        <StringPreference
+            android:defaultValue="@string/saving_path"
+            android:key="PATH"
+            android:summary="%s"
+            android:title="@string/saving_path" />
+
+        <!--<CheckBoxPreference-->
+        <!--android:defaultValue="false"-->
+        <!--android:key="fabHide"-->
+        <!--android:title="@string/pref_title_hide_follow_button" />-->
+
+        <!--<CheckBoxPreference-->
+        <!--android:defaultValue="true"-->
+        <!--android:key="mediaPreviewEnabled"-->
+        <!--android:title="@string/pref_title_show_media_preview" />-->
+
+        <!--<CheckBoxPreference-->
+        <!--android:defaultValue="false"-->
+        <!--android:dependency="mediaPreviewEnabled"-->
+        <!--android:key="alwaysShowSensitiveMedia"-->
+        <!--android:title="@string/pref_title_alway_show_sensitive_media" />-->
+
+    </PreferenceCategory>
+
+    <!--<PreferenceCategory android:title="@string/pref_test">-->
+    <!--<ListPreference-->
+    <!--android:defaultValue="public"-->
+    <!--android:entries="@array/post_privacy_names"-->
+    <!--android:entryValues="@array/post_privacy_values"-->
+    <!--android:key="defaultPostPrivacy"-->
+    <!--android:summary="%s"-->
+    <!--android:title="@string/pref_default_post_privacy" />-->
+    <!--</PreferenceCategory>-->
+
+</PreferenceScreen>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/listToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    </android.support.v7.widget.Toolbar>
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        AppCompatActivity rootActivity = (AppCompatActivity) getActivity();
+        Toolbar toolbar = (Toolbar) rootActivity.findViewById(R.id.toolbar);
+//        rootActivity.setSupportActionBar(toolbar);
+        rootActivity.getSupportActionBar().hide();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppCompatActivity rootActivity = (AppCompatActivity) getActivity();
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        rootActivity.setSupportActionBar(toolbar);
+        rootActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        rootActivity.getSupportActionBar().show();
+        activity.toast("resume");
+    }
+
+
+
+
+package info.aario.snotepad;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+
+public class SettingsActivity extends PreferenceActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.activity_settings, root, false);
+        root.addView(bar, 0); // insert at top
+        bar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        addPreferencesFromResource(R.xml.preferences);
+
+    }
+}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+package info.aario.snotepad;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
+import android.view.MenuItem;
+
+public class SettingsActivity extends PreferenceActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        addPreferencesFromResource(R.xml.preferences);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+}
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
+
+
+//        getSupportActionBar().setTitle(this.getString(R.string.pref_title_settings));
