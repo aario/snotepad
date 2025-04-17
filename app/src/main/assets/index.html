@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SNotePad Interface</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 15px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 5px 0;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+             background-color: #004085;
+        }
+        input[type="text"], textarea {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background-color: #e9ecef;
+            margin-bottom: 8px;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        li:hover {
+            background-color: #ced4da;
+        }
+        .file-content {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            white-space: pre-wrap; /* Preserve whitespace and newlines */
+            word-wrap: break-word; /* Break long words */
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto; /* Add scroll if content is too long */
+        }
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SNotePad</h1>
+
+    <div id="error-display" class="error-message hidden"></div>
+
+    <div class="container">
+        <h2>File Explorer</h2>
+        <button id="select-folder-btn">Select Folder</button>
+        <p>Selected Folder Files:</p>
+        <ul id="file-list">
+            </ul>
+    </div>
+
+    <div class="container">
+        <h2>Save Note to App Storage</h2>
+        <input type="text" id="filename-input" placeholder="Enter filename (e.g., note.txt)">
+        <textarea id="content-textarea" placeholder="Enter file content here..."></textarea>
+        <button id="save-file-btn">Save File</button>
+    </div>
+
+    <div class="container">
+        <h2>Preferences (Key-Value Store)</h2>
+        <input type="text" id="prefs-key-input" placeholder="Enter preference key">
+        <input type="text" id="prefs-value-input" placeholder="Enter value to save/load">
+        <button id="save-prefs-btn">Save Preference</button>
+        <button id="load-prefs-btn">Load Preference</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

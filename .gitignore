@@ -1,11 +1,34 @@
-*.iml
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-/captures
-.externalNativeBuild
+# .gitignore
+# Generated files
 *.apk
-.idea
+*.aab
+*.ap_
+*.a_
+*.dex
+*.class
+
+# Build directory
+build/
+*/build/
+
+# Local configuration files (sensitive info)
+local.properties
+*.jks
+*.keystore
+keystore.env
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.gradle-home/
+captures/
+.DS_Store
+*/.DS_Store
+
+# Gradle cache
+.gradle/
+
+# Log files
+*.log

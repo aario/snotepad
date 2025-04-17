@@ -1,31 +1,121 @@
-apply plugin: 'com.android.application'
+// app/build.gradle (App Level)
+// Configures settings specific to the 'app' module.
+
+// Apply necessary plugins
+plugins {
+    id 'com.android.application' // Apply the Android Application plugin
+    id 'org.jetbrains.kotlin.android' // Apply the Kotlin Android plugin
+}
+
+// REMOVED: Logic to load signing config from keystore.properties is removed.
+/*
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} else {
+    println("Warning: keystore.properties not found. Using placeholder signing config.")
+    keystoreProperties['storeFile'] = 'keystore.jks'
+    keystoreProperties['storePassword'] = 'password'
+    keystoreProperties['keyAlias'] = 'alias'
+    keystoreProperties['keyPassword'] = 'password'
+}
+*/
+
+// Read signing configuration from environment variables
+def keyStoreFileEnv = System.getenv('KEYSTORE_FILE')
+def keyStorePasswordEnv = System.getenv('KEYSTORE_PASSWORD')
+def keyAliasEnv = System.getenv('KEY_ALIAS')
+def keyPasswordEnv = System.getenv('KEY_PASSWORD')
+
+// Check if environment variables are set
+if (keyStoreFileEnv == null || keyStorePasswordEnv == null || keyAliasEnv == null || keyPasswordEnv == null) {
+    println("Warning: Signing environment variables (KEYSTORE_FILE, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD) not fully set. Release build signing might fail.")
+    // Optionally, throw an error to fail the build immediately if variables are missing
+    // throw new GradleException("Missing signing environment variables for release build.")
+}
+
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    namespace 'info.aario.snotepad' // Application package name
+    compileSdk 34 // Target Android SDK version (use a recent API level)
+
     defaultConfig {
         applicationId "info.aario.snotepad"
-        minSdkVersion 15
-        targetSdkVersion 25
-        versionCode 2
-        versionName "1.2.2"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        minSdk 24 // Minimum Android version supported (Android 7.0 Nougat)
+        targetSdk 34 // Target SDK version (should match compileSdk)
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            // Use values read from environment variables
+            // Check if KEYSTORE_FILE is set before trying to create a file object
+            if (keyStoreFileEnv != null) {
+                 storeFile file(keyStoreFileEnv) // Use the absolute path from the env variable
+            } else {
+                // Provide a default or handle the error appropriately
+                println "Warning: KEYSTORE_FILE environment variable not set."
+                // storeFile file('dummy.jks') // Example: point to a non-existent file to likely cause later failure if needed
+            }
+            storePassword keyStorePasswordEnv
+            keyAlias keyAliasEnv
+            keyPassword keyPasswordEnv
+        }
+    }
+
     buildTypes {
         release {
+            minifyEnabled true // Enable code shrinking & obfuscation
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release // Apply the release signing configuration
+        }
+        debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Debug builds are automatically signed with a debug key
+        }
+    }
+
+    // Configure Java/Kotlin compiler options
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    // Ensure assets directory is included
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets']
+            // Ensure res directory is recognized (Gradle usually does this automatically, but doesn't hurt)
+            res.srcDirs = ['src/main/res']
         }
     }
 }
 
 dependencies {
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:25.2.0'
-    testCompile 'junit:junit:4.12'
-    compile 'com.nononsenseapps:filepicker:4.0.0'
+    // Core Kotlin libraries
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23' // Match plugin version
+
+    // AndroidX libraries (essential for modern Android development)
+    implementation 'androidx.core:core-ktx:1.13.0' // Core Kotlin extensions
+    implementation 'androidx.appcompat:appcompat:1.6.1' // App compatibility library
+    implementation 'androidx.webkit:webkit:1.10.0' // WebView support library
+    implementation "androidx.documentfile:documentfile:1.0.1" // For Storage Access Framework (SAF) interaction
+
+    // Coroutines for background tasks
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // Testing libraries (optional, but good practice)
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+

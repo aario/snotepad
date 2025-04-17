@@ -1,1 +1,22 @@
+// settings.gradle
+// Defines the modules included in the build.
+
+pluginManagement {
+    repositories {
+        google() // Repository for Android artifacts
+        mavenCentral() // General repository for Java/Kotlin libraries
+        gradlePluginPortal() // Repository for Gradle plugins
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Include the 'app' module in the project
+rootProject.name = "SNotePad"
 include ':app'
+

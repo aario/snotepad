@@ -1,23 +1,24 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// build.gradle (Project Level)
+// Configures build settings applicable to all modules in the project.
 
 buildscript {
     repositories {
-        jcenter()
+        google() // Needed for Android Gradle plugin
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        // Define the Android Gradle plugin version
+        // Use a recent, stable version. Check https://developer.android.com/studio/releases/gradle-plugin for updates.
+        classpath 'com.android.tools.build:gradle:8.3.2' // Example version, adjust as needed
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        // Define the Kotlin Gradle plugin version
+        // Use a version compatible with the AGP version. Check https://kotlinlang.org/docs/releases.html#android.
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23' // Example version, adjust as needed
     }
 }
 
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+// Apply plugins to all projects (root and sub-projects)
+// Base plugin provides tasks like 'clean'
+plugins {
+    id 'base'
 }
