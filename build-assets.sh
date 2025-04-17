@@ -10,6 +10,7 @@ docker run \
     wsn-builder \
     /bin/bash -c '
         npm install \
+	&& gulp clean \
         && gulp build \
         '
 
