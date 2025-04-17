@@ -2,3 +2,4 @@ node_modules
 vendor
 css
 js/*.min.js
+js/scripts.js

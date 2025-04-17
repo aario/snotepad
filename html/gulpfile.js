@@ -4,6 +4,7 @@
 const autoprefixer = require("gulp-autoprefixer");
 const browsersync = require("browser-sync").create();
 const cleanCSS = require("gulp-clean-css");
+const concat = require("gulp-concat"); // <-- Add this line
 const del = require("del");
 const gulp = require("gulp");
 const header = require("gulp-header");
@@ -42,9 +43,10 @@ function browserSyncReload(done) {
   done();
 }
 
-// Clean vendor
+// Clean vendor and built assets
 function clean() {
-  return del(["./vendor/", "./css/*.min.*","./js/*.min.*"]);
+  // Also clean the potentially old single min file and the new concatenated one
+  return del(["./vendor/", "./css/*.min.*", "./js/*.min.*", "./js/scripts.js"]);
 }
 
 // Bring third party dependencies from node_modules into vendor directory
@@ -77,11 +79,12 @@ function modules() {
       '!./node_modules/jquery/dist/core.js'
     ])
     .pipe(gulp.dest('./vendor/jquery'));
+  // EasyMDE
   var easymde = gulp.src([
       './node_modules/easymde/dist/*'
     ])
     .pipe(gulp.dest('./vendor/easymde'));
-  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing);
+  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, easymde); // Added easymde here
 }
 
 // CSS task
@@ -109,28 +112,36 @@ function css() {
     .pipe(browsersync.stream());
 }
 
-// JS task
+// JS task - UPDATED
 function js() {
   return gulp
-    .src([
-      './js/*.js',
-      '!./js/*.min.js',
-    ])
+    // --- Source all JS files from the src directory ---
+    .src('./js/src/**/*.js') // Read all .js files inside js/src/
+    .pipe(plumber())        // Add plumber for error handling
+    // --- Concatenate them into one file ---
+    .pipe(concat('scripts.js')) // Combine into scripts.js (you can choose any name)
+    // --- Add the banner to the concatenated file ---
+    .pipe(header(banner, {      // Add banner *before* minifying the combined file
+        pkg: pkg
+    }))
+    // --- Output the non-minified concatenated version (optional) ---
+    .pipe(gulp.dest('./js'))    // Save scripts.js to the js directory
+    // --- Minify the concatenated file ---
     .pipe(uglify())
-    .pipe(header(banner, {
-      pkg: pkg
-    }))
+    // --- Rename the minified file ---
     .pipe(rename({
-      suffix: '.min'
+        suffix: '.min' // Rename scripts.js to scripts.min.js
     }))
-    .pipe(gulp.dest('./js'))
+    // --- Output the minified file ---
+    .pipe(gulp.dest('./js')) // Save scripts.min.js to the js directory
     .pipe(browsersync.stream());
 }
 
-// Watch files
+// Watch files - UPDATED
 function watchFiles() {
-  gulp.watch("./scss/**/*", css);
-  gulp.watch(["./js/**/*", "!./js/**/*.min.js"], js);
+  gulp.watch("./scss/**/*.scss", css);
+  // --- Watch the source JS files now ---
+  gulp.watch("./js/src/**/*.js", js); // Watch the new source directory
   gulp.watch("./**/*.html", browserSyncReload);
 }
 
