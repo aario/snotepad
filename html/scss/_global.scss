@@ -1,0 +1,97 @@
+// Global component styles
+
+html {
+  position: relative;
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden; // Prevent the main html/body scrollbar
+}
+
+body {
+  height: 100%;
+  overflow: hidden; // Prevent the main html/body scrollbar
+}
+
+a {
+  &:focus {
+    outline: none;
+  }
+}
+
+// Main page wrapper
+#wrapper {
+  display: flex;
+  height: 100%; // Ensure the main wrapper fills the body height
+}
+
+#content-wrapper {
+  background-color: $gray-100;
+  width: 100%;
+  display: flex; // Use flexbox to manage children (Topbar, #content, Footer)
+  flex-direction: column;
+  overflow: hidden; // Prevent this wrapper from scrolling
+  height: 100%; // Make it fill the wrapper height
+}
+
+#content {
+  flex: 1 1 auto; // Allow #content to grow and shrink to fill space between topbar and footer
+  overflow: hidden; // Prevent this intermediate container from scrolling
+  display: flex; // Use flex to manage container-fluid child
+  flex-direction: column; // Stack children vertically
+  position: relative; // Needed for some child positioning perhaps, usually safe to have
+}
+
+// Set container padding to match gutter width instead of default 15px
+.container,
+.container-fluid {
+  padding-left: $grid-gutter-width;
+  padding-right: $grid-gutter-width;
+}
+
+// *** Key Change: Make the container-fluid inside #content scrollable ***
+#content > .container-fluid {
+  flex-grow: 1; // Make container fill #content vertically
+  overflow-y: auto; // Enable vertical scrolling ONLY when needed
+  overflow-x: hidden; // Prevent horizontal scrolling
+  display: flex; // Use flex for the row child
+  flex-direction: column; // Stack children vertically
+   padding-top: 0; // Adjust padding if topbar change caused issues
+   padding-bottom: 1.5rem; // Keep bottom padding for spacing above footer
+}
+
+// Ensure the row and column take up space within the scrolling container-fluid
+#content > .container-fluid > .row {
+  flex-grow: 1; // Make the row attempt to fill the container
+  display: flex; // Ensure row itself uses flex
+}
+
+#content > .container-fluid > .row > .col { // Target columns directly in that row
+  // Ensure columns can stretch. Adding d-flex flex-column in HTML is good.
+  // No extra flex-grow needed here usually if HTML structure is correct.
+}
+
+
+// Scroll to top button
+.scroll-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  display: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  text-align: center;
+  color: $white;
+  background: fade-out($gray-800, .5);
+  line-height: 46px;
+  z-index: 1031; // Ensure it's above content but below modals maybe
+  &:focus,
+  &:hover {
+    color: white;
+  }
+  &:hover {
+    background: $gray-800;
+  }
+  i {
+    font-weight: 800;
+  }
+}

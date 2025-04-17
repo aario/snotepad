@@ -1,0 +1,56 @@
+// Custom Card Styling
+
+.card {
+  .card-header {
+    // Format Dropdowns in Card Headings
+    .dropdown {
+      line-height: 1;
+      .dropdown-menu {
+        line-height: 1.5;
+      }
+    }
+  }
+  // Collapsable Card Styling
+  .card-header[data-toggle="collapse"] {
+    text-decoration: none;
+    position: relative;
+    padding: 0.75rem 3.25rem 0.75rem 1.25rem;
+    &::after {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding-right: 1.725rem;
+      line-height: 51px;
+      font-weight: 900;
+      content: '\f107';
+      font-family: 'Font Awesome 5 Free';
+      color: $gray-400;
+    }
+    &.collapsed {
+      border-radius: $card-border-radius;
+      &::after {
+        content: '\f105';
+      }
+    }
+  }
+}
+
+// --- Card and Editor Scroll ---
+
+.card.h-100 {
+  // Ensure card uses flex and takes available height within its column
+  display: flex; // Already has d-flex class
+  flex-direction: column; // Already has flex-column class
+  flex-grow: 1; // Make the card itself grow within the .col
+  overflow: hidden; // Prevent the card border/shadow area from scrolling
+}
+
+// Ensure card-body is the flexible part INSIDE the card
+.card-body {
+   // If it doesn't have flex-grow-1 class in HTML, add styles here:
+   flex-grow: 1;
+   overflow: hidden; // Prevent card-body itself from scrolling; children (editor) will handle content
+   display: flex;
+   flex-direction: column;
+   padding: 1rem; // Or your desired padding
+}

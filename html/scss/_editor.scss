@@ -1,0 +1,32 @@
+// Sass/SCSS version for EasyMDE height within .card-body
+
+.card-body { // Target specifically within card-body
+  // Styles applied to both the EasyMDE wrapper and the CodeMirror instance
+  // These make the editor components attempt to fill the flexible card-body
+  .EasyMDEContainer,
+  .CodeMirror {
+    flex-grow: 1;      // Allow growing within the card-body flex container
+    min-height: 200px; // Optional: ensure a minimum usable height
+    // height: 100%;   // IMPORTANT: REMOVE or comment out fixed height
+    border: none;      // Optional: remove border if it looks odd
+    display: flex;     // Ensure CodeMirror itself is flex container for its children
+    flex-direction: column;
+  }
+
+  // Styles applied specifically to the scrolling area within CodeMirror
+  .CodeMirror {
+    .CodeMirror-scroll {
+       min-height: 150px; // Optional: minimum height for the scrollable text area
+       // height: 100%;   // IMPORTANT: REMOVE or comment out fixed height
+       flex-grow: 1; // Make scroll area fill CodeMirror
+       position: relative; // Usually needed for CodeMirror internals
+    }
+    // Ensure gutters, etc., don't prevent shrinking/growing
+    .CodeMirror-gutters {
+        height: auto !important; // Let it size to content
+    }
+    .CodeMirror-sizer {
+        // Sizer usually handles width/height based on content
+    }
+  }
+}
