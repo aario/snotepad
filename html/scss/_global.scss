@@ -39,6 +39,17 @@ a {
   display: flex; // Use flex to manage container-fluid child
   flex-direction: column; // Stack children vertically
   position: relative; // Needed for some child positioning perhaps, usually safe to have
+  
+  @include media-breakpoint-down(sm) {
+    .container-fluid {
+      padding-left: 0;
+      padding-right: 0;
+      .card-body {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
 }
 
 // Set container padding to match gutter width instead of default 15px

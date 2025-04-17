@@ -1,3 +1,4 @@
+// scss/navs/_sidebar.scss
 // Sidebar
 .sidebar {
     width: $sidebar-collapsed-width + 3;
@@ -140,9 +141,29 @@
         letter-spacing: 0.05rem;
         z-index: 1;
 
-        .sidebar-brand-icon i {
-            font-size: 2rem;
+        .sidebar-brand-icon {
+             // Ensure consistent alignment and sizing area
+             display: flex; // Added
+             align-items: center; // Added
+             justify-content: center; // Added
+             // Set a base size for the container if needed, or size the img directly
+             // Example: min-width: 1.5rem; min-height: 1.5rem;
+
+            img {
+                // ** MODIFICATION START **
+                // Set height similar to nav-link icons (0.85rem on md+)
+                // Use width: auto initially for aspect ratio, or set fixed width too.
+                height: 1.85rem;
+                width: auto; // Maintain aspect ratio
+                // Or enforce square dimensions like icon fonts:
+                // width: 0.85rem;
+                // object-fit: contain; // Use if setting both width and height
+
+                vertical-align: middle; // Align with text if text were present
+                // ** MODIFICATION END **
+            }
         }
+
 
         .sidebar-brand-text {
             display: none;
@@ -224,7 +245,7 @@
                 padding: 1rem;
 
                 i {
-                    font-size: 0.85rem;
+                    font-size: 0.85rem; // Target size for the logo
                     margin-right: 0.25rem;
                 }
 
@@ -254,8 +275,13 @@
         }
 
         .sidebar-brand {
-            .sidebar-brand-icon i {
-                font-size: 2rem;
+            .sidebar-brand-icon {
+                 img {
+                     // Ensure the size is consistent with the nav icons in this view
+                     height: 1.85rem;
+                     width: auto; // Or width: 0.85rem; object-fit: contain;
+                     max-height: 2rem; // Keep constraint
+                 }
             }
 
             .sidebar-brand-text {
@@ -316,6 +342,7 @@
 
                     i {
                         margin-right: 0;
+                        // Font size should still be 0.85rem unless overridden
                     }
 
                     &[data-toggle="collapse"]::after {
@@ -325,8 +352,13 @@
             }
 
             .sidebar-brand {
-                .sidebar-brand-icon i {
-                    font-size: 2rem;
+                .sidebar-brand-icon {
+                     img {
+                        // Ensure the size is consistent in the toggled view
+                        height: 1.85rem;
+                        width: auto; // Or width: 0.85rem; object-fit: contain;
+                        max-height: 2rem; // Keep constraint
+                     }
                 }
 
                 .sidebar-brand-text {
