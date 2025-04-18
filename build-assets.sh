@@ -1,6 +1,11 @@
 #to build:
 #   docker build -t wsn-builder .
 
+gulpCommand=build
+if [ "x$1" == 'xwatch' ]; then
+    gulpCommand=watch
+fi
+
 docker run \
     -ti \
     --rm \
@@ -11,7 +16,7 @@ docker run \
     /bin/bash -c '
         npm install \
 	&& gulp clean \
-        && gulp build \
+        && gulp '"$gulpCommand"' \
         '
 
 echo 'Run build.sh [debug] script to build the apk file.'
