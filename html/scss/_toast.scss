@@ -1,0 +1,31 @@
+#toastContainer {
+  /* Small screens (Default): Bottom Center */
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100; /* Ensure it's above most elements */
+  width: auto;   /* Adjust width as needed */
+  max-width: 90%; /* Prevent excessive width on small screens */
+}
+
+/* Medium screens and up (md breakpoint - adjust if needed) */
+@media (min-width: 768px) {
+  #toastContainer {
+    top: 5rem;   /* Adjust top position as needed (consider navbar height) */
+    right: 1rem;
+    bottom: auto; /* Override small screen setting */
+    left: auto;   /* Override small screen setting */
+    transform: none; /* Override small screen setting */
+    max-width: 350px; /* Optional: Set a max width for toasts */
+  }
+}
+
+/* Ensure template is hidden initially */
+#toastTemplate {
+  display: none;
+}
+
+/* Add some spacing between toasts if multiple appear */
+#toastContainer .toast + .toast {
+  margin-top: 0.5rem;
+}
