@@ -64,7 +64,9 @@
         if (typeof EasyMDE !== 'undefined') {
             if ($editorElement.length > 0) {
                 easyMDE = new EasyMDE({
-                    element: $editorElement[0]
+                    element: $editorElement[0],
+                    spellChecker: false,
+                    autoDownloadFontAwesome: false
                 });
                 console.log('EasyMDE Initialized Successfully!');
             } else {
