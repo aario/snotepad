@@ -1,5 +1,6 @@
 (function($) {
     var currentPath = ''
+
     // Define the function that should be called for settings
     window.lunchFolderView = (path) => {
         console.log("lunchFolderView function called!");
@@ -18,6 +19,7 @@
             window.editorNewFile(path)
         });
         window.requestReadFolder(path, window.folderViewReadFolderSuccess)
+        window.writePreferences('lastPath', path)
     }
 
     window.folderViewReadFolderSuccess = (path, folderContentJson) => {

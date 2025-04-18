@@ -75,6 +75,12 @@
                 )
             )
 
+    
+            const lastPath = window.readPreferences('lastPath')
+            if (lastPath !== undefined && lastPath !== null) {
+                window.lunchFolderView(lastPath)
+            }
+
             window.hideLoading()
         });
 
