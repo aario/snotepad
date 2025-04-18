@@ -60,6 +60,7 @@
                     ]
                 });
 
+                $('#btn-save').off('click');
                 $('#btn-save').on('click', (event) => {
                     event.preventDefault()
                     let path = $("#editor-path").text()
@@ -73,9 +74,14 @@
                         path = path + '/' + filename
                     }
 
-                    const content = easyMDE.codemirror.getValue()
-                    console.log('Saving content', content)
-                    window.requestWriteFile(path, content, window.editorWriteFileSuccess)
+                    easyMDE.codemirror.save()
+
+                    // Defer value retrieval and saving to the next event loop tick
+                    setTimeout(() => {
+                        // Try getting the value *inside* the timeout
+                        const content = easyMDE.value();
+                        window.requestWriteFile(path, content, window.editorWriteFileSuccess)
+                    }, 100);
                 })
 
                 console.log('EasyMDE Initialized Successfully!');
