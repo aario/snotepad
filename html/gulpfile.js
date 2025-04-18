@@ -40,11 +40,26 @@ const paths = {
  js: {
   src: './js/*.js',
   dest: './js/build/',
+  minifiedDest: '../app/src/main/assets/',
   concatFile: 'scripts.js',
   minSuffix: '.min'
  },
- // --- Fonts Configuration ---
+ etc: {
+   src: [
+     './index.html',
+     './logo.png',
+   ],
+   dest: '../app/src/main/assets/'
+ },
  fonts: {
+   src: [
+     './fonts/*',
+     './vendor/fontawesome-free/webfonts/*',
+   ],
+   dest: '../app/src/main/assets/fonts'
+ },
+ // --- Fonts Configuration ---
+ googleFonts: {
    src: './fonts.list',
    dest: './', // Destination for gulp.dest() after googleWebfonts runs
    fontDir: 'fonts/', // Fonts will go to ./fonts/ relative to dest
@@ -56,7 +71,7 @@ const paths = {
 };
 const templatesDir = path.join(__dirname, 'templates');
 const generatedTemplatesJsPath = path.join(__dirname, paths.templates.dest, paths.templates.generatedFile);
-const generatedFontCssPath = path.join(__dirname, paths.fonts.cssDir, paths.fonts.cssFilename); // Path to generated font CSS
+const generatedFontCssPath = path.join(__dirname, paths.googleFonts.cssDir, paths.googleFonts.cssFilename); // Path to generated font CSS
 
 // BrowserSync
 function browserSync(done) {
@@ -88,25 +103,25 @@ function clean() {
 
 // Google Fonts Task - CORRECTED
 function googlefonts() {
-  const fontListPath = paths.fonts.src;
+  const fontListPath = paths.googleFonts.src;
   if (!fs.existsSync(fontListPath)) {
     const fontContent = 'Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i';
     fs.writeFileSync(fontListPath, fontContent);
     console.log(`Created ${fontListPath} with default Nunito font.`);
   }
 
-  return gulp.src(paths.fonts.src)
+  return gulp.src(paths.googleFonts.src)
     .pipe(plumber()) // Add plumber for error handling
     .pipe(googleWebfonts({
-      fontsDir: paths.fonts.fontDir, // Relative to dest
-      cssFilename: paths.fonts.cssFilename,
+      fontsDir: paths.googleFonts.fontDir, // Relative to dest
+      cssFilename: paths.googleFonts.cssFilename,
       // formats: ['woff2', 'woff'] // Optionally specify formats
     }))
     .on('error', function(err) { // More specific error logging
       console.error('Error in googlefonts task:', err.toString());
       this.emit('end'); // Prevent Gulp from stopping on error
     })
-    .pipe(gulp.dest(paths.fonts.dest)); // Output to root directory './'
+    .pipe(gulp.dest(paths.googleFonts.dest)); // Output to root directory './'
 }
 
 
@@ -180,7 +195,7 @@ function css() {
    suffix: ".min"
   }))
   .pipe(cleanCSS())
-  .pipe(gulp.dest("./css")) // Output the minified combined CSS
+  .pipe(gulp.dest("../app/src/main/assets/")) // Output the minified combined CSS
   .pipe(browsersync.stream());
 }
 
@@ -247,8 +262,20 @@ function js() {
   .pipe(rename({
    suffix: paths.js.minSuffix
   }))
-  .pipe(gulp.dest(paths.js.dest))
+  .pipe(gulp.dest(paths.js.minifiedDest))
   .pipe(browsersync.stream());
+}
+
+function etc() {
+  return gulp
+    .src(paths.etc.src)
+    .pipe(gulp.dest(paths.etc.dest))
+}
+
+function fonts() {
+  return gulp
+    .src(paths.fonts.src)
+    .pipe(gulp.dest(paths.fonts.dest))
 }
 
 // Watch files - Watches generated font CSS
@@ -259,13 +286,13 @@ function watchFiles() {
  gulp.watch([paths.js.src, `!${generatedTemplatesJsPath}`], js);
  gulp.watch(paths.templates.src, gulp.series(generateTemplatesJS, js));
  // Watch the font list file, regenerate fonts and then css if it changes
- gulp.watch(paths.fonts.src, gulp.series(googlefonts, css));
+ gulp.watch(paths.googleFonts.src, gulp.series(googlefonts, css));
  gulp.watch("./**/*.html", browserSyncReload);
 }
 
 // Define complex tasks - Ensure googlefonts runs before css
 const vendor = gulp.series(clean, googlefonts, modules);
-const build = gulp.series(vendor, generateTemplatesJS, gulp.parallel(css, js)); // css now depends on googlefonts completing first
+const build = gulp.series(vendor, generateTemplatesJS, gulp.parallel(css, js, etc, fonts)); // css now depends on googlefonts completing first
 const watch = gulp.series(build, gulp.parallel(watchFiles, browserSync));
 
 // Export tasks

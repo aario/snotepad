@@ -24,7 +24,7 @@
             return
         }
 
-        AndroidInterface.requestFolderSelection();
+        AndroidInterface.initiateFolderSelection();
     }
 
     window.requestFolderSelectionSuccess = (path) => {
@@ -47,7 +47,7 @@
             1
         )
         if (!DEBUG) {
-            AndroidInterface.requestRemoveFolderPermission(path);
+            AndroidInterface.initiateRemoveFolderPermission(path);
         }
 
         window.writePreferences('paths', JSON.stringify(paths))
@@ -91,7 +91,7 @@
             return
         }
 
-        AndroidInterface.requestReadFolder(path)
+        AndroidInterface.initiateReadFolder(path)
     }
 
     window.readFolderSuccess = (path, folderContent) => {
@@ -112,7 +112,7 @@
             return
         }
 
-        AndroidInterface.requestReadFile(path)
+        AndroidInterface.initiateReadFile(path)
     }
 
     window.readFileSuccess = (path, fileContent) => {
@@ -128,7 +128,7 @@
             return
         }
 
-        AndroidInterface.requestWriteFile(path, fileContent)
+        AndroidInterface.initiateWriteFile(path, fileContent)
     }
 
     window.writeFileSuccess = (path) => {

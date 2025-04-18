@@ -23,3 +23,28 @@ You can even give it address of your OwnCloud folder if you have the app install
 It takes a lot of time and effort to write a software. If you found SNotepad usefull, please consider making a donation by visiting:
 		[https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UJTM2GDGPEFHA](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UJTM2GDGPEFHA)
 Thanks.
+
+# Development
+
+User interface part of this app is done via html5 and javascript.
+Heavy usage of jquery, bootstrap 5 and SB Admin 2
+
+## Web Assets
+
+Web Asset source files are in html folder. After you compiled them, they get copied over to:
+```
+../app/src/main/assets
+```
+To faster develop and test the web asset files locally, open ../app/src/main/assets/index.html file in a browser wiht `?debug=true`.
+
+### Compile
+
+To compile web assets, run `build-assets.sh` It will compile them inside a docker container. To build the docker container refer to Build the Compile Container Section
+
+## Build the Compile Container Section
+
+Inside project root, run:
+
+```
+docker build -t wsn-builder .
+```

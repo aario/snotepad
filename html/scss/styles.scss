@@ -3,7 +3,12 @@
 
 // Import Bootstrap
 @import "../vendor/bootstrap/scss/bootstrap.scss";
-@import "../vendor/fontawesome-free/css/all.min.css";
+
+// Import the main FontAwesome SCSS file
+$fa-font-path: "fonts";
+@import "../vendor/fontawesome-free/scss/fontawesome.scss"; // Or all.scss, etc.
+@import "../vendor/fontawesome-free/scss/solid.scss"; // Import specific styles if needed
+
 @import "../vendor/easymde/easymde.min.css";
 
 // Import Custom SB Admin 2 Mixins and Components
