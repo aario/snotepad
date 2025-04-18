@@ -1,4 +1,10 @@
+// scss/utilities/_text.scss
+
 // Grayscale Text Utilities
+
+// Recommendation: Replace usages of .text-gray-XXX in your HTML
+// with standard Bootstrap classes like .text-body-secondary, .text-muted, etc.
+// If you MUST keep these, you could try mapping them, but it might not be perfect:
 
 .text-xs {
   font-size: .7rem;
@@ -8,41 +14,36 @@
   font-size: 1.2rem;
 }
 
-.text-gray-100 {
-  color: $gray-100 !important;
+// --- Example Mapping (Use with caution) ---
+.text-gray-100 { // Often used for background text? Maybe var(--bs-body-bg)? Unlikely.
+  color: var(--bs-gray-100) !important; // Assumes you have --bs-gray-100 defined, Bootstrap might not by default
 }
-
 .text-gray-200 {
-  color: $gray-200 !important;
+  color: var(--bs-gray-200) !important; // Or map to e.g., var(--bs-tertiary-color) ?
 }
-
 .text-gray-300 {
-  color: $gray-300 !important;
+  color: var(--bs-gray-300) !important; // Or map to e.g., var(--bs-border-color) ?
 }
-
 .text-gray-400 {
-  color: $gray-400 !important;
+  color: var(--bs-gray-400) !important; // Or map to e.g., var(--bs-secondary-color) / var(--bs-border-color) ?
 }
-
 .text-gray-500 {
-  color: $gray-500 !important;
+  color: var(--bs-secondary-color) !important; // Good candidate for secondary
 }
-
 .text-gray-600 {
-  color: $gray-600 !important;
+  color: var(--bs-body-color) !important; // Good candidate for body default
 }
-
 .text-gray-700 {
-  color: $gray-700 !important;
+  color: var(--bs-emphasis-color) !important; // Good candidate for emphasis
 }
-
 .text-gray-800 {
-  color: $gray-800 !important;
+  color: var(--bs-dark) !important; // Or a darker emphasis var if available
 }
-
 .text-gray-900 {
-  color: $gray-900 !important;
+   color: var(--bs-dark) !important; // Good candidate for dark text
 }
+// --- End Example Mapping ---
+
 
 .icon-circle {
   height: 2.5rem;
@@ -51,4 +52,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  // Background/color should be set by theme color utilities (.bg-primary, .text-white etc) in HTML
 }

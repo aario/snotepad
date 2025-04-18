@@ -1,17 +1,28 @@
+// scss/utilities/_background.scss
+
 // Background Gradient Utilities
+// Note: Using functions like darken() with CSS vars in linear-gradient is tricky.
+// You might need to define explicit light/dark gradients or use simpler backgrounds.
 
 @each $color, $value in $theme-colors {
-  .bg-gradient-#{$color} {
-    background-color: $value;
-    background-image: linear-gradient(180deg, $value 10%, darken($value, 15%) 100%);
-    background-size: cover;
-  }
+   .bg-gradient-#{$color} {
+     // Apply the appropriate CSS variable based on $color
+     // This requires more complex setup or manual var assignment for each color.
+     // Using standard Bootstrap .bg-* and .text-* utilities is often easier.
+   }
 }
 
+
 // Grayscale Background Utilities
+// Recommendation: Replace usages of .bg-gray-XXX with standard Bootstrap
+// background utilities like .bg-body, .bg-body-secondary, .bg-body-tertiary,
+// .bg-light, .bg-dark where possible.
 
 @each $level, $value in $grays {
-  .bg-gray-#{$level} {
-    background-color: $value !important;
-  }
+   // Map to Bootstrap vars if needed, but prefer standard classes.
+   // Example:
+   // .bg-gray-100 { background-color: var(--bs-light) !important; } // If $gray-100 is your light bg
+   // .bg-gray-200 { background-color: var(--bs-tertiary-bg) !important; }
+   // .bg-gray-800 { background-color: var(--bs-dark-subtle) !important; } // ? Maybe
+   // .bg-gray-900 { background-color: var(--bs-dark) !important; }
 }

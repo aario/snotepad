@@ -1,52 +1,141 @@
-// Lucas Bebber's Glitch Effect
-// Tutorial and CSS from CSS Tricks
-// https://css-tricks.com/glitch-effect-text-images-svg/
+// scss/_editor.scss
 
-.error {
-  color: $gray-800;
-  font-size: 7rem;
-  position: relative;
-  line-height: 1;
-  width: 12.5rem;
-}
-@keyframes noise-anim {
-  $steps: 20;
-  @for $i from 0 through $steps {
-    #{percentage($i*(1/$steps))} {
-      clip: rect(random(100)+px,9999px,random(100)+px,0);
+// --- Base Sizing (Keep your existing styles) ---
+.card-body { // Target specifically within card-body if needed
+  .EasyMDEContainer,
+  .CodeMirror {
+    flex-grow: 1;
+    min-height: 200px;
+    border: none; // Keep or adjust as needed
+    display: flex;
+    flex-direction: column;
+  }
+
+  .CodeMirror {
+    .CodeMirror-scroll {
+       min-height: 150px;
+       flex-grow: 1;
+       position: relative;
+    }
+    .CodeMirror-gutters {
+        height: auto !important;
+    }
+    .CodeMirror-sizer {
+        // Sizer usually handles width/height based on content
     }
   }
 }
-.error:after {
-  content: attr(data-text);
-  position: absolute;
-  left: 2px;
-  text-shadow: -1px 0 $red;
-  top: 0;
-  color: $gray-800;
-  background: $gray-100;
-  overflow: hidden;
-  clip: rect(0,900px,0,0);
-  animation: noise-anim 2s infinite linear alternate-reverse;
-}
+// --- End Base Sizing ---
 
-@keyframes noise-anim-2 {
-  $steps: 20;
-  @for $i from 0 through $steps {
-    #{percentage($i*(1/$steps))} {
-      clip: rect(random(100)+px,9999px,random(100)+px,0);
+
+// *** ADD DARK THEME STYLES FOR EASYMDE / CODEMIRROR ***
+[data-bs-theme="dark"] {
+
+  // Style EasyMDE Toolbar
+  .editor-toolbar {
+    background-color: var(--bs-tertiary-bg); // Darker background for toolbar
+    border-color: var(--bs-border-color);
+
+    // Toolbar buttons
+    button, a.fa { // Target buttons and icon links
+      color: var(--bs-secondary-color); // Lighter icon color
+      border-color: var(--bs-border-color) !important; // Ensure borders match theme
+
+      &:hover, &.active {
+        background-color: var(--bs-secondary-bg); // Darker hover/active background
+        border-color: var(--bs-border-color-translucent) !important;
+        color: var(--bs-light); // Brighter icon on hover/active
+      }
+    }
+
+    // Separators
+    i.separator {
+        border-color: var(--bs-border-color);
+        border-right: none; // Keep existing separator style logic
     }
   }
+
+  // Style CodeMirror editor area
+  .CodeMirror {
+    background-color: var(--bs-dark); // Dark background for editor
+    color: var(--bs-body-color); // Default text color for editor
+    border-color: var(--bs-border-color); // Border if applicable
+  }
+
+  // CodeMirror Gutters (line numbers, etc.)
+  .CodeMirror-gutters {
+    background-color: var(--bs-dark-subtle, var(--bs-dark)); // Slightly different dark bg or same as editor
+    border-right: 1px solid var(--bs-border-color);
+    color: var(--bs-secondary-color); // Color for line numbers
+  }
+
+  // CodeMirror Cursor
+  .CodeMirror-cursor {
+    border-left: 1px solid var(--bs-light); // Light cursor for dark background
+  }
+
+  // CodeMirror Selection
+  .CodeMirror-selected {
+      // Use a background color that contrasts with both the editor bg and text
+      background-color: rgba(var(--bs-primary-rgb), 0.3); // Example: translucent primary
+  }
+
+  // CodeMirror Active Line (Optional styling)
+  .CodeMirror-activeline-background {
+      background-color: rgba(var(--bs-light-rgb), 0.07); // Subtle highlight for the active line
+  }
+
+  // Style EasyMDE Status Bar
+  .editor-statusbar {
+    background-color: var(--bs-tertiary-bg); // Match toolbar or use another dark shade
+    color: var(--bs-secondary-color); // Text color for status bar items
+    border-color: var(--bs-border-color);
+  }
+
+  // Style EasyMDE Preview Area (if needed)
+  .editor-preview, .editor-preview-side {
+      background-color: var(--bs-body-bg); // Use body background for preview
+      color: var(--bs-body-color); // Use body text color for preview
+      border-color: var(--bs-border-color);
+
+      // Ensure headings, links etc. in preview use dark theme variables
+      h1, h2, h3, h4, h5, h6 {
+        color: var(--bs-heading-color);
+        border-bottom-color: var(--bs-border-color); // Example for heading underlines
+      }
+       a {
+           color: var(--bs-link-color);
+           &:hover {
+               color: var(--bs-link-hover-color);
+           }
+       }
+       code {
+           color: var(--bs-code-color);
+           background-color: var(--bs-dark-bg-subtle); // Background for inline code
+       }
+       pre {
+            background-color: var(--bs-dark-bg-subtle); // Background for code blocks
+            border-color: var(--bs-border-color);
+            code {
+                 background-color: transparent; // Reset inline code bg within pre
+            }
+       }
+       blockquote {
+            color: var(--bs-secondary-color);
+            border-left-color: var(--bs-border-color);
+       }
+       hr {
+           border-top-color: var(--bs-border-color-translucent);
+       }
+       // Add more styles as needed for tables, lists, etc.
+  }
+
+  // Adjust Fullscreen Appearance if necessary
+  .EasyMDEContainer.fullscreen {
+     background-color: var(--bs-dark); // Ensure fullscreen background is dark
+     border-color: var(--bs-border-color);
+     z-index: var(--bs-modal-zindex, 1055); // Ensure it's above other content like Bootstrap modals
+  }
+
 }
-.error:before {
-  content: attr(data-text);
-  position: absolute;
-  left: -2px;
-  text-shadow: 1px 0 $blue;
-  top: 0;
-  color: $gray-800;
-  background: $gray-100;
-  overflow: hidden;
-  clip: rect(0,900px,0,0);
-  animation: noise-anim-2 3s infinite linear alternate-reverse;
-}
+// *** END DARK THEME STYLES ***

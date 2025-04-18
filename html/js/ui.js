@@ -99,4 +99,5 @@
         window.sidebarUpdateFolders(paths)
         window.settingsUpdateFolders(paths)
     }
+    document.documentElement.setAttribute('data-bs-theme', 'dark')
 })(jQuery); // End of use strict

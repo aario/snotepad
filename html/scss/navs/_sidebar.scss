@@ -1,8 +1,13 @@
 // scss/navs/_sidebar.scss
-// Sidebar
+// Sidebar - Theme Aware
+
+// --- Base Styles (Default/Light Theme - based on original .sidebar-dark) ---
 .sidebar {
     width: $sidebar-collapsed-width + 3;
     min-height: 100vh;
+    // --- Base Styles from original .sidebar-dark ---
+    background-color: $blue; // Assuming $blue is your desired base background from _variables.scss
+    color: rgba(255, 255, 255, 0.8); // Default text color (fade-out($white, 0.2))
 
     .nav-item {
         position: relative;
@@ -15,6 +20,26 @@
             text-align: center;
             padding: 0.75rem 1rem;
             width: $sidebar-collapsed-width;
+            color: rgba(255, 255, 255, 0.8); // (fade-out($white, 0.2))
+
+            i {
+                color: rgba(255, 255, 255, 0.3); // (fade-out($white, 0.7))
+            }
+
+            &:active,
+            &:focus,
+            &:hover {
+                color: $white; // Use direct white or var(--bs-white)
+                i {
+                    color: $white; // Use direct white or var(--bs-white)
+                }
+            }
+
+            // Accordion Arrow Icon Color
+            &[data-toggle="collapse"]::after {
+                 color: rgba(255, 255, 255, 0.5); // (fade-out($white, 0.5))
+            }
+
 
             span {
                 font-size: 0.65rem;
@@ -25,21 +50,27 @@
         &.active {
             .nav-link {
                 font-weight: 700;
+                color: $white; // Use direct white or var(--bs-white)
+
+                i {
+                    color: $white; // Use direct white or var(--bs-white)
+                }
             }
         }
 
-        // Accordion
+        // Accordion (Inner part styles depend on theme)
         .collapse {
             position: absolute;
             left: calc(#{$sidebar-collapsed-width} + #{$grid-gutter-width} / 2);
             z-index: 1;
             top: 2px;
-            // Grow In Animation
             @extend .animated--grow-in;
 
             .collapse-inner {
                 border-radius: $border-radius;
                 box-shadow: $box-shadow;
+                // Use theme variables for the inner part
+                background-color: var(--bs-body-bg);
             }
         }
 
@@ -63,29 +94,32 @@
                     text-transform: uppercase;
                     font-weight: 800;
                     font-size: 0.65rem;
-                    color: $gray-500;
+                    color: var(--bs-secondary-color); // Theme variable
                 }
 
                 .collapse-item {
                     padding: 0.5rem 1rem;
                     margin: 0 0.5rem;
                     display: block;
-                    color: $gray-900;
+                    color: var(--bs-body-color); // Theme variable
                     text-decoration: none;
                     border-radius: $border-radius;
                     white-space: nowrap;
 
                     &:hover {
-                        background-color: $gray-200;
+                        background-color: var(--bs-tertiary-bg); // Theme variable
+                        color: var(--bs-emphasis-color); // Theme variable
                     }
 
                     &:active {
-                        background-color: $gray-300;
+                        background-color: var(--bs-secondary-bg); // Theme variable
+                        color: var(--bs-emphasis-color); // Theme variable
                     }
 
                     &.active {
-                        color: $primary;
+                        color: var(--bs-primary); // Theme variable (or maybe var(--bs-link-color)?)
                         font-weight: 700;
+                        background-color: transparent;
                     }
                 }
             }
@@ -98,16 +132,22 @@
         text-align: center;
         margin-bottom: 1rem;
         cursor: pointer;
+        background-color: rgba(255, 255, 255, 0.2); // (fade-out($white, 0.8)) - Adjusted for better visibility maybe?
 
         &::after {
             font-weight: 900;
             content: '\f104';
             font-family: 'Font Awesome 5 Free';
             margin-right: 0.1rem;
+            color: rgba(255, 255, 255, 0.5); // (fade-out($white, 0.5))
         }
 
         &:hover {
             text-decoration: none;
+            background-color: rgba(255, 255, 255, 0.25); // (fade-out($white, 0.75))
+            &::after {
+                 color: rgba(255, 255, 255, 0.75); // Brighter arrow on hover
+            }
         }
 
         &:focus {
@@ -123,7 +163,13 @@
             content: '\f105';
             font-family: 'Font Awesome 5 Free';
             margin-left: 0.25rem;
+            color: rgba(255, 255, 255, 0.5); // (fade-out($white, 0.5))
         }
+        &:hover { // Hover on the wrapper when toggled
+             #sidebarToggle::after { // Need to target the pseudo-element within
+                 color: rgba(255, 255, 255, 0.75);
+             }
+         }
 
         .sidebar-card {
             display: none;
@@ -140,30 +186,18 @@
         text-transform: uppercase;
         letter-spacing: 0.05rem;
         z-index: 1;
+        color: $white; // Use direct white or var(--bs-white)
 
         .sidebar-brand-icon {
-             // Ensure consistent alignment and sizing area
-             display: flex; // Added
-             align-items: center; // Added
-             justify-content: center; // Added
-             // Set a base size for the container if needed, or size the img directly
-             // Example: min-width: 1.5rem; min-height: 1.5rem;
-
+            display: flex;
+            align-items: center;
+            justify-content: center;
             img {
-                // ** MODIFICATION START **
-                // Set height similar to nav-link icons (0.85rem on md+)
-                // Use width: auto initially for aspect ratio, or set fixed width too.
                 height: 1.85rem;
-                width: auto; // Maintain aspect ratio
-                // Or enforce square dimensions like icon fonts:
-                // width: 0.85rem;
-                // object-fit: contain; // Use if setting both width and height
-
-                vertical-align: middle; // Align with text if text were present
-                // ** MODIFICATION END **
+                width: auto;
+                vertical-align: middle;
             }
         }
-
 
         .sidebar-brand-text {
             display: none;
@@ -172,6 +206,7 @@
 
     hr.sidebar-divider {
         margin: 0 1rem 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.15); // (fade-out($white, 0.85))
     }
 
     .sidebar-heading {
@@ -180,20 +215,22 @@
         font-weight: 800;
         font-size: 0.65rem;
         @extend .text-uppercase;
+        color: rgba(255, 255, 255, 0.4); // (fade-out($white, 0.6))
     }
 
     .sidebar-card {
+        // These likely don't need theme changes if always dark-ish inside
         display: flex;
         flex-direction: column;
         align-items: center;
         font-size: $font-size-sm;
         border-radius: $border-radius;
-        color: fade-out($white, 0.2);
+        color: rgba(255, 255, 255, 0.8); // fade-out($white, 0.2)
         margin-left: 1rem;
         margin-right: 1rem;
         margin-bottom: 1rem;
         padding: 1rem;
-        background-color: fade-out($black, 0.9);
+        background-color: rgba(0, 0, 0, 0.1); // fade-out($black, 0.9) -> transparent black
         .sidebar-card-illustration {
             height: 3rem;
             display: block;
@@ -203,314 +240,168 @@
         }
         p {
             font-size: 0.75rem;
-            color: fade-out($white, 0.5);
+            color: rgba(255, 255, 255, 0.5); // fade-out($white, 0.5)
         }
     }
 }
+// --- End Base Styles ---
 
+
+// --- Dark Theme Overrides ---
+[data-bs-theme="dark"] {
+    .sidebar {
+        // --- Dark Theme Specific Styles ---
+        background-color: var(--bs-dark); // Use Bootstrap dark variable
+        color: var(--bs-secondary-color); // Default text color for dark theme sidebar
+
+        .nav-item {
+            .nav-link {
+                color: var(--bs-secondary-color); // Default link color
+
+                i {
+                    color: var(--bs-tertiary-color); // Subtle icon color
+                }
+
+                &:active,
+                &:focus,
+                &:hover {
+                    color: var(--bs-light);
+                    i {
+                        color: var(--bs-light);
+                    }
+                }
+
+                // Accordion Arrow Icon Color
+                &[data-toggle="collapse"]::after {
+                    color: var(--bs-tertiary-color);
+                }
+            }
+
+            &.active {
+                .nav-link {
+                    color: var(--bs-light);
+                    i {
+                        color: var(--bs-light);
+                    }
+                }
+            }
+            
+            // Accordion inner already uses theme vars, should be fine.
+        }
+
+        #sidebarToggle {
+            background-color: var(--bs-secondary-bg); // Dark theme bg for toggle
+
+            &::after {
+                color: var(--bs-tertiary-color); // Dark theme arrow color
+            }
+
+            &:hover {
+                background-color: var(--bs-tertiary-bg); // Dark theme hover bg
+                &::after {
+                    color: var(--bs-secondary-color); // Dark theme hover arrow color
+                }
+            }
+        }
+        
+         &.toggled {
+             #sidebarToggle::after {
+                 color: var(--bs-tertiary-color); // Dark theme arrow color
+             }
+             &:hover { // Hover on the wrapper when toggled
+                 #sidebarToggle::after { // Need to target the pseudo-element within
+                      color: var(--bs-secondary-color); // Dark theme hover arrow color
+                 }
+             }
+         }
+
+
+        .sidebar-brand {
+            color: var(--bs-light); // Brand text color in dark mode
+            // Icon itself doesn't change color usually
+        }
+
+        hr.sidebar-divider {
+            border-top-color: var(--bs-border-color-translucent); // Dark theme border
+        }
+
+        .sidebar-heading {
+            color: var(--bs-tertiary-color); // Subtle heading in dark mode
+        }
+
+        .sidebar-card {
+             // Adjust if needed, but the original might be fine if always dark inside
+             // background-color: rgba(var(--bs-black-rgb), 0.2); // Slightly darker if needed
+             // color: var(--bs-secondary-color);
+             // p { color: var(--bs-tertiary-color); }
+        }
+    }
+}
+// --- End Dark Theme Overrides ---
+
+
+// --- Media Query adjustments (Mostly layout, colors handled above) ---
 @include media-breakpoint-up(md) {
     .sidebar {
         width: $sidebar-base-width !important;
 
         .nav-item {
-
-            // Accordion
             .collapse {
                 position: relative;
                 left: 0;
                 z-index: 1;
                 top: 0;
                 animation: none;
-
-                .collapse-inner {
-                    border-radius: 0;
-                    box-shadow: none;
-                }
+                .collapse-inner { border-radius: 0; box-shadow: none; }
             }
-
-            .collapsing {
-                display: block;
-                transition: $transition-collapse;
-            }
-
-            .collapse,
-            .collapsing {
-                margin: 0 1rem;
-            }
+            .collapsing { display: block; transition: $transition-collapse; }
+            .collapse, .collapsing { margin: 0 1rem; }
 
             .nav-link {
                 display: block;
                 width: 100%;
                 text-align: left;
                 padding: 1rem;
-
-                i {
-                    font-size: 0.85rem; // Target size for the logo
-                    margin-right: 0.25rem;
-                }
-
-                span {
-                    font-size: 0.85rem;
-                    display: inline;
-                }
-
-                // Accordion Arrow Icon
+                i { font-size: 0.85rem; margin-right: 0.25rem; }
+                span { font-size: 0.85rem; display: inline; }
                 &[data-toggle="collapse"] {
-                    &::after {
-                        width: 1rem;
-                        text-align: center;
-                        float: right;
-                        vertical-align: 0;
-                        border: 0;
-                        font-weight: 900;
-                        content: '\f107';
-                        font-family: 'Font Awesome 5 Free';
-                    }
-
-                    &.collapsed::after {
-                        content: '\f105';
-                    }
+                    &::after { width: 1rem; text-align: center; float: right; vertical-align: 0; border: 0; font-weight: 900; content: '\f107'; font-family: 'Font Awesome 5 Free'; }
+                    &.collapsed::after { content: '\f105'; }
                 }
             }
         }
-
-        .sidebar-brand {
-            .sidebar-brand-icon {
-                 img {
-                     // Ensure the size is consistent with the nav icons in this view
-                     height: 1.85rem;
-                     width: auto; // Or width: 0.85rem; object-fit: contain;
-                     max-height: 2rem; // Keep constraint
-                 }
-            }
-
-            .sidebar-brand-text {
-                display: inline;
-            }
-        }
-
-        .sidebar-heading {
-            text-align: left;
-        }
+        .sidebar-brand .sidebar-brand-text { display: inline; }
+        .sidebar-heading { text-align: left; }
 
         &.toggled {
             overflow: visible;
             width: $sidebar-collapsed-width + 3 !important;
 
             .nav-item {
-
-                // Accordion
                 .collapse {
-                    position: absolute;
-                    left: calc(#{$sidebar-collapsed-width} + #{$grid-gutter-width} / 2);
-                    z-index: 1;
-                    top: 2px;
-                    // Grow In Animation for Toggled State
-                    animation-name: growIn;
-                    animation-duration: 200ms;
-                    animation-timing-function: transform cubic-bezier(.18, 1.25, .4, 1), opacity cubic-bezier(0, 1, .4, 1);
-
-                    .collapse-inner {
-                        box-shadow: $box-shadow;
-                        border-radius: $border-radius;
-                    }
+                    position: absolute; left: calc(#{$sidebar-collapsed-width} + #{$grid-gutter-width} / 2); z-index: 1; top: 2px;
+                    animation-name: growIn; animation-duration: 200ms; animation-timing-function: transform cubic-bezier(.18, 1.25, .4, 1), opacity cubic-bezier(0, 1, .4, 1);
+                    .collapse-inner { box-shadow: $box-shadow; border-radius: $border-radius; }
                 }
-
-                .collapsing {
-                    display: none;
-                    transition: none;
-                }
-
-                .collapse,
-                .collapsing {
-                    margin: 0;
-                }
-
-                &:last-child {
-                    margin-bottom: 1rem;
-                }
+                .collapsing { display: none; transition: none; }
+                .collapse, .collapsing { margin: 0; }
+                &:last-child { margin-bottom: 1rem; }
 
                 .nav-link {
-                    text-align: center;
-                    padding: 0.75rem 1rem;
-                    width: $sidebar-collapsed-width;
-
-                    span {
-                        font-size: 0.65rem;
-                        display: block;
-                    }
-
-                    i {
-                        margin-right: 0;
-                        // Font size should still be 0.85rem unless overridden
-                    }
-
-                    &[data-toggle="collapse"]::after {
-                        display: none;
-                    }
+                    text-align: center; padding: 0.75rem 1rem; width: $sidebar-collapsed-width;
+                    span { font-size: 0.65rem; display: block; }
+                    i { margin-right: 0; }
+                    &[data-toggle="collapse"]::after { display: none; }
                 }
             }
-
-            .sidebar-brand {
-                .sidebar-brand-icon {
-                     img {
-                        // Ensure the size is consistent in the toggled view
-                        height: 1.85rem;
-                        width: auto; // Or width: 0.85rem; object-fit: contain;
-                        max-height: 2rem; // Keep constraint
-                     }
-                }
-
-                .sidebar-brand-text {
-                    display: none;
-                }
-            }
-
-            .sidebar-heading {
-                text-align: center;
-            }
+            .sidebar-brand .sidebar-brand-text { display: none; }
+            .sidebar-heading { text-align: center; }
         }
     }
 }
-
-// Sidebar Color Variants
-
-// Sidebar Light
-.sidebar-light {
-    .sidebar-brand {
-        color: $gray-700;
-    }
-
-    hr.sidebar-divider {
-        border-top: 1px solid $gray-200;
-    }
-
-    .sidebar-heading {
-        color: $gray-500;
-    }
-
-    .nav-item {
-        .nav-link {
-            color: $gray-600;
-
-            i {
-                color: $gray-400;
-            }
-
-            &:active,
-            &:focus,
-            &:hover {
-                color: $gray-700;
-
-                i {
-                    color: $gray-700;
-                }
-            }
-
-            // Accordion
-            &[data-toggle="collapse"]::after {
-                color: $gray-500;
-            }
-        }
-
-        &.active {
-            .nav-link {
-                color: $gray-700;
-
-                i {
-                    color: $gray-700;
-                }
-            }
-        }
-    }
-
-    // Color the sidebar toggler
-    #sidebarToggle {
-        background-color: $gray-200;
-
-        &::after {
-            color: $gray-500;
-        }
-
-        &:hover {
-            background-color: $gray-300;
-        }
-    }
-}
-
-// Sidebar Dark
-.sidebar-dark {
-    .sidebar-brand {
-        color: $white;
-    }
-
-    hr.sidebar-divider {
-        border-top: 1px solid fade-out($white, 0.85);
-    }
-
-    .sidebar-heading {
-        color: fade-out($white, 0.6);
-    }
-
-    .nav-item {
-        .nav-link {
-            color: fade-out($white, 0.2);
-
-            i {
-                color: fade-out($white, 0.7);
-            }
-
-            &:active,
-            &:focus,
-            &:hover {
-                color: $white;
-
-                i {
-                    color: $white;
-                }
-            }
-
-            // Accordion
-            &[data-toggle="collapse"]::after {
-                color: fade-out($white, 0.5);
-            }
-        }
-
-        &.active {
-            .nav-link {
-                color: $white;
-
-                i {
-                    color: $white;
-                }
-            }
-        }
-    }
-
-    // Color the sidebar toggler
-    #sidebarToggle {
-        background-color: fade-out($white, 0.8);
-
-        &::after {
-            color: fade-out($white, 0.5);
-        }
-
-        &:hover {
-            background-color: fade-out($white, 0.75);
-        }
-    }
-
-    &.toggled {
-        #sidebarToggle::after {
-            color: fade-out($white, 0.5);
-        }
-    }
-}
+// --- End Media Query Adjustments ---
 
 // --- Sidebar Scroll ---
-
 #accordionSidebar {
-  overflow-y: auto; // Add vertical scrollbar ONLY when needed
-  // SB Admin 2 CSS likely handles positioning and default height.
-  // This should constrain its scroll within the #wrapper height.
+  overflow-y: auto;
 }

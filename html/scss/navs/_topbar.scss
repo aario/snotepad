@@ -1,69 +1,106 @@
+// scss/navs/_topbar.scss
+
 // Topbar
 .topbar {
   height: $topbar-base-height;
+  // Assume default topbar is light, uses standard navbar classes potentially
+  // Or set a base background using CSS vars if it's custom
+  // Example: background-color: var(--bs-light);
+  // Example: border-bottom: 1px solid var(--bs-border-color);
+
   #sidebarToggleTop {
     height: 2.5rem;
     width: 2.5rem;
+    color: var(--bs-secondary-color); // Use variable for icon color
+
     &:hover {
-      background-color: $gray-200;
+      background-color: var(--bs-tertiary-bg); // Use variable for hover bg
+      color: var(--bs-emphasis-color);
     }
     &:active {
-      background-color: $gray-300;
+      background-color: var(--bs-secondary-bg); // Use variable for active bg
+      color: var(--bs-emphasis-color);
     }
   }
+
   .navbar-search {
     width: 25rem;
     input {
       font-size: 0.85rem;
       height: auto;
+      // Input should inherit theme styles from Bootstrap's form control styles
     }
   }
+
   .topbar-divider {
     width: 0;
-    border-right: 1px solid $border-color;
+    border-right: 1px solid var(--bs-border-color); // Use border variable
     height: calc(#{$topbar-base-height} - 2rem);
     margin: auto 1rem;
   }
-  .nav-item {
-    .nav-link {
-      height: $topbar-base-height;
-      display: flex;
-      align-items: center;
-      padding: 0 0.75rem;
-      &:focus {
-        outline: none;
+
+  // Style nav links within the topbar context
+  .navbar-nav { // Target specifically within .topbar if needed
+      .nav-item {
+        .nav-link {
+          height: $topbar-base-height;
+          display: flex;
+          align-items: center;
+          padding: 0 0.75rem;
+          color: var(--bs-secondary-color); // Default link color (adjust if topbar is dark)
+
+          &:hover {
+            color: var(--bs-emphasis-color); // Hover color
+          }
+          &:active {
+            color: var(--bs-emphasis-color); // Active color
+          }
+           &:focus {
+             outline: none;
+           }
+        }
+         &:focus {
+             outline: none;
+        }
       }
-    }
-    &:focus {
-      outline: none;
-    }
   }
+
+
   .dropdown {
-    position: static;
+    position: static; // Or relative as needed
     .dropdown-menu {
       width: calc(100% - #{$grid-gutter-width});
       right: $grid-gutter-width / 2;
+      // Dropdown menu itself should inherit Bootstrap's theme styles
     }
   }
+
+  // Style the custom dropdown list within topbar
   .dropdown-list {
     padding: 0;
-    border: none;
+    border: none; // Use Bootstrap's dropdown border var if needed: var(--bs-border-color)
     overflow: hidden;
+
     .dropdown-header {
-      background-color: $primary;
-      border: 1px solid $primary;
+      // Use theme colors vars for header
+      background-color: var(--bs-primary); // Example: Use primary color
+      border: 1px solid var(--bs-primary);
       padding-top: 0.75rem;
       padding-bottom: 0.75rem;
-      color: $white;
+      color: var(--bs-light); // Use light text on primary bg
     }
+
     .dropdown-item {
       white-space: normal;
       padding-top: 0.5rem;
       padding-bottom: 0.5rem;
-      border-left: 1px solid $border-color;
-      border-right: 1px solid $border-color;
-      border-bottom: 1px solid $border-color;
+      // Use border variable
+      border-left: 1px solid var(--bs-border-color);
+      border-right: 1px solid var(--bs-border-color);
+      border-bottom: 1px solid var(--bs-border-color);
       line-height: 1.3rem;
+      color: var(--bs-body-color); // Use body color var
+
       .dropdown-list-image {
         position: relative;
         height: 2.5rem;
@@ -73,23 +110,27 @@
           width: 2.5rem;
         }
         .status-indicator {
-          background-color: $gray-200;
+          // Use background variables
+          background-color: var(--bs-secondary-bg); // Or map $gray-200 equivalent
           height: 0.75rem;
           width: 0.75rem;
           border-radius: 100%;
           position: absolute;
           bottom: 0;
           right: 0;
-          border: .125rem solid $white;
+          // Use body background for border against image
+          border: .125rem solid var(--bs-body-bg);
         }
       }
       .text-truncate {
         max-width: 10rem;
       }
       &:active {
-        background-color: $gray-200;
-        color: $gray-900;
+        // Use background/color variables for active state
+        background-color: var(--bs-secondary-bg);
+        color: var(--bs-emphasis-color);
       }
+        // Hover state is handled by Bootstrap's base dropdown-item styles usually
     }
   }
   @include media-breakpoint-up(sm) {
@@ -105,38 +146,6 @@
       .dropdown-item {
         .text-truncate {
           max-width: 13.375rem;
-        }
-      }
-    }
-  }
-}
-
-.topbar.navbar-dark {
-  .navbar-nav {
-    .nav-item {
-      .nav-link {
-        color: fade-out($white, 0.2);
-        &:hover {
-          color: $white;
-        }
-        &:active {
-          color: $white;
-        }
-      }
-    }
-  }
-}
-
-.topbar.navbar-light {
-  .navbar-nav {
-    .nav-item {
-      .nav-link {
-        color: $gray-600;
-        &:hover {
-          color: $gray-700;
-        }
-        &:active {
-          color: $gray-800;
         }
       }
     }
