@@ -57,7 +57,7 @@
         $('.btn-folder-delete').on('click', function(button) {
             let id = $(this).data('id')
             let path = $('#code-folder-path-' + id).text()
-            window.deleteFolder(path)
+            window.releaseFolder(path)
         })
     }
 

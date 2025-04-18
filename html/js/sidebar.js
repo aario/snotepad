@@ -62,7 +62,7 @@
             const $newItem = $(
                 window.renderTemplate(
                     {
-                        'basename': window.basename(path),
+                        'basename': decodeURIComponent(window.basename(path)).replaceAll(':', ' : '),
                         'path': path,
                         'id': i,
                         'active': active

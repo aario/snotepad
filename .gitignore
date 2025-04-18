@@ -29,6 +29,7 @@ captures/
 
 # Gradle cache
 .gradle/
+.gradle-opt/
 
 # Log files
 *.log

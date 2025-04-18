@@ -1,11 +1,14 @@
 (function($) {
     "use strict"; // Start of use strict
+    const VERSION = '1'
 
     const DEFAULT_VALUES = {
         'paths': {}
     }
 
     const DEBUG = (new URLSearchParams(window.location.search)).get('debug') === 'true'
+
+    console.log('version', VERSION)
 
     setTimeout(() => {
             if (typeof AndroidInterface === 'undefined' && DEBUG === false) {
@@ -78,15 +81,15 @@
         if (DEBUG) {
             let files = []
             for (let i = 1; i <= 10; i++) {
-                const filePath = path + '/File ' + i
+                const filename = 'File ' + i
                 const date = new Date(); // Gets the current date and time
                 date.setDate(date.getDate() - i)
                 files.push({
-                    'path': filePath,
+                    'filename': filename,
                     'date': date.toLocaleDateString()
                 })
             }
-            window.readFolderSuccess(path, files)
+            window.readFolderSuccess(path, JSON.stringify(files))
 
             return
         }

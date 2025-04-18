@@ -1,5 +1,4 @@
 (function($) {
-    let easyMDE
     let isFileNew
 
     // Define the function that should be called for settings
@@ -15,23 +14,6 @@
 
     function lunchEditor(path, isNew) {
         window.setNavBar('navbar-editor',{})
-
-        $('#btn-save').on('click', (event) => {
-            event.preventDefault()
-            let path = $("#editor-path").text()
-            if (isFileNew) {
-                let filename = $("#filename").val().trim()
-                if (filename === '') {
-                    window.showToast('Please first enter a filename.', true)
-                    return
-                }
-
-                path = path + '/' + filename
-            }
-
-            const content = easyMDE.value()
-            window.requestWriteFile(path, content, window.editorWriteFileSuccess)
-        })
 
         isFileNew = isNew
         if (isNew) {
@@ -63,11 +45,39 @@
         // Check if EasyMDE is defined (it might be loaded asynchronously or conditionally)
         if (typeof EasyMDE !== 'undefined') {
             if ($editorElement.length > 0) {
-                easyMDE = new EasyMDE({
+                let easyMDE = new EasyMDE({
                     element: $editorElement[0],
                     spellChecker: false,
-                    autoDownloadFontAwesome: false
+                    autoDownloadFontAwesome: false,
+                    toolbar: [
+                        "bold", "italic", "heading", "|",
+                        "quote", "unordered-list", "ordered-list", "|",
+                        "link", "image", "|",
+                        "preview", // Maybe "side-by-side", "fullscreen" if desired
+                        "guide", "|",
+                        "undo", // Add this
+                        "redo"  // Add this
+                    ]
                 });
+
+                $('#btn-save').on('click', (event) => {
+                    event.preventDefault()
+                    let path = $("#editor-path").text()
+                    if (isFileNew) {
+                        let filename = $("#filename").val().trim()
+                        if (filename === '') {
+                            window.showToast('Please first enter a filename.', true)
+                            return
+                        }
+
+                        path = path + '/' + filename
+                    }
+
+                    const content = easyMDE.codemirror.getValue()
+                    console.log('Saving content', content)
+                    window.requestWriteFile(path, content, window.editorWriteFileSuccess)
+                })
+
                 console.log('EasyMDE Initialized Successfully!');
             } else {
                 // Only log error if the *element* is missing, not if EasyMDE library is missing

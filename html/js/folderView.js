@@ -20,15 +20,16 @@
         window.requestReadFolder(path, window.folderViewReadFolderSuccess)
     }
 
-    window.folderViewReadFolderSuccess = (path, folderContent) => {
+    window.folderViewReadFolderSuccess = (path, folderContentJson) => {
         const $filesDiv = $("#files");
+        const folderContent = JSON.parse(folderContentJson)
         $filesDiv.empty()
         $.each(folderContent, (i, file) => {
             $filesDiv.append(
                 window.renderTemplate(
                     {
-                        'basename': window.basename(file.path),
-                        'path': file.path,
+                        'path': path + '/' + file.filename,
+                        'basename': file.filename,
                         'date': file.date,
                         'id': i
                     },

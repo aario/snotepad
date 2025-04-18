@@ -1,8 +1,5 @@
 package info.aario.snotepad
 
-import android.util.Log // Import the Log class
-import android.webkit.WebView // Import the WebView class
-
 /**
  * Contains utility functions for the SNotePad application.
  */

@@ -16,6 +16,12 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.io.File
+import org.json.JSONArray
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Provides methods accessible from JavaScript running within the WebView.
@@ -24,20 +30,9 @@ import java.io.OutputStreamWriter
  * @property activity The MainActivity instance, providing access to context, lifecycle, etc.
  */
 class WebAppInterface(private val activity: MainActivity) {
-
-    private val PREFS_NAME = "SNotePadPrefs" // Consider moving constants elsewhere if needed
-
     @JavascriptInterface
-    fun showToast(message: String) {
-        // Use the activity context and run on UI thread
-        activity.runOnUiThread {
-             Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    @JavascriptInterface
-    fun requestFolderSelection() {
-         Log.d("WebAppInterface", "requestFolderSelection called")
+    fun initiateFolderSelection() {
+        Log.d("WebAppInterface", "initiateFolderSelection called")
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply { }
         try {
              // Access the launcher via the activity instance
@@ -45,78 +40,192 @@ class WebAppInterface(private val activity: MainActivity) {
         } catch (e: Exception) {
              Log.e("WebAppInterface", "Could not launch folder picker", e)
              // Use activity's evaluateJavascript helper
-             activity.evaluateJavascript("javascript:showError('Could not open folder picker: ${escapeStringForJavaScript(e.message ?: "Unknown error")}')")
+             activity.toastError("Could not open folder picker: ${escapeStringForJavaScript(e.message ?: "Unknown error")}")
         }
     }
 
+    // Made public so WebAppInterface can call it via the activity instance (e.g., after save)
     @JavascriptInterface
-    fun readFileContent(uriString: String) {
-         Log.d("WebAppInterface", "readFileContent called for: $uriString")
-         val fileUri = Uri.parse(uriString)
-         // Use activity's lifecycleScope
-         activity.lifecycleScope.launch(Dispatchers.IO) {
-             try {
-                 // Use activity's contentResolver
-                 activity.contentResolver.openInputStream(fileUri)?.use { inputStream ->
-                     BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                         val content = reader.readText()
-                         Log.d("WebAppInterface", "Read content successfully")
-                         withContext(Dispatchers.Main) {
-                             val escapedContent = escapeStringForJavaScript(content)
-                             val escapedUri = escapeStringForJavaScript(uriString)
-                             activity.evaluateJavascript("javascript:displayFileContent('$escapedUri', '$escapedContent')")
-                         }
-                     }
-                 } ?: throw Exception("Could not open input stream for URI: $uriString")
-             } catch (e: Exception) {
-                 Log.e("WebAppInterface", "Error reading file content for URI: $uriString", e)
-                 withContext(Dispatchers.Main) {
-                     val escapedUri = escapeStringForJavaScript(uriString)
-                     activity.evaluateJavascript("javascript:showError('Error reading file $escapedUri: ${escapeStringForJavaScript(e.message ?: "Unknown error")}')")
-                 }
-             }
-         }
-    }
-
-    @JavascriptInterface
-    fun saveFile(filename: String, content: String) {
-        Log.d("WebAppInterface", "saveFile called: $filename")
-        // Access selectedDirectoryUri via the activity instance
-        val currentDirectoryUri = activity.selectedDirectoryUri
-        if (currentDirectoryUri == null) {
-            activity.evaluateJavascript("javascript:showError('Error: No folder selected. Please select a folder first.')")
-            return
-        }
-        if (filename.isBlank()) {
-            activity.evaluateJavascript("javascript:showError('Filename cannot be empty.')")
-            return
-        }
-        val safeFilename = filename.replace(Regex("[^a-zA-Z0-9._-]"), "_")
-
+    fun initiateReadFolder(directoryUriString: String) {
+        val directoryUri = Uri.parse(directoryUriString)
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // Use activity context for DocumentFile
+                val directory = DocumentFile.fromTreeUri(activity, directoryUri)
+                if (directory != null && directory.isDirectory && directory.canRead()) {
+                    val filesList = mutableListOf<JSONObject>()
+                    val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US) // Use Locale.US for consistency
+
+                    directory.listFiles().forEach { file ->
+                        if (file.isFile) {
+                            val lastModifiedMillis = file.lastModified()
+                            val formattedDate = if (lastModifiedMillis > 0) {
+                                // Convert milliseconds to Date and format
+                                isoFormat.format(Date(lastModifiedMillis))
+                            } else {
+                                "Unknown Date" // Handle cases where timestamp is 0 or unavailable
+                            }
+                            filesList.add(JSONObject().apply {
+                                put("date", formattedDate)
+                                put("filename",  file.name)
+                            })
+                        }
+                    }
+                    val filesJson = JSONArray(filesList).toString()
+                    // Use escapeStringForJavaScript from Utils.kt (ensure import)
+                    val escapedJson = escapeStringForJavaScript(filesJson)
+                    val escapedUri = escapeStringForJavaScript(directoryUri.toString())
+                    withContext(Dispatchers.Main) {
+                        activity.evaluateJavascript("javascript:window.readFolderSuccess('$escapedUri', '$escapedJson')")
+                    }
+                } else {
+                    activity.toastError("Selected item is not a directory or cannot be read.")
+                }
+            } catch (e: Exception) {
+                Log.e("WebAppInterface", "Error listing files", e)
+                activity.toastError("Error listing files: ${escapeStringForJavaScript(e.message ?: "Unknown error")}")
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun initiateReleaseFolderPermission(uriToReleaseString: String) {
+        val uriToRelease = Uri.parse(uriToReleaseString)
+        try {
+            // Specify the exact flags you want to release.
+            // If you took both read and write, you might need to call release twice,
+            // or release the specific one you no longer need.
+            // Here we assume you want to release the read permission.
+            val releaseFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+
+            activity.contentResolver.releasePersistableUriPermission(uriToRelease, releaseFlags);
+            System.out.println("Released READ permission for URI: " + uriToRelease);
+
+            val releaseWriteFlags: Int = Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+            activity.contentResolver.releasePersistableUriPermission(uriToRelease, releaseWriteFlags);
+            System.out.println("Released WRITE permission for URI: " + uriToRelease);
+        } catch (e: SecurityException) {
+            System.err.println("Failed to release permission for URI: $uriToRelease - ${e.message}");
+            activity.toastError("Failed to get persistent permission for the selected folder.")
+        }
+    }
+
+    @JavascriptInterface
+    fun initiateReadFile(uriString: String) {
+        var filename = basename(uriString)
+        // Perform file operations off the main thread
+        activity.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Parse the directory URI string
+                val directoryUri = Uri.parse(uriString)
+
+                // 2. Get a DocumentFile representing the directory
+                // Requires context (from activity) and the directory URI
+                val documentsTree = DocumentFile.fromTreeUri(activity, directoryUri)
+
+                // Check if the directory URI is valid and accessible
+                if (documentsTree == null || !documentsTree.isDirectory) {
+                    Log.e("WebAppInterface", "Failed to access directory from URI: $uriString")
+                    activity.toastError("Error: Could not access the specified folder.")
+                    return@launch // Exit the coroutine
+                }
+
+                // 3. Find the specific file within the directory
+                val file = documentsTree.findFile(filename)
+
+                // Check if the file exists and is a regular file
+                if (file == null || !file.isFile) {
+                    Log.e("WebAppInterface", "File '$filename' not found or is not a file in directory: $uriString")
+                    activity.toastError("Error: File '$filename' not found.")
+                    return@launch // Exit the coroutine
+                }
+
+                Log.d("WebAppInterface", "Found file: ${file.uri}")
+
+                // 4. Read the file content using ContentResolver
+                val stringBuilder = StringBuilder()
+                try {
+                    activity.contentResolver.openInputStream(file.uri)?.use { inputStream ->
+                        BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                            var line: String?
+                            while (reader.readLine().also { line = it } != null) {
+                                stringBuilder.append(line).append("\n") // Append line and newline
+                            }
+                        }
+                    } ?: run {
+                        // Handle case where openInputStream returns null (should be rare if file exists)
+                        Log.e("WebAppInterface", "Could not open input stream for file: ${file.uri}")
+                        activity.toastError("Error: Could not open file for reading.")
+                        return@launch
+                    }
+
+                    val fileContent = stringBuilder.toString()
+                    Log.d("WebAppInterface", "Successfully read file content (length: ${fileContent.length})")
+
+                    // --- IMPORTANT ---
+                    // 5. TODO: Do something with the fileContent
+                    //    For example, pass it back to your WebView's JavaScript.
+                    //    This needs to be done on the main thread if interacting with UI/WebView.
+                    withContext(Dispatchers.Main) {
+                        // Example: Call a JavaScript function named 'handleFileContent'
+                        // activity.webView.evaluateJavascript("javascript:handleFileContent(`${fileContent.replace("`", "\\`")}`);", null)
+                        Log.i("WebAppInterface", "File read complete. Content needs to be sent to JS.")
+                        val escapedFileContent = escapeStringForJavaScript(fileContent)
+                        val escapedUri = escapeStringForJavaScript(directoryUri.toString())
+                        activity.evaluateJavascript("javascript:window.readFileSuccess('$escapedUri', '$escapedFileContent')")
+                    }
+                    // --- /IMPORTANT ---
+                } catch (e: Exception) { // Catch potential IOExceptions during read
+                    Log.e("WebAppInterface", "Error reading file content from ${file.uri}", e)
+                    activity.toastError("Error reading file: ${e.localizedMessage}")
+                }
+
+            } catch (e: IllegalArgumentException) {
+                Log.e("WebAppInterface", "Invalid URI string provided: $uriString", e)
+                activity.toastError("Error: Invalid folder path provided.")
+            } catch (e: SecurityException) {
+                 Log.e("WebAppInterface", "Permission denied for URI: $uriString", e)
+                 activity.toastError("Error: Permission denied to access folder.")
+            } catch (e: Exception) { // Catch other unexpected errors
+                Log.e("WebAppInterface", "An unexpected error occurred during initiateReadFile", e)
+                activity.toastError("An unexpected error occurred.")
+            }
+        }
+    }
+
+    @JavascriptInterface
+    fun initiateWriteFile(uriString: String, content: String) {
+        Log.d("WebAppInterface", "saveFile called: $uriString")
+        val directoryUriString = dirname(uriString)
+        val currentDirectoryUri = Uri.parse(directoryUriString)
+        var filename = basename(uriString)
+        val safeFilename = filename.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+        var filenameEncoded = Uri.encode(safeFilename)
+        val fileUri = Uri.parse("$directoryUriString/$filenameEncoded")
+        val escapedSafeFilename = escapeStringForJavaScript(safeFilename)
+        val escapedUri = escapeStringForJavaScript(uriString)
+        activity.lifecycleScope.launch(Dispatchers.IO) { // Launch coroutine on IO dispatcher
+            try {
                 val directory = DocumentFile.fromTreeUri(activity, currentDirectoryUri)
                 if (directory == null || !directory.isDirectory || !directory.canWrite()) {
                      withContext(Dispatchers.Main) {
-                        activity.evaluateJavascript("javascript:showError('Error: Cannot write to the selected directory. Please select another folder.')")
+                        activity.toastError("Error: Cannot write to the selected directory. Please select another folder.")
                      }
                     return@launch
                 }
-                val existingFile = directory.findFile(safeFilename)
+                val existingFile = directory.findFile(filenameEncoded)
                 if (existingFile != null) {
                     Log.d("WebAppInterface", "File '$safeFilename' exists, deleting for overwrite.")
                     if (!existingFile.delete()) {
                          withContext(Dispatchers.Main) {
-                            activity.evaluateJavascript("javascript:showError('Error: Could not delete existing file $safeFilename for overwrite.')")
+                            activity.toastError("Error: Could not delete existing file $escapedSafeFilename for overwrite.")
                          }
                         return@launch
                     }
                 }
-                val newFile = directory.createFile("text/plain", safeFilename)
+                val newFile = directory.createFile("text/plain", filenameEncoded)
                 if (newFile == null) {
                      withContext(Dispatchers.Main) {
-                        activity.evaluateJavascript("javascript:showError('Error: Could not create file $safeFilename in the selected directory.')")
+                        activity.toastError("javascript:showError('Error: Could not create file $escapedSafeFilename in the selected directory.")
                      }
                     return@launch
                 }
@@ -129,78 +238,57 @@ class WebAppInterface(private val activity: MainActivity) {
 
                 Log.d("WebAppInterface", "File '$safeFilename' saved successfully in selected directory.")
                 withContext(Dispatchers.Main) {
-                    showToast("File '$safeFilename' saved in selected folder.") // Can call own showToast
-                    activity.evaluateJavascript("javascript:clearSaveFields()")
-                    // Refresh list after saving - call activity's method
-                    activity.listFilesFromUri(currentDirectoryUri)
+                    activity.evaluateJavascript("javascript:window.writeFileSuccess('$escapedUri')")
                 }
             } catch (e: Exception) {
-                Log.e("WebAppInterface", "Error saving file to selected directory", e)
+                Log.e("WebAppInterface", "Error saving file to path: $uriString", e)
+                // Switch back to the Main thread for error UI updates
                 withContext(Dispatchers.Main) {
-                     activity.evaluateJavascript("javascript:showError('Error saving file $safeFilename: ${escapeStringForJavaScript(e.message ?: "Unknown error")}')")
+                    activity.toastError("Error saving file: ${escapeStringForJavaScript(e.message ?: "Unknown error")}")
                 }
             }
         }
     }
 
-
     @JavascriptInterface
-    fun saveToPreferences(key: String, value: String) {
-         Log.d("WebAppInterface", "saveToPreferences called: Key=$key")
-         if (key.isBlank()) {
-             activity.evaluateJavascript("javascript:showError('Preference key cannot be empty.')")
-             return
-         }
-         activity.lifecycleScope.launch(Dispatchers.IO) {
-             try {
-                 // Use activity context to get SharedPreferences
-                 val prefs: SharedPreferences = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                 with(prefs.edit()) {
-                     putString(key, value)
-                     apply()
-                 }
-                 Log.d("WebAppInterface", "Preference saved: Key=$key")
-                 withContext(Dispatchers.Main) {
-                     showToast("Preference '$key' saved.") // Can call own showToast
-                 }
-             } catch (e: Exception) {
-                 Log.e("WebAppInterface", "Error saving preference", e)
-                  withContext(Dispatchers.Main) {
-                     activity.evaluateJavascript("javascript:showError('Error saving preference $key: ${escapeStringForJavaScript(e.message ?: "Unknown error")}')")
-                 }
-             }
-         }
-    }
-
-    @JavascriptInterface
-    fun loadFromPreferences(key: String) {
-        Log.d("WebAppInterface", "loadFromPreferences called: Key=$key")
-        if (key.isBlank()) {
-             activity.evaluateJavascript("javascript:showError('Preference key cannot be empty.')")
-            return
-        }
-        activity.lifecycleScope.launch(Dispatchers.IO) {
-             try {
-                // Use activity context to get SharedPreferences
-                val prefs: SharedPreferences = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                val value = prefs.getString(key, null)
-                withContext(Dispatchers.Main) {
-                    if (value != null) {
-                        Log.d("WebAppInterface", "Preference loaded: Key=$key, Value=$value")
-                        val escapedValue = escapeStringForJavaScript(value)
-                        activity.evaluateJavascript("javascript:displayPreferenceValue('$escapedValue')")
-                    } else {
-                        Log.w("WebAppInterface", "Preference not found for key: $key")
-                        activity.evaluateJavascript("javascript:showError('No value found for key: $key')")
-                        activity.evaluateJavascript("javascript:displayPreferenceValue('')")
+    fun deleteFile(uriString: String) {
+        val directoryUriString = uriString.substringBeforeLast('/', missingDelimiterValue = "")
+        var filename = uriString.split('/').last()
+        val currentDirectoryUri = Uri.parse(directoryUriString)
+        activity.lifecycleScope.launch(Dispatchers.IO) { // Launch coroutine on IO dispatcher
+            try {
+                val directory = DocumentFile.fromTreeUri(activity, currentDirectoryUri)
+                if (directory == null || !directory.isDirectory || !directory.canWrite()) {
+                     withContext(Dispatchers.Main) {
+                        activity.toastError("Error: Cannot write to the selected directory. Please select another folder.")
+                     }
+                    return@launch
+                }
+                val existingFile = directory.findFile(filename)
+                if (existingFile != null) {
+                    Log.d("WebAppInterface", "File '$filename' exists, deleting for overwrite.")
+                    if (!existingFile.delete()) {
+                         withContext(Dispatchers.Main) {
+                            activity.toastError("Error: Could not find the file $filename for removal.")
+                         }
+                        return@launch
                     }
                 }
-             } catch (e: Exception) {
-                 Log.e("WebAppInterface", "Error loading preference", e)
-                  withContext(Dispatchers.Main) {
-                     activity.evaluateJavascript("javascript:showError('Error loading preference $key: ${escapeStringForJavaScript(e.message ?: "Unknown error")}')")
-                 }
-             }
-         }
+            } catch (e: Exception) {
+                Log.e("WebAppInterface", "Error saving file to path: $uriString", e)
+                // Switch back to the Main thread for error UI updates
+                withContext(Dispatchers.Main) {
+                    activity.toastError("Error saving file: ${escapeStringForJavaScript(e.message ?: "Unknown error")}")
+                }
+            }
+        }
+    }
+
+    fun dirname(uriString: String): String {
+        return uriString.substringBeforeLast('/', missingDelimiterValue = "")
+    }
+
+    fun basename(uriString: String): String {
+        return uriString.split('/').last()
     }
 }

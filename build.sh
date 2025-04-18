@@ -10,6 +10,7 @@ docker run \
     -ti \
     --rm \
     -v $(pwd):/workspace \
+    -v $(pwd)/.gradle-opt:/opt \
     -v $(pwd)/.gradle-home:/root/.gradle \
     -w /workspace \
     wsn-builder \
