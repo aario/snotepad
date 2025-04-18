@@ -99,5 +99,53 @@
         window.sidebarUpdateFolders(paths)
         window.settingsUpdateFolders(paths)
     }
-    document.documentElement.setAttribute('data-bs-theme', 'dark')
+
+
+
+
+
+  window.getStoredTheme = () => localStorage.getItem('theme')
+  window.setStoredTheme = theme => localStorage.setItem('theme', theme)
+
+  const getPreferredTheme = () => {
+    const storedTheme = window.getStoredTheme()
+    if (storedTheme) {
+      return storedTheme
+    }
+    // Default to 'auto' if nothing is stored and system preference isn't dark.
+    // Or default to 'light' if you prefer.
+    // If system default is dark, 'auto' would resolve to 'dark' anyway in setTheme.
+    return 'auto'
+  }
+
+  window.setTheme = theme => {
+    if (theme === 'auto') {
+      // Check system preference and apply dark/light accordingly
+      document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+    } else {
+      document.documentElement.setAttribute('data-bs-theme', theme)
+    }
+  }
+
+  // --- Apply the theme and update UI on initial load ---
+  const initialTheme = getPreferredTheme();
+  window.setTheme(initialTheme);
+  // Store 'auto' explicitly if it was the initial derived preference but not stored
+  if (!getStoredTheme() && initialTheme === 'auto') {
+       window.setStoredTheme('auto')
+  }
+
+  // --- Listen for system theme changes AFTER initial load ---
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    const storedTheme = window.getStoredTheme()
+    // Only react to system changes if the user explicitly selected 'auto' or hasn't made a choice yet
+    if (storedTheme === 'auto' || !storedTheme) {
+      // Re-evaluate preferred theme (which checks system preference if theme is 'auto')
+      const newPreferred = getPreferredTheme();
+      window.setTheme(newPreferred);
+      // No UI update needed here for radio buttons, as the 'auto' radio should remain checked.
+      // If 'auto' wasn't stored and system changed, getPreferredTheme would return 'light'/'dark'
+      // but we likely still want 'auto' selected conceptually unless the user explicitly picks light/dark.
+    }
+  })
 })(jQuery); // End of use strict
