@@ -82,7 +82,8 @@ function clean() {
   "./vendor/",
   "./css/*.css",
   "./js/build/*",
-  "./fonts/"
+  "./fonts/",
+  "./dict/"
  ]);
 }
 
@@ -108,7 +109,6 @@ function googlefonts() {
     })
     .pipe(gulp.dest(paths.fonts.dest)); // Output to root directory './'
 }
-
 
 // Bring third party dependencies from node_modules into vendor directory
 function modules() {
@@ -150,6 +150,14 @@ function modules() {
   .pipe(gulp.dest('./vendor/hammerjs'));
 
  return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, easymde, hammerJS);
+}
+
+function spellCheckDicts() {
+  return gulp.src([
+    './node_modules/codemirror-spell-checker/dist/en_US.aff',
+    './node_modules/codemirror-spell-checker/dist/en_US.dic'
+  ])
+  .pipe(gulp.dest('./dict')); // Copy to the 'dict' folder at the root
 }
 
 // CSS task - Includes generated font CSS
@@ -264,7 +272,7 @@ function watchFiles() {
 }
 
 // Define complex tasks - Ensure googlefonts runs before css
-const vendor = gulp.series(clean, googlefonts, modules);
+const vendor = gulp.series(clean, googlefonts, modules, spellCheckDicts);
 const build = gulp.series(vendor, generateTemplatesJS, gulp.parallel(css, js)); // css now depends on googlefonts completing first
 const watch = gulp.series(build, gulp.parallel(watchFiles, browserSync));
 
@@ -278,3 +286,4 @@ exports.watch = watch;
 exports.default = build;
 exports.generateTemplatesJS = generateTemplatesJS;
 exports.googlefonts = googlefonts;
+exports.spellCheckDicts = spellCheckDicts;
