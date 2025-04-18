@@ -74,6 +74,8 @@
                     window.readPreferences('paths')
                 )
             )
+
+            window.hideLoading()
         });
 
     // Scroll to top button appear

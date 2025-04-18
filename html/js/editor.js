@@ -1,4 +1,7 @@
 (function($) {
+    let easyMDE
+    let isFileNew
+
     // Define the function that should be called for settings
     window.editorNewFile = (path) => {
         console.log("editorNewFile function called!");
@@ -11,18 +14,47 @@
     }
 
     function lunchEditor(path, isNew) {
-        window.setNavBar(
-            'navbar-editor',
-            {
-                'path': path
-            }
-        );
+        window.setNavBar('navbar-editor',{})
 
+        $('#btn-save').on('click', (event) => {
+            event.preventDefault()
+            let path = $("#editor-path").text()
+            if (isFileNew) {
+                let filename = $("#filename").val().trim()
+                if (filename === '') {
+                    window.showToast('Please first enter a filename.', true)
+                    return
+                }
+
+                path = path + '/' + filename
+            }
+
+            const content = easyMDE.value()
+            window.requestWriteFile(path, content, window.editorWriteFileSuccess)
+        })
+
+        isFileNew = isNew
+        if (isNew) {
+            window.editorReadFileSuccess(path)
+
+            return
+        }
+
+        window.requestReadFile(path, window.editorReadFileSuccess)
+    }
+
+    window.editorWriteFileSuccess = (path) => {
+        isFileNew = false
+        window.showToast('Saved to:<br/><i>' + path + '</i>')
+    }
+
+    window.editorReadFileSuccess = (path, content) => {
         window.setPage(
             'editor',
             {
-                'basename': isNew ? 'Untitled' : window.basename(path),
-                'content': isNew ? '' : window.readFile(path),
+                'path': path,
+                'basename': isFileNew ? 'Untitled' : window.basename(path),
+                'content': isFileNew ? '' : content,
             }
         );
 
@@ -31,13 +63,13 @@
         // Check if EasyMDE is defined (it might be loaded asynchronously or conditionally)
         if (typeof EasyMDE !== 'undefined') {
             if ($editorElement.length > 0) {
-            const easyMDE = new EasyMDE({
-                element: $editorElement[0]
-            });
-            console.log('EasyMDE Initialized Successfully!');
+                easyMDE = new EasyMDE({
+                    element: $editorElement[0]
+                });
+                console.log('EasyMDE Initialized Successfully!');
             } else {
-            // Only log error if the *element* is missing, not if EasyMDE library is missing
-            console.error('Error: Textarea element with ID "markdown-editor" not found.');
+                // Only log error if the *element* is missing, not if EasyMDE library is missing
+                console.error('Error: Textarea element with ID "markdown-editor" not found.');
             }
         } else {
             // Optional: Log if EasyMDE library itself isn't loaded when the script runs

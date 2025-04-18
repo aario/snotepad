@@ -1,4 +1,5 @@
 (function($) {
+    var currentPath = ''
     // Define the function that should be called for settings
     window.lunchFolderView = (path) => {
         console.log("lunchFolderView function called!");
@@ -8,6 +9,7 @@
         window.setPage(
             'folderView',
             {
+                'path': path,
                 'basename': window.basename(path)
             }
         );
@@ -15,11 +17,13 @@
             let path = $("#div-folderView-path").text()
             window.editorNewFile(path)
         });
+        window.requestReadFolder(path, window.folderViewReadFolderSuccess)
+    }
 
+    window.folderViewReadFolderSuccess = (path, folderContent) => {
         const $filesDiv = $("#files");
         $filesDiv.empty()
-        const files = window.listFiles(path)
-        $.each(files, (i, file) => {
+        $.each(folderContent, (i, file) => {
             $filesDiv.append(
                 window.renderTemplate(
                     {
@@ -45,8 +49,5 @@
             let path = $('#div-file-path-' + id).text()
             window.editorOpenFile(path)
         })
-    }
-    window.getFolderViewrCurrentPath = () => {
-        return '';
     }
 })(jQuery); // End of use strict

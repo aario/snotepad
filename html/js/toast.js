@@ -2,7 +2,7 @@ $(document).ready(function() {
   "use strict"; // Start of use strict
 
   // Function to show an error toast
-  window.showErrorToast = (message, isError) => {
+  window.showToast = (message, isError) => {
     // Generate a unique ID for the new toast
     const uniqueId = 'toast-' + Date.now()
 
@@ -12,6 +12,7 @@ $(document).ready(function() {
             {
                 'id': uniqueId,
                 'message': message,
+                'title': isError ? 'Error' : 'Info',
                 'bg': isError ? 'danger' : 'info',
                 'role': isError ? 'alert' : 'info',
             },

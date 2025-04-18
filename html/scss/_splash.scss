@@ -1,0 +1,39 @@
+// SCSS for Loading Overlay (e.g., in _global.scss or _splash.scss)
+
+#loading-overlay {
+  position: fixed; // Stick to the viewport
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(var(--bs-body-bg-rgb), 0.9); // Use body background with opacity
+  display: flex; // Use flexbox for centering
+  justify-content: center;
+  align-items: center;
+  z-index: 1056; // Ensure it's above other content (Bootstrap modals are ~1050-1055)
+  opacity: 1;
+  transition: opacity 0.5s ease-out; // Smooth fade-out transition
+
+  // Style the spinner if needed (optional, Bootstrap defaults are usually fine)
+  .spinner-border {
+    width: 3rem; // Example: Make spinner slightly larger
+    height: 3rem; // Example: Make spinner slightly larger
+  }
+
+  // Class to apply via jQuery to hide the overlay
+  &.hidden {
+    opacity: 0;
+    pointer-events: none; // Prevent interaction after hiding
+  }
+}
+
+// Ensure it's hidden initially by default IF JavaScript might be slow or disabled (optional but good practice)
+// You can achieve this by adding the .hidden class directly in the HTML initially,
+// OR by adding this rule if you prefer CSS-first hiding:
+// body:not(.loaded) #loading-overlay {
+//   /* Styles above */
+// }
+// body.loaded #loading-overlay {
+//   opacity: 0;
+//   pointer-events: none;
+// }

@@ -99,6 +99,18 @@
 
         let pathValue = $pathDiv.text();
 
+        // Find the parent li.nav-item of the clicked link
+        let $parentLi = $(this).closest('li.nav-item');
+
+        // Find all li.nav-item elements within the same parent container 
+        //    (e.g., all direct children of the surrounding UL/OL)
+        //    and remove the 'active' class from all of them.
+        //    This ensures only one item is active at a time within this group.
+        $parentLi.parent().children('li.nav-item').removeClass('active');
+
+        // Add the 'active' class specifically to the parent li of the clicked link.
+        $parentLi.addClass('active');
+
         // Display the path in an alert dialog
         window.lunchFolderView(pathValue)
     });        

@@ -1,17 +1,40 @@
 (function($) {
     "use strict"; // Start of use strict
+
+    const DEFAULT_VALUES = {
+        'paths': {}
+    }
+
+    const DEBUG = (new URLSearchParams(window.location.search)).get('debug') === 'true'
+
+    setTimeout(() => {
+            if (typeof AndroidInterface === 'undefined' && DEBUG === false) {
+                window.showToast("Android interface not available. Probably I'm incompatible with your phone altogether :-(");
+            }
+        },
+        1000
+    )
+
+    let callbacks = {}
+
     window.requestFolderSelection = () => {
-        let i = Math.floor(Math.random() * 9999) + 1
-        window.requestFolderSelectionSuccess('/storage/path-to-folder-' + i + '/Folder ' + i)
+        if (DEBUG) {
+            let i = Math.floor(Math.random() * 9999) + 1
+            window.requestFolderSelectionSuccess('/storage/path-to-folder-' + i + '/Folder ' + i)
+            return
+        }
+
+        AndroidInterface.requestFolderSelection();
     }
 
     window.requestFolderSelectionSuccess = (path) => {
-        const pathsJson = window.readPreferences('paths')
-        if (pathsJson === '') {
-            pathsJson = '[]';
+        let paths = JSON.parse(window.readPreferences('paths'));
+        if (paths === null) {
+            paths = []
         }
-        let paths = JSON.parse(pathsJson);
+
         paths.push(path)
+
         window.writePreferences('paths', JSON.stringify(paths))
         window.uiUpdateFolders(paths)
     }
@@ -23,52 +46,93 @@
             $.inArray(path, paths),
             1
         )
+        if (!DEBUG) {
+            AndroidInterface.requestRemoveFolderPermission(path);
+        }
 
         window.writePreferences('paths', JSON.stringify(paths))
         window.uiUpdateFolders(paths)
     }
 
     window.deleteFile = (path) => {
-        //Nothing needed at this point
+        if (!DEBUG) {
+            AndroidInterface.deleteFile(path);
+        }
     }
 
-    let settings = {}
     window.readPreferences = (key) => {
-        if (key === 'paths' && settings['paths'] === undefined) {
-            let paths = []
-            for (let i = 1; i <= 10; i++) {
-                paths.push('/storage/path-to-folder-' + i + '/Folder ' + i)
-            }
-            settings['paths'] = JSON.stringify(paths)
+        result = window.localStorage.getItem(key)
+        if (result === undefined) {
+            result = DEFAULT_VALUES[key]
         }
 
-        return settings[key]
+        return result
     }
 
     window.writePreferences = (key, value) => {
-        settings[key] = value
+        window.localStorage.setItem(key, value);
     }
 
-    window.listFiles = (path) => {
-        let files = []
-        for (let i = 1; i <= 10; i++) {
-            const filePath = path + '/File ' + i
-            const date = new Date(); // Gets the current date and time
-            date.setDate(date.getDate() - i)
-            files.push({
-                'path': filePath,
-                'date': date.toLocaleDateString()
-            })
+    window.requestReadFolder = (path, callback) => {
+        callbacks['readFolder' + path] = callback
+        if (DEBUG) {
+            let files = []
+            for (let i = 1; i <= 10; i++) {
+                const filePath = path + '/File ' + i
+                const date = new Date(); // Gets the current date and time
+                date.setDate(date.getDate() - i)
+                files.push({
+                    'path': filePath,
+                    'date': date.toLocaleDateString()
+                })
+            }
+            window.readFolderSuccess(path, files)
+
+            return
         }
 
-        return files
+        AndroidInterface.requestReadFolder(path)
     }
-    window.readFile = (path) => {
-        let content = '# Sample Content\n\n *' + path + '*\n\n'
-        for (let i = 1; i <= 30; i++) {
-            content = content + '- Line ' + i + '\n'
+
+    window.readFolderSuccess = (path, folderContent) => {
+        callbacks['readFolder' + path](path, folderContent)
+        delete callbacks['readFolder' + path]
+    }
+
+    window.requestReadFile = (path, callback) => {
+        callbacks['readFile' + path] = callback
+        if (DEBUG) {
+            let content = '# Sample Content\n\n *' + path + '*\n\n'
+            for (let i = 1; i <= 30; i++) {
+                content = content + '- Line ' + i + '\n'
+            }
+            
+            window.readFileSuccess(path, content)
+
+            return
         }
 
-        return content
+        AndroidInterface.requestReadFile(path)
+    }
+
+    window.readFileSuccess = (path, fileContent) => {
+        callbacks['readFile' + path](path, fileContent)
+        delete callbacks['readFile' + path]
+    }
+
+    window.requestWriteFile = (path, fileContent, callback) => {
+        callbacks['writeFile' + path] = callback
+        if (DEBUG) {
+            window.writeFileSuccess(path)
+
+            return
+        }
+
+        AndroidInterface.requestWriteFile(path, fileContent)
+    }
+
+    window.writeFileSuccess = (path) => {
+        callbacks['writeFile' + path](path)
+        delete callbacks['writeFile' + path]
     }
 })(jQuery); // End of use strict
