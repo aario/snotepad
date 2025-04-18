@@ -1,6 +1,6 @@
 (function($) {
     "use strict"; // Start of use strict
-    const VERSION = '1'
+    const VERSION = 2
 
     const DEFAULT_VALUES = {
         'paths': {}
