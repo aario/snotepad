@@ -32,3 +32,8 @@ captures/
 
 # Log files
 *.log
+
+#google-font files:
+html/fonts.list
+html/fonts/
+html/google-fonts.css

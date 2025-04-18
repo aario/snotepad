@@ -8,7 +8,7 @@
 
 // Import Custom SB Admin 2 Mixins and Components
 @import "mixins.scss";
-@import "global.scss";
+@import "global.scss"; // Ensure font-family definitions here use "Nunito"
 @import "utilities.scss";
 
 // Custom Components
