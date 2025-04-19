@@ -13,6 +13,7 @@
     }
 
     function lunchEditor(path, isNew) {
+        window.showLoading('Loading file...')
         window.setNavBar('navbar-editor',{})
 
         isFileNew = isNew
@@ -27,6 +28,7 @@
 
     window.editorWriteFileSuccess = (path) => {
         isFileNew = false
+        window.hideLoading()
         window.showToast('Saved to:<br/><i>' + path + '</i>')
     }
 
@@ -63,6 +65,7 @@
                 $('#btn-save').off('click');
                 $('#btn-save').on('click', (event) => {
                     event.preventDefault()
+                    window.showLoading('Saving file...')
                     let path = $("#editor-path").text()
                     if (isFileNew) {
                         let filename = $("#filename").val().trim()
@@ -97,6 +100,7 @@
                 console.warn('EasyMDE library not found, cannot initialize editor for #markdown-editor.');
             }
         }
+        window.hideLoading()
     }
 
     window.getEditorCurrentPath = () => {

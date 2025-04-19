@@ -3,6 +3,7 @@
 
     // Define the function that should be called for settings
     window.lunchFolderView = (path) => {
+        window.showLoading('Loading folder...')
         console.log("lunchFolderView function called!");
 
         window.setNavBar('navbar-folderView', {});
@@ -52,5 +53,7 @@
             let path = $('#div-file-path-' + id).text()
             window.editorOpenFile(path)
         })
+
+        window.hideLoading()
     }
 })(jQuery); // End of use strict
