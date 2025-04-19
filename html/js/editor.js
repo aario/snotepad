@@ -86,8 +86,11 @@
 
     window.editorWriteFileSuccess = (path) => {
         isFileNew = false
+        const folderName = window.getHumanReadableBasename(window.dirname(path))
+        const filename = window.basename(path)
+        $('#filename').val(filename)
         window.hideLoading()
-        window.showToast('Saved to:<br/><i>' + path + '</i>')
+        window.showToast('Saved to:<br/><i>' + folderName + '/' + filename + '</i>')
     }
 
     window.editorReadFileSuccess = (path, content) => {
@@ -132,6 +135,10 @@
                         }
 
                         path = path + '/' + filename
+                    } else {
+                        //In case the user wants to change the filename we always save in the same original folder, with the new name
+                        const origPath = window.dirname(path)
+                        path = origPath + '/' + $("#filename").val().trim()
                     }
 
                     easyMDE.codemirror.save()

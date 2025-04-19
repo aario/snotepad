@@ -219,7 +219,7 @@ class WebAppInterface(private val activity: MainActivity) {
         val directoryUriString = dirname(uriString)
         val currentDirectoryUri = Uri.parse(directoryUriString)
         var filename = basename(uriString)
-        val safeFilename = filename.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+        val safeFilename = filename.replace(Regex("[^a-zA-Z0-9._\\s()-]"), "_")
         var filenameEncoded = Uri.encode(safeFilename)
         val fileUri = Uri.parse("$directoryUriString/$filenameEncoded")
         val escapedSafeFilename = escapeStringForJavaScript(safeFilename)
@@ -259,7 +259,8 @@ class WebAppInterface(private val activity: MainActivity) {
 
                 Log.d("WebAppInterface", "File '$safeFilename' saved successfully in selected directory.")
                 withContext(Dispatchers.Main) {
-                    activity.evaluateJavascript("javascript:window.writeFileSuccess('$escapedUri')")
+                    val escapedNewUri = escapeStringForJavaScript("$directoryUriString/${newFile.name}")
+                    activity.evaluateJavascript("javascript:window.writeFileSuccess('$escapedUri', '$escapedNewUri')")
                 }
             } catch (e: Exception) {
                 Log.e("WebAppInterface", "Error saving file to path: $uriString", e)
@@ -303,6 +304,11 @@ class WebAppInterface(private val activity: MainActivity) {
                 }
             }
         }
+    }
+
+    @JavascriptInterface
+    fun releaseFolder(uriString: String) {
+        Log.d("WebAppInterface", "NOT IMPLEMENTED YET: releaseFolder: $uriString")
     }
 
     fun dirname(uriString: String): String {

@@ -48,7 +48,6 @@ $(document).ready(function() {
     // Optional: Remove the toast from DOM after it's hidden to prevent buildup
     toastElement.addEventListener('hidden.bs.toast', function () {
       hammer.destroy(); // Clean up Hammer instance
-      $toastClone.remove();
     });
   }
 });

@@ -43,11 +43,58 @@
             )
         })
 
+        let fileToDeleteId = null; // Variable to store the ID of the file to delete
+        let $itemToDelete = null; // Variable to store the jQuery element to remove
+        let fileToDeleteName = null
+
+        // Get the modal instance
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+        // Handle the click on the final confirmation button inside the modal
+        $('#confirmBtn').off('click').on('click', function() {
+            if (fileToDeleteId !== null && $itemToDelete) {
+                let path = $('#div-file-path-' + fileToDeleteId).text()
+                console.log("Deleting file with path:", path);
+                window.deleteFile(path)
+
+                // Hide the modal
+                confirmModal.hide();
+
+                $itemToDelete.fadeOut(300, function() {
+                    $(this).remove();
+                });
+
+
+                window.showToast('File deleted:<br/>' + fileToDeleteName)
+                // Reset the stored variables
+                fileToDeleteId = null;
+                $itemToDelete = null;
+            } else {
+                console.error("Could not find file ID or element to delete.");
+                confirmModal.hide(); // Hide modal even if error occurs
+            }
+        });
+
+        // Optional: Clear stored data when modal is closed without confirming
+        $('#confirmModal').on('hidden.bs.modal', function () {
+            if (fileToDeleteId !== null) { // Only reset if deletion wasn't confirmed
+                // console.log("Modal closed without confirmation, resetting.");
+                fileToDeleteId = null;
+                $itemToDelete = null;
+                fileToDeleteName = null;
+            }
+        });
+
         $('.btn-file-delete').on('click', function(button) {
-            let id = $(this).data('id')
-            let path = $('#div-file-path-' + id).text()
-            window.deleteFile(path)
-            $('#div-file-' + id).remove()
+            fileToDeleteId = $(this).data('id')
+            $itemToDelete = $('#div-file-' + fileToDeleteId)
+            fileToDeleteName = $('#div-filename-' + fileToDeleteId).text()
+
+            $('#confirmModalLabel').text('Delete File')
+            $('#confirmModalMessage').html('Are you sure you want to permanently delete this file?<br/>' + fileToDeleteName)
+
+            // Show the modal
+            confirmModal.show();
         })
 
         $('.div-file-open').on('click', function(button) {
@@ -93,7 +140,7 @@
             'folderView',
             {
                 'path': path,
-                'basename': window.getHumanReadableFolderName(path)
+                'basename': window.getHumanReadableBasename(path)
             }
         );
         $('#btn-add-file').on('click', function() {

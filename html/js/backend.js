@@ -74,7 +74,7 @@
         delete callbacks['scanFolder' + path]
     }
 
-    window.deleteFolder = (path) => {
+    window.releaseFolder = (path) => {
         const pathsJson = window.readPreferences('paths')
         let paths = JSON.parse(pathsJson);
         paths.splice(
@@ -82,7 +82,7 @@
             1
         )
         if (!DEBUG) {
-            AndroidInterface.initiateRemoveFolderPermission(path);
+            AndroidInterface.releaseFolder(path);
         }
 
         window.writePreferences('paths', JSON.stringify(paths))
@@ -158,7 +158,7 @@
     window.requestWriteFile = (path, fileContent, callback) => {
         callbacks['writeFile' + path] = callback
         if (DEBUG) {
-            window.writeFileSuccess(path)
+            window.writeFileSuccess(path, path)
 
             return
         }
@@ -166,8 +166,8 @@
         AndroidInterface.initiateWriteFile(path, fileContent)
     }
 
-    window.writeFileSuccess = (path) => {
-        callbacks['writeFile' + path](path)
-        delete callbacks['writeFile' + path]
+    window.writeFileSuccess = (originalPath, path) => {
+        callbacks['writeFile' + originalPath](path)
+        delete callbacks['writeFile' + originalPath]
     }
 })(jQuery); // End of use strict

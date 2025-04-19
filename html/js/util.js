@@ -24,7 +24,7 @@
         }
     }
 
-    window.getHumanReadableFolderName = (path) => {
+    window.getHumanReadableBasename = (path) => {
         return window.basename(
             decodeURIComponent(
                 window.basename(path)

@@ -61,7 +61,7 @@
             const $newItem = $(
                 window.renderTemplate(
                     {
-                        'basename': window.getHumanReadableFolderName(path),
+                        'basename': window.getHumanReadableBasename(path),
                         'path': path,
                         'id': i,
                         'active': active
