@@ -37,3 +37,16 @@
     /* color: black; */
     /* border: 1px solid orange; */
 }
+
+.fixed-editor-toolbar {
+  position: fixed;
+  top: 4.5rem; /* Adjust if your topbar height variable is different */
+  width: auto;
+  background: white; /* Or use a theme variable like var(--bs-body-bg) for light mode */
+  border: 1px solid #ced4da; /* Or use a theme variable like var(--bs-border-color) */
+  z-index: 1000; /* Ensure it's above content but potentially below modals */
+  /* Add padding or other styling as needed */
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Optional shadow */
+}

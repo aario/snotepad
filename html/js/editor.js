@@ -144,6 +144,23 @@
                     }, 100);
                 })
 
+                $('#btn-editor-toolbar').on('click', function(e) {
+                    // Prevent the default action (e.g., following the href="#")
+                    e.preventDefault();
+                    var $editorToolbar = $('.editor-toolbar');
+                    var $toggleButton = $('#btn-editor-toolbar');
+                    $editorToolbar.toggleClass('fixed-editor-toolbar');
+                    // Get the top offset of the editor toolbar relative to the document
+                    var toolbarTopOffset = $editorToolbar.offset().top;
+                    // Get the current vertical scroll position of the window
+                    var windowScrollTop = $(window).scrollTop();
+                    // Check if the top of the toolbar is above the top of the viewport
+                    if (toolbarTopOffset > windowScrollTop && !$editorToolbar.hasClass("fixed-editor-toolbar")) {
+                        // Toolbar is still visible (or below the scrolled position)
+                        $toggleButton.hide(); // Or use .fadeOut() for a smooth effect
+                    }
+                });
+
                 console.log('EasyMDE Initialized Successfully!');
             } else {
                 // Only log error if the *element* is missing, not if EasyMDE library is missing
@@ -175,5 +192,29 @@
         $('.file-search-input').not(this).val(searchTerm);
         // Perform the debounced search
         debouncedSearch(searchTerm.trim());
+    });
+
+    $('#btn-editor-toolbar').hide();
+    // Function to check the toolbar's position and toggle the button
+    $(".container-fluid").on('scroll', function() {
+        // Cache the jQuery objects for performance
+        var $editorToolbar = $('.editor-toolbar');
+        var $toggleButton = $('#btn-editor-toolbar');
+        if ($editorToolbar.length && $toggleButton.length) {
+            // Get the top offset of the editor toolbar relative to the document
+            var toolbarTopOffset = $editorToolbar.offset().top;
+
+            // Get the current vertical scroll position of the window
+            var windowScrollTop = $(window).scrollTop();
+
+            // Check if the top of the toolbar is above the top of the viewport
+            if (toolbarTopOffset < windowScrollTop) {
+                // Toolbar is scrolled out of view (above the viewport)
+                $toggleButton.show(); // Or use .fadeIn() for a smooth effect
+            } else if (!$editorToolbar.hasClass("fixed-editor-toolbar")) {
+                // Toolbar is still visible (or below the scrolled position)
+                $toggleButton.hide(); // Or use .fadeOut() for a smooth effect
+            }
+        }
     });
 })(jQuery); // End of use strict
