@@ -35,7 +35,6 @@
     });
 
     window.sidebarUpdateFolders = (paths) => {
-        // Select the button with the ID 'sidebarToggleTop' using jQuery
         const $div = $("#sidebarFoldersBegin");
 
         // Find all sibling elements that come *after* the button
@@ -113,5 +112,19 @@
 
         // Display the path in an alert dialog
         window.lunchFolderView(pathValue)
-    });        
+    });
+
+    window.hideSidebar = () => {
+        const $button = $("#sidebarToggleTop");
+        var isSmallScreen = $button.is(':visible');
+        
+        // Check if the sidebar is currently shown (does not have 'toggled' class)
+        var isSidebarVisible = !$('#accordionSidebar').hasClass('toggled');
+
+        // If it's a small screen AND the sidebar is visible
+        if (isSmallScreen && isSidebarVisible) {
+            // Trigger a click on the button to hide the sidebar
+            $button.trigger('click');
+        }
+    }
 })(jQuery); // End of use strict

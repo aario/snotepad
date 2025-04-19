@@ -46,7 +46,7 @@ class WebAppInterface(private val activity: MainActivity) {
 
     // Made public so WebAppInterface can call it via the activity instance (e.g., after save)
     @JavascriptInterface
-    fun initiateReadFolder(directoryUriString: String) {
+    fun initiateReadFolder(directoryUriString: String, scan: Boolean) {
         val directoryUri = Uri.parse(directoryUriString)
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -67,6 +67,26 @@ class WebAppInterface(private val activity: MainActivity) {
                             filesList.add(JSONObject().apply {
                                 put("date", formattedDate)
                                 put("filename",  file.name)
+
+                                // Read and add file content only if scan is true
+                                if (scan) {
+                                    var fileContent = "Error reading content" // Default error message
+                                    try {
+                                        // Use contentResolver for SAF URIs
+                                        activity.contentResolver.openInputStream(file.uri)?.use { inputStream ->
+                                            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                                                // Read the entire file content. Be cautious with large files.
+                                                // Consider limiting the size or reading line by line if necessary.
+                                                fileContent = reader.readText()
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("WebAppInterface", "Error reading file content for ${file.name}", e)
+                                        // Keep the default error message or customize
+                                        fileContent = "Error reading content: ${e.message}"
+                                    }
+                                    put("content", fileContent) // Add content to JSON
+                                }
                             })
                         }
                     }
@@ -74,8 +94,9 @@ class WebAppInterface(private val activity: MainActivity) {
                     // Use escapeStringForJavaScript from Utils.kt (ensure import)
                     val escapedJson = escapeStringForJavaScript(filesJson)
                     val escapedUri = escapeStringForJavaScript(directoryUri.toString())
+                    var functionName = "${if (scan) "scan" else "read"}FolderSuccess"
                     withContext(Dispatchers.Main) {
-                        activity.evaluateJavascript("javascript:window.readFolderSuccess('$escapedUri', '$escapedJson')")
+                        activity.evaluateJavascript("javascript:window.$functionName('$escapedUri', '$escapedJson')")
                     }
                 } else {
                     activity.toastError("Selected item is not a directory or cannot be read.")

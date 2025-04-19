@@ -1,5 +1,23 @@
 (function($) {
     "use strict"; // Start of use strict
+
+    // Fuse.js options
+    const FUSE_OPTIONS = {
+        // includeScore: true, // Uncomment to see scores for debugging/ranking
+        // threshold: 0.4,    // Adjusts fuzziness (0=exact match, 1=match anything). Default 0.6 is often fine.
+        keys: [
+            {
+                name: 'filename', // Field to search
+                weight: 0.7       // Higher weight = more importance
+            },
+            {
+                name: 'content',  // Field to search
+                weight: 0.3       // Lower weight = less importance
+            }
+            // 'date' is intentionally omitted, so it won't be searched
+        ]
+    };
+
     var currentPath = ''
     var folderContent = []
 
@@ -8,10 +26,10 @@
         $('#sortDropdown i').removeClass().addClass(iconClass + ' fa-fw'); // Remove existing classes, add new ones
     }
 
-    function arrangeitems(sort, order) {
+    function renderFolderContent() {
         const $itemsDiv = $("#items");
         $itemsDiv.empty()
-        $.each(window.sortArray(folderContent, sort, order), (i, file) => {
+        $.each(folderContent, (i, file) => {
             $itemsDiv.append(
                 window.renderTemplate(
                     {
@@ -37,9 +55,30 @@
             let path = $('#div-file-path-' + id).text()
             window.editorOpenFile(path)
         })
+    }
 
+    function arrangeitems(sort, order) {
+        folderContent = window.sortArray(folderContent, sort, order)
+        renderFolderContent()
         window.writePreferences('sort', sort)
         window.writePreferences('order', order)
+    }
+
+    function performSearch(fuse, data, searchTerm) {
+        searchTerm = searchTerm.trim(); // Remove leading/trailing whitespace
+        console.log("Search triggered. Term:", searchTerm);
+
+        let results = [];
+        if (searchTerm) {
+            // Perform the search using Fuse.js
+            // Fuse returns an array of objects: { item: originalObject, refIndex: ..., score: ... }
+            folderContent = fuse.search(searchTerm).map(result => result.item);;
+        } else {
+            folderContent = data;
+        }
+
+        // Display the results
+        renderFolderContent();
     }
 
     // Define the function that should be called for settings
@@ -66,9 +105,8 @@
         window.writePreferences('lastPath', path)
     }
 
-    window.folderViewReadFolderSuccess = (path, folderContentJson) => {
-        folderContent = JSON.parse(folderContentJson)
-
+    window.folderViewReadFolderSuccess = (path, content) => {
+        folderContent = content
         const lastSort = window.readPreferences('sort')
         const lastOrder = window.readPreferences('order')
         arrangeitems(
@@ -98,6 +136,47 @@
             }
         });
 
+        var data = null;
+        var fuse = null;
+        let searchHandler = function() {
+            let searchTerm = '';
+            if ($(this).is('input')) {
+                searchTerm = $(this).val();
+            } else { // It's the button click
+                searchTerm = $(this).closest('.input-group').find('.folder-search-input').val();
+            }
+
+            if (fuse === null) {
+                    // Initialize Fuse with the data and options
+                    // This creates the index the first time.
+                    let scanSuccessHandler = (path, scannedData) => {
+                        data = scannedData;
+                        fuse = new Fuse(data, FUSE_OPTIONS);
+                        window.hideLoading()
+                        performSearch(fuse, data, searchTerm)
+                    }
+                    window.requestScanFolder(currentPath, scanSuccessHandler)
+
+                    return
+            }
+
+            performSearch(fuse, data, searchTerm)
+        }
+
+        // Attach event listener for typing in the search input fields
+        $('.folder-search-input').on('input', searchHandler);
+
+        // Attach event listener for clicking the search buttons
+        // Select buttons within the input group append divs
+        $('.input-group-append .btn').on('click', searchHandler);
+
+        // Also handle form submission (e.g., pressing Enter in the input)
+        $('form.navbar-search').on('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            searchHandler.call($(this).find('.folder-search-input'));
+        });
+
+        window.hideSidebar()
         window.hideLoading()
     }
 

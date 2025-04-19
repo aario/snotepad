@@ -32,6 +32,8 @@
                 window.readPreferences('paths')
             )
         )
+
+        window.hideSidebar()
     }
 
     window.settingsUpdateFolders = (paths) => {

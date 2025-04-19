@@ -101,7 +101,9 @@
                 console.warn('EasyMDE library not found, cannot initialize editor for #markdown-editor.');
             }
         }
+
         window.hideLoading()
+        window.hideSidebar()
     }
 
     window.getEditorCurrentPath = () => {

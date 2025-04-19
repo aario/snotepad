@@ -42,6 +42,38 @@
         window.uiUpdateFolders(paths)
     }
 
+    window.requestScanFolder = (path, callback) => {
+        callbacks['scanFolder' + path] = callback
+        if (DEBUG) {
+            let files = []
+            const numberWords = [
+                "", "one", "two", "three", "four", "five",
+                "six", "seven", "eight", "nine", "ten"
+            ];
+            for (let i = 1; i <= 10; i++) {
+                const filename = 'File ' + i
+                const content = numberWords[i]
+                const date = new Date(); // Gets the current date and time
+                date.setDate(date.getDate() - i)
+                files.push({
+                    'filename': filename,
+                    'content': content,
+                    'date': date.toLocaleDateString()
+                })
+            }
+            window.scanFolderSuccess(path, JSON.stringify(files))
+
+            return
+        }
+
+        AndroidInterface.initiateReadFolder(path, true)
+    }
+
+    window.scanFolderSuccess = (path, folderContentJson) => {
+        callbacks['scanFolder' + path](path, JSON.parse(folderContentJson))
+        delete callbacks['scanFolder' + path]
+    }
+
     window.deleteFolder = (path) => {
         const pathsJson = window.readPreferences('paths')
         let paths = JSON.parse(pathsJson);
@@ -94,11 +126,11 @@
             return
         }
 
-        AndroidInterface.initiateReadFolder(path)
+        AndroidInterface.initiateReadFolder(path, false)
     }
 
-    window.readFolderSuccess = (path, folderContent) => {
-        callbacks['readFolder' + path](path, folderContent)
+    window.readFolderSuccess = (path, folderContentJson) => {
+        callbacks['readFolder' + path](path, JSON.parse(folderContentJson))
         delete callbacks['readFolder' + path]
     }
 
