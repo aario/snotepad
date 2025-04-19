@@ -1,6 +1,63 @@
 (function($) {
     "use strict"; // Start of use strict
     let isFileNew
+    let easyMDE = null; // Variable to hold the EasyMDE instance
+    let currentHighlights = []; // Array to keep track of highlighted text markers
+
+    // Function to clear previous search highlights
+    function clearSearchHighlights() {
+        if (easyMDE && easyMDE.codemirror) {
+            currentHighlights.forEach(marker => marker.clear());
+        }
+        currentHighlights = [];
+    }
+
+    // Function to perform the search and highlight
+    function performSearch(searchTerm) {
+        clearSearchHighlights(); // Clear previous highlights first
+
+        if (!easyMDE || !easyMDE.codemirror || !searchTerm) {
+            return; // Exit if editor isn't ready or search term is empty
+        }
+
+        const cm = easyMDE.codemirror;
+        const query = searchTerm;
+        // Start search from the beginning of the document, case-insensitive
+        let cursor = cm.getSearchCursor(query, { line: 0, ch: 0 }, { caseFold: true });
+
+        while (cursor.findNext()) {
+            // Highlight the found match
+            const marker = cm.markText(cursor.from(), cursor.to(), {
+                className: 'search-highlight' // Add a CSS class for styling
+            });
+            currentHighlights.push(marker); // Store the marker to clear it later
+        }
+
+        // Optional: Scroll to the first match if found
+        if (currentHighlights.length > 0) {
+            const firstMatchPos = currentHighlights[0].find().from;
+             // Check if find() returned a valid position before scrolling
+            if (firstMatchPos) {
+                cm.scrollIntoView(firstMatchPos, 100); // 100 is margin in pixels
+            }
+        }
+    }
+
+    // Debounce function to limit how often performSearch runs
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func.apply(this, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Create a debounced version of the search function
+    const debouncedSearch = debounce(performSearch, 300); // Wait 300ms after typing stops
 
     // Define the function that should be called for settings
     window.editorNewFile = (path) => {
@@ -48,16 +105,15 @@
         // Check if EasyMDE is defined (it might be loaded asynchronously or conditionally)
         if (typeof EasyMDE !== 'undefined') {
             if ($editorElement.length > 0) {
-                let easyMDE = new EasyMDE({
+                easyMDE = new EasyMDE({
                     element: $editorElement[0],
                     spellChecker: false,
                     autoDownloadFontAwesome: false,
                     toolbar: [
                         "bold", "italic", "heading", "|",
                         "quote", "unordered-list", "ordered-list", "|",
-                        "link", "image", "|",
+                        "link", "|",
                         "preview", // Maybe "side-by-side", "fullscreen" if desired
-                        "guide", "|",
                         "undo", // Add this
                         "redo"  // Add this
                     ]
@@ -109,4 +165,15 @@
     window.getEditorCurrentPath = () => {
         return $("#editor-path").text();
     }
+
+    // Add Event Listener for Search Input (Use Event Delegation)
+    // This ensures the listener works even if the inputs are re-rendered,
+    // and it only needs to be attached once.
+    $(document).on('input', '.file-search-input', function() {
+        const searchTerm = $(this).val();
+        // Optional: Sync the value to the other search input
+        $('.file-search-input').not(this).val(searchTerm);
+        // Perform the debounced search
+        debouncedSearch(searchTerm.trim());
+    });
 })(jQuery); // End of use strict
