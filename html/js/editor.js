@@ -1,4 +1,5 @@
 (function($) {
+    "use strict"; // Start of use strict
     let isFileNew
 
     // Define the function that should be called for settings

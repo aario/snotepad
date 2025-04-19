@@ -23,4 +23,12 @@
             return path.substring(0, lastSeparatorIndex);
         }
     }
+
+    window.getHumanReadableFolderName = (path) => {
+        return window.basename(
+            decodeURIComponent(
+                window.basename(path)
+            ).replaceAll(':', ' : ')
+        )
+    }
 })(jQuery); // End of use strict

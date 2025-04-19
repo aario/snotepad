@@ -62,7 +62,7 @@
             const $newItem = $(
                 window.renderTemplate(
                     {
-                        'basename': decodeURIComponent(window.basename(path)).replaceAll(':', ' : '),
+                        'basename': window.getHumanReadableFolderName(path),
                         'path': path,
                         'id': i,
                         'active': active
