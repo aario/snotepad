@@ -220,8 +220,7 @@ class WebAppInterface(private val activity: MainActivity) {
         val currentDirectoryUri = Uri.parse(directoryUriString)
         var filename = basename(uriString)
         val safeFilename = filename.replace(Regex("[^a-zA-Z0-9._\\s()-]"), "_")
-        var filenameEncoded = Uri.encode(safeFilename)
-        val fileUri = Uri.parse("$directoryUriString/$filenameEncoded")
+        val fileUri = Uri.parse("$directoryUriString/$safeFilename")
         val escapedSafeFilename = escapeStringForJavaScript(safeFilename)
         val escapedUri = escapeStringForJavaScript(uriString)
         activity.lifecycleScope.launch(Dispatchers.IO) { // Launch coroutine on IO dispatcher
@@ -233,7 +232,7 @@ class WebAppInterface(private val activity: MainActivity) {
                      }
                     return@launch
                 }
-                val existingFile = directory.findFile(filenameEncoded)
+                val existingFile = directory.findFile(safeFilename)
                 if (existingFile != null) {
                     Log.d("WebAppInterface", "File '$safeFilename' exists, deleting for overwrite.")
                     if (!existingFile.delete()) {
@@ -243,7 +242,7 @@ class WebAppInterface(private val activity: MainActivity) {
                         return@launch
                     }
                 }
-                val newFile = directory.createFile("text/plain", filenameEncoded)
+                val newFile = directory.createFile("text/plain", safeFilename)
                 if (newFile == null) {
                      withContext(Dispatchers.Main) {
                         activity.toastError("javascript:showError('Error: Could not create file $escapedSafeFilename in the selected directory.")
