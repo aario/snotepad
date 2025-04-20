@@ -48,6 +48,7 @@ class WebAppInterface(private val activity: MainActivity) {
     @JavascriptInterface
     fun initiateReadFolder(directoryUriString: String, scan: Boolean) {
         val directoryUri = Uri.parse(directoryUriString)
+        var functionName = "${if (scan) "scan" else "read"}FolderCallback"
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val directory = DocumentFile.fromTreeUri(activity, directoryUri)
@@ -55,55 +56,61 @@ class WebAppInterface(private val activity: MainActivity) {
                     val filesList = mutableListOf<JSONObject>()
                     val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US) // Use Locale.US for consistency
 
-                    directory.listFiles().forEach { file ->
-                        if (file.isFile) {
-                            val lastModifiedMillis = file.lastModified()
-                            val formattedDate = if (lastModifiedMillis > 0) {
-                                // Convert milliseconds to Date and format
-                                isoFormat.format(Date(lastModifiedMillis))
-                            } else {
-                                "Unknown Date" // Handle cases where timestamp is 0 or unavailable
-                            }
-                            filesList.add(JSONObject().apply {
-                                put("date", formattedDate)
-                                put("filename",  file.name)
+                    for (file in directory.listFiles()) {
+                        val mimeType = file.type // Get MIME type upfront
 
-                                // Read and add file content only if scan is true
-                                if (scan) {
-                                    var fileContent = "Error reading content" // Default error message
-                                    try {
-                                        // Use contentResolver for SAF URIs
-                                        activity.contentResolver.openInputStream(file.uri)?.use { inputStream ->
-                                            BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                                                // Read the entire file content. Be cautious with large files.
-                                                // Consider limiting the size or reading line by line if necessary.
-                                                fileContent = reader.readText()
-                                            }
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e("WebAppInterface", "Error reading file content for ${file.name}", e)
-                                        // Keep the default error message or customize
-                                        fileContent = "Error reading content: ${e.message}"
-                                    }
-                                    put("content", fileContent) // Add content to JSON
-                                }
-                            })
+                        // Guard Clause: Skip this iteration if it's not a file,
+                        // or if the MIME type is null,
+                        // or if the MIME type doesn't start with "text/"
+                        if (!file.isFile || mimeType == null || !mimeType.startsWith("text/", ignoreCase = true)) {
+                            continue // Skip to the next item in listFiles()
                         }
+
+                        val lastModifiedMillis = file.lastModified()
+                        val formattedDate = if (lastModifiedMillis > 0) {
+                            // Convert milliseconds to Date and format
+                            isoFormat.format(Date(lastModifiedMillis))
+                        } else {
+                            "Unknown Date" // Handle cases where timestamp is 0 or unavailable
+                        }
+                        filesList.add(JSONObject().apply {
+                            put("date", formattedDate)
+                            put("filename",  file.name)
+
+                            // Read and add file content only if scan is true
+                            if (scan) {
+                                var fileContent = "Error reading content" // Default error message
+                                try {
+                                    // Use contentResolver for SAF URIs
+                                    activity.contentResolver.openInputStream(file.uri)?.use { inputStream ->
+                                        BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                                            // Read the entire file content. Be cautious with large files.
+                                            // Consider limiting the size or reading line by line if necessary.
+                                            fileContent = reader.readText()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("WebAppInterface", "Error reading file content for ${file.name}", e)
+                                    // Keep the default error message or customize
+                                    fileContent = "Error reading content: ${e.message}"
+                                }
+                                put("content", fileContent) // Add content to JSON
+                            }
+                        })
                     }
                     val filesJson = JSONArray(filesList).toString()
                     // Use escapeStringForJavaScript from Utils.kt (ensure import)
                     val escapedJson = escapeStringForJavaScript(filesJson)
                     val escapedUri = escapeStringForJavaScript(directoryUri.toString())
-                    var functionName = "${if (scan) "scan" else "read"}FolderSuccess"
                     withContext(Dispatchers.Main) {
-                        activity.evaluateJavascript("javascript:window.$functionName('$escapedUri', '$escapedJson')")
+                        activity.callJs("$functionName('$escapedUri', '$escapedJson')")
                     }
                 } else {
-                    activity.toastError("Selected item is not a directory or cannot be read.")
+                    activity.callJs("$functionName('Selected item is not a directory or cannot be read.', true)")
                 }
             } catch (e: Exception) {
                 Log.e("WebAppInterface", "Error listing files", e)
-                activity.toastError("Error listing files: ${escapeStringForJavaScript(e.message ?: "Unknown error")}")
+                activity.callJs("$functionName('Error listing files: ${escapeStringForJavaScript(e.message ?: "Unknown error")}', true)")
             }
         }
     }
@@ -146,7 +153,7 @@ class WebAppInterface(private val activity: MainActivity) {
                 // Check if the directory URI is valid and accessible
                 if (documentsTree == null || !documentsTree.isDirectory) {
                     Log.e("WebAppInterface", "Failed to access directory from URI: $uriString")
-                    activity.toastError("Error: Could not access the specified folder.")
+                    activity.callJs("readFileCallback('Error: Could not access the specified folder.', true)")
                     return@launch // Exit the coroutine
                 }
 
@@ -156,7 +163,7 @@ class WebAppInterface(private val activity: MainActivity) {
                 // Check if the file exists and is a regular file
                 if (file == null || !file.isFile) {
                     Log.e("WebAppInterface", "File '$filename' not found or is not a file in directory: $uriString")
-                    activity.toastError("Error: File '$filename' not found.")
+                    activity.callJs("readFileCallback('Error: File '$filename' not found.', true)")
                     return@launch // Exit the coroutine
                 }
 
@@ -175,7 +182,7 @@ class WebAppInterface(private val activity: MainActivity) {
                     } ?: run {
                         // Handle case where openInputStream returns null (should be rare if file exists)
                         Log.e("WebAppInterface", "Could not open input stream for file: ${file.uri}")
-                        activity.toastError("Error: Could not open file for reading.")
+                        activity.callJs("readFileCallback('Error: Could not open file for reading.', true)")
                         return@launch
                     }
 
@@ -192,23 +199,23 @@ class WebAppInterface(private val activity: MainActivity) {
                         Log.i("WebAppInterface", "File read complete. Content needs to be sent to JS.")
                         val escapedFileContent = escapeStringForJavaScript(fileContent)
                         val escapedUri = escapeStringForJavaScript(directoryUri.toString())
-                        activity.evaluateJavascript("javascript:window.readFileSuccess('$escapedUri', '$escapedFileContent')")
+                        activity.callJs("readFileCallback('$escapedUri', '$escapedFileContent')")
                     }
                     // --- /IMPORTANT ---
                 } catch (e: Exception) { // Catch potential IOExceptions during read
                     Log.e("WebAppInterface", "Error reading file content from ${file.uri}", e)
-                    activity.toastError("Error reading file: ${e.localizedMessage}")
+                    activity.callJs("readFileCallback('Error reading file: ${e.localizedMessage}', true)")
                 }
 
             } catch (e: IllegalArgumentException) {
                 Log.e("WebAppInterface", "Invalid URI string provided: $uriString", e)
-                activity.toastError("Error: Invalid folder path provided.")
+                activity.callJs("readFileCallback('Error: Invalid folder path provided.', true)")
             } catch (e: SecurityException) {
                  Log.e("WebAppInterface", "Permission denied for URI: $uriString", e)
-                 activity.toastError("Error: Permission denied to access folder.")
+                 activity.callJs("readFileCallback('Error: Permission denied to access folder.', true)")
             } catch (e: Exception) { // Catch other unexpected errors
                 Log.e("WebAppInterface", "An unexpected error occurred during initiateReadFile", e)
-                activity.toastError("An unexpected error occurred.")
+                activity.callJs("readFileCallback('An unexpected error occurred.', true)")
             }
         }
     }
@@ -228,7 +235,7 @@ class WebAppInterface(private val activity: MainActivity) {
                 val directory = DocumentFile.fromTreeUri(activity, currentDirectoryUri)
                 if (directory == null || !directory.isDirectory || !directory.canWrite()) {
                      withContext(Dispatchers.Main) {
-                        activity.toastError("Error: Cannot write to the selected directory. Please select another folder.")
+                        activity.callJs("writeFileCallback('Error: Cannot write to the selected directory. Please select another folder.', true)")
                      }
                     return@launch
                 }
@@ -237,7 +244,7 @@ class WebAppInterface(private val activity: MainActivity) {
                     Log.d("WebAppInterface", "File '$safeFilename' exists, deleting for overwrite.")
                     if (!existingFile.delete()) {
                          withContext(Dispatchers.Main) {
-                            activity.toastError("Error: Could not delete existing file $escapedSafeFilename for overwrite.")
+                            activity.callJs("writeFileCallback('Error: Could not delete existing file $escapedSafeFilename for overwrite.', true)")
                          }
                         return@launch
                     }
@@ -245,7 +252,7 @@ class WebAppInterface(private val activity: MainActivity) {
                 val newFile = directory.createFile("text/plain", safeFilename)
                 if (newFile == null) {
                      withContext(Dispatchers.Main) {
-                        activity.toastError("javascript:showError('Error: Could not create file $escapedSafeFilename in the selected directory.")
+                        activity.callJs("writeFileCallback('javascript:showError('Error: Could not create file $escapedSafeFilename in the selected directory.', true)")
                      }
                     return@launch
                 }
@@ -259,13 +266,13 @@ class WebAppInterface(private val activity: MainActivity) {
                 Log.d("WebAppInterface", "File '$safeFilename' saved successfully in selected directory.")
                 withContext(Dispatchers.Main) {
                     val escapedNewUri = escapeStringForJavaScript("$directoryUriString/${newFile.name}")
-                    activity.evaluateJavascript("javascript:window.writeFileSuccess('$escapedUri', '$escapedNewUri')")
+                    activity.callJs("writeFileCallback('$escapedUri', '$escapedNewUri')")
                 }
             } catch (e: Exception) {
                 Log.e("WebAppInterface", "Error saving file to path: $uriString", e)
                 // Switch back to the Main thread for error UI updates
                 withContext(Dispatchers.Main) {
-                    activity.toastError("Error saving file: ${escapeStringForJavaScript(e.message ?: "Unknown error")}")
+                    activity.callJs("writeFileCallback('Error saving file: ${escapeStringForJavaScript(e.message ?: "Unknown error")}', true)")
                 }
             }
         }

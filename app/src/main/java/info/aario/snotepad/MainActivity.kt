@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                     contentResolver.takePersistableUriPermission(uri, takeFlags)
                     Log.d("MainActivity", "Folder selected: $uri")
                     val escapedUri = escapeStringForJavaScript(uri.toString())
-                    evaluateJavascript("javascript:window.requestFolderSelectionSuccess('$escapedUri')")
+                    callJs("requestFolderSelectionSuccess('$escapedUri')")
                 } catch (e: SecurityException) {
                      Log.e("MainActivity", "Failed to take persistable URI permission", e)
                      toastError("Failed to get persistent permission for the selected folder.")
@@ -97,12 +97,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // --- evaluateJavascript remains in MainActivity (helper for this activity) ---
+    // --- callJs remains in MainActivity (helper for this activity) ---
     // Made public so WebAppInterface can call it via the activity instance
-    fun evaluateJavascript(script: String) {
+    fun callJs(script: String) {
         if (::webView.isInitialized) {
              webView.post {
-                webView.evaluateJavascript(script, null)
+                webView.evaluateJavascript("javascript:window.$script", null)
              }
         } else {
             Log.w("MainActivity", "WebView not initialized when trying to evaluate JS: $script")
@@ -110,6 +110,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun toastError(message: String) {
-        evaluateJavascript("javascript:window.showToast('$message', true)");
+        callJs("showToast('$message', true)");
     }
 }

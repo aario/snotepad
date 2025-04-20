@@ -61,7 +61,7 @@
                     'date': date.toLocaleDateString()
                 })
             }
-            window.scanFolderSuccess(path, JSON.stringify(files))
+            window.scanFolderCallback(path, JSON.stringify(files))
 
             return
         }
@@ -69,8 +69,8 @@
         AndroidInterface.initiateReadFolder(path, true)
     }
 
-    window.scanFolderSuccess = (path, folderContentJson) => {
-        callbacks['scanFolder' + path](path, JSON.parse(folderContentJson))
+    window.scanFolderCallback = (path, folderContentJson, isError) => {
+        callbacks['scanFolder' + path](path, JSON.parse(folderContentJson), isError)
         delete callbacks['scanFolder' + path]
     }
 
@@ -121,7 +121,7 @@
                     'date': date.toLocaleDateString()
                 })
             }
-            window.readFolderSuccess(path, JSON.stringify(files))
+            window.readFolderCallback(path, JSON.stringify(files))
 
             return
         }
@@ -129,8 +129,8 @@
         AndroidInterface.initiateReadFolder(path, false)
     }
 
-    window.readFolderSuccess = (path, folderContentJson) => {
-        callbacks['readFolder' + path](path, JSON.parse(folderContentJson))
+    window.readFolderCallback = (path, folderContentJson, isError) => {
+        callbacks['readFolder' + path](path, JSON.parse(folderContentJson), isError)
         delete callbacks['readFolder' + path]
     }
 
@@ -142,7 +142,7 @@
                 content = content + '- Line ' + i + '\n'
             }
             
-            window.readFileSuccess(path, content)
+            window.readFileCallback(path, content)
 
             return
         }
@@ -150,15 +150,15 @@
         AndroidInterface.initiateReadFile(path)
     }
 
-    window.readFileSuccess = (path, fileContent) => {
-        callbacks['readFile' + path](path, fileContent)
+    window.readFileCallback = (path, fileContent, isError) => {
+        callbacks['readFile' + path](path, fileContent, isError)
         delete callbacks['readFile' + path]
     }
 
     window.requestWriteFile = (path, fileContent, callback) => {
         callbacks['writeFile' + path] = callback
         if (DEBUG) {
-            window.writeFileSuccess(path, path)
+            window.writeFileCallback(path, path)
 
             return
         }
@@ -166,8 +166,8 @@
         AndroidInterface.initiateWriteFile(path, fileContent)
     }
 
-    window.writeFileSuccess = (originalPath, path) => {
-        callbacks['writeFile' + originalPath](path)
+    window.writeFileCallback = (originalPath, path, isError) => {
+        callbacks['writeFile' + originalPath](path, isError)
         delete callbacks['writeFile' + originalPath]
     }
 })(jQuery); // End of use strict

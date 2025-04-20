@@ -76,16 +76,23 @@
 
         isFileNew = isNew
         if (isNew) {
-            window.editorReadFileSuccess(path)
+            window.editorReadFileCallback(path)
 
             return
         }
 
-        window.requestReadFile(path, window.editorReadFileSuccess)
+        window.requestReadFile(path, window.editorReadFileCallback)
     }
 
-    window.editorWriteFileSuccess = (path) => {
+    window.editorWriteFileCallback= (result, isError) => {
+        if (isError) {
+            window.showToast(result, isError)
+
+            return
+        }
+
         isFileNew = false
+        const path = result
         const folderName = window.getHumanReadableBasename(window.dirname(path))
         const filename = window.basename(path)
         $('#filename').val(filename)
@@ -93,7 +100,15 @@
         window.showToast('Saved to:<br/><i>' + folderName + '/' + filename + '</i>')
     }
 
-    window.editorReadFileSuccess = (path, content) => {
+    window.editorReadFileCallback = (result, content, isError) => {
+        if (isError) {
+            window.showToast(result, isError)
+
+            return
+        }
+
+        const path = result
+
         window.setPage(
             'editor',
             {
@@ -147,7 +162,7 @@
                     setTimeout(() => {
                         // Try getting the value *inside* the timeout
                         const content = easyMDE.value();
-                        window.requestWriteFile(path, content, window.editorWriteFileSuccess)
+                        window.requestWriteFile(path, content, window.editorWriteFileCallback)
                     }, 100);
                 })
 
@@ -160,9 +175,9 @@
                     // Get the top offset of the editor toolbar relative to the document
                     var toolbarTopOffset = $editorToolbar.offset().top;
                     // Get the current vertical scroll position of the window
-                    var windowScrollTop = $(window).scrollTop();
+                    var offsetThreshold = $("#content").offset().top
                     // Check if the top of the toolbar is above the top of the viewport
-                    if (toolbarTopOffset > windowScrollTop && !$editorToolbar.hasClass("fixed-editor-toolbar")) {
+                    if (toolbarTopOffset > offsetThreshold && !$editorToolbar.hasClass("fixed-editor-toolbar")) {
                         // Toolbar is still visible (or below the scrolled position)
                         $toggleButton.hide(); // Or use .fadeOut() for a smooth effect
                     }
@@ -184,6 +199,7 @@
 
         window.hideLoading()
         window.hideSidebar()
+        $('#btn-editor-toolbar').hide();
     }
 
     window.getEditorCurrentPath = () => {
@@ -212,10 +228,10 @@
             var toolbarTopOffset = $editorToolbar.offset().top;
 
             // Get the current vertical scroll position of the window
-            var windowScrollTop = $(window).scrollTop();
+            var offsetThreshold = $("#content").offset().top
 
             // Check if the top of the toolbar is above the top of the viewport
-            if (toolbarTopOffset < windowScrollTop) {
+            if (toolbarTopOffset < offsetThreshold) {
                 // Toolbar is scrolled out of view (above the viewport)
                 $toggleButton.show(); // Or use .fadeIn() for a smooth effect
             } else if (!$editorToolbar.hasClass("fixed-editor-toolbar")) {

@@ -22,8 +22,17 @@
     var folderContent = []
 
     // Function to set the initial/default icon for the sort dropdown toggle
-    function setDefaultSortIcon(iconClass) {
-        $('#sortDropdown i').removeClass().addClass(iconClass + ' fa-fw'); // Remove existing classes, add new ones
+    function setDefaultSortIcon(sort, order) {
+        
+        $('#sortDropdown i').removeClass().addClass(
+            'fas fa-'
+            + (
+                sort === 'filename'
+                ? (order === 'asc' ? 'arrow-down-a-z' : 'arrow-up-z-a')
+                : (order === 'asc' ? 'arrow-down-short-wide' : 'arrow-up-wide-short')
+            ) 
+            + ' fa-fw'
+        ); // Remove existing classes, add new ones
     }
 
     function renderFolderContent() {
@@ -109,6 +118,8 @@
         renderFolderContent()
         window.writePreferences('sort', sort)
         window.writePreferences('order', order)
+
+        setDefaultSortIcon(sort, order)
     }
 
     function performSearch(fuse, data, searchTerm) {
@@ -148,11 +159,17 @@
             window.editorNewFile(path)
         });
 
-        window.requestReadFolder(path, window.folderViewReadFolderSuccess)
+        window.requestReadFolder(path, window.folderViewReadFolderCallback)
         window.writePreferences('lastPath', path)
     }
 
-    window.folderViewReadFolderSuccess = (path, content) => {
+    window.folderViewReadFolderCallback = (result, content, isError) => {
+        if (isError) {
+            window.showToast(result, isError)
+
+            return
+        }
+
         folderContent = content
         const lastSort = window.readPreferences('sort')
         const lastOrder = window.readPreferences('order')
@@ -161,17 +178,9 @@
             lastOrder === null ? 'desc' : lastOrder
         )
 
-        // Set the default icon on page load (using the one from your HTML)
-        setDefaultSortIcon('fas fa-arrow-down-a-z');
-
         // Event handler for when a sort option is clicked
         $('[aria-labelledby="sortDropdown"] .dropdown-item').on('click', function(e) {
             e.preventDefault(); // Prevent default anchor behavior
-
-            // Find the icon within the clicked item
-            var $selectedIcon = $(this).find('.icon-circle i');
-            var selectedIconClass = $selectedIcon.attr('class').replace(' text-white', '').trim(); // Get icon class, remove text-white utility
-            setDefaultSortIcon(selectedIconClass);
 
             // Find the text of the selected option
             let sort = $(this).find('.font-weight-bold').text();
@@ -196,7 +205,13 @@
             if (fuse === null) {
                     // Initialize Fuse with the data and options
                     // This creates the index the first time.
-                    let scanSuccessHandler = (path, scannedData) => {
+                    let scanSuccessHandler = (result, scannedData, isError) => {
+                        if (isError) {
+                            window.showToast(result, isError)
+
+                            return
+                        }
+
                         data = scannedData;
                         fuse = new Fuse(data, FUSE_OPTIONS);
                         window.hideLoading()
