@@ -31,10 +31,12 @@ import java.util.Locale
 import java.util.Date
 import android.os.Build
 import android.content.pm.ApplicationInfo
+import androidx.activity.OnBackPressedCallback
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var webViewBackCallback: OnBackPressedCallback
 
     // Keep ActivityResultLauncher in MainActivity as it's tied to the Activity lifecycle
     // Made public so WebAppInterface can access it via the activity instance
@@ -86,15 +88,26 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContentView(webView)
-    }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (::webView.isInitialized && webView.canGoBack()) { // Added check for initialization
-            webView.goBack()
-        } else {
-            super.onBackPressed()
+        // --- Modern Back Press Handling ---
+        val onBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // This callback is always enabled, so this code will always execute
+                // when the back button is pressed while this Activity is active.
+
+                // Check if webView is initialized before calling methods on it,
+                // just as a safety measure, though based on your description it should be.
+                if (! ::webView.isInitialized) {
+                    return;
+                }
+
+                callJs("handleBackPress()")
+            }
         }
+
+        // Add the callback to the dispatcher, linking it to the Activity's lifecycle
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        // --- End Modern Back Press Handling ---
     }
 
     // --- callJs remains in MainActivity (helper for this activity) ---

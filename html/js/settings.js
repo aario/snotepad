@@ -8,7 +8,7 @@
         window.setPage('settings', {});
         $('#btn-add-folder').on('click', function() {
             window.requestFolderSelection()
-        });
+        })
 
 
         // Update radio buttons to reflect the initial theme (use stored theme or default 'auto')
@@ -34,6 +34,7 @@
         )
 
         window.hideSidebar()
+        window.historyPush(window.lunchSettings)
     }
 
     window.settingsUpdateFolders = (paths) => {

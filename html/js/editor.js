@@ -82,6 +82,7 @@
         }
 
         window.requestReadFile(path, window.editorReadFileCallback)
+        window.historyPush(lunchEditor, [path, isNew])
     }
 
     window.editorWriteFileCallback= (result, isError) => {

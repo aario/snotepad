@@ -161,6 +161,7 @@
 
         window.requestReadFolder(path, window.folderViewReadFolderCallback)
         window.writePreferences('lastPath', path)
+        window.historyPush(lunchFolderView, [path])
     }
 
     window.folderViewReadFolderCallback = (result, content, isError) => {
