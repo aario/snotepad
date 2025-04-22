@@ -3,6 +3,7 @@
     let isFileNew
     let easyMDE = null; // Variable to hold the EasyMDE instance
     let currentHighlights = []; // Array to keep track of highlighted text markers
+    let alreadyConfirmed = false;
 
     // Function to clear previous search highlights
     function clearSearchHighlights() {
@@ -70,6 +71,22 @@
         lunchEditor(path, false)
     }
 
+    let confirmExit = (callback) => {
+        if (easyMDE.codemirror.isClean()) {
+            callback(true)
+
+            return
+        }
+
+        window.confirmModal(
+            'Discard Changes',
+            'Are you sure you want to discard changes?',
+            () => {
+                callback(true)
+            }
+        )
+    }
+
     function lunchEditor(path, isNew) {
         window.showLoading('Loading file...')
         window.setNavBar('navbar-editor',{})
@@ -82,7 +99,11 @@
         }
 
         window.requestReadFile(path, window.editorReadFileCallback)
-        window.historyPush(lunchEditor, [path, isNew])
+        window.historyPush(
+            lunchEditor,
+            [path, isNew],
+            confirmExit
+        )
     }
 
     window.editorWriteFileCallback= (result, isError) => {
@@ -97,6 +118,7 @@
         const folderName = window.getHumanReadableBasename(window.dirname(path))
         const filename = window.basename(path)
         $('#filename').val(filename)
+        easyMDE.codemirror.markClean()
         window.hideLoading()
         window.showToast('Saved to:<br/><i>' + folderName + '/' + filename + '</i>')
     }

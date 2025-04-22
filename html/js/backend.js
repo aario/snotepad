@@ -1,6 +1,6 @@
 (function($) {
     "use strict"; // Start of use strict
-    const VERSION = 2
+    const VERSION = 3
 
     const DEFAULT_VALUES = {
         'paths': {}
@@ -169,5 +169,9 @@
     window.writeFileCallback = (originalPath, path, isError) => {
         callbacks['writeFile' + originalPath](path, isError)
         delete callbacks['writeFile' + originalPath]
+    }
+
+    if (DEBUG) {
+        $("#btnBack").removeClass('d-none')
     }
 })(jQuery); // End of use strict

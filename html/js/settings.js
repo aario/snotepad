@@ -1,5 +1,8 @@
 (function($) {
-    // Define the function that should be called for settings
+    let confirmExit = (callback) => {
+        callback(true)
+    }
+
     window.lunchSettings = () => {
         console.log("lunchSettings function called!");
 
@@ -34,7 +37,11 @@
         )
 
         window.hideSidebar()
-        window.historyPush(window.lunchSettings)
+        window.historyPush(
+            window.lunchSettings,
+            null,
+            confirmExit
+        )
     }
 
     window.settingsUpdateFolders = (paths) => {
@@ -62,54 +69,34 @@
         let $itemToDelete = null; // Variable to store the jQuery element to remove
         let folderToReleaseName = null
 
-        // Get the modal instance
-        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-
-        // Handle the click on the final confirmation button inside the modal
-        $('#confirmBtn').off('click').on('click', function() {
-            if (folderToReleaseId !== null && $itemToDelete) {
-                let path = $('#code-folder-path-' + folderToReleaseId).text()
-                console.log("Releasing folder with path:", path);
-                window.releaseFolder(path)
-
-                // Hide the modal
-                confirmModal.hide();
-
-                $itemToDelete.fadeOut(300, function() {
-                    $(this).remove();
-                });
-
-
-                window.showToast('Folder released:<br/>' + folderToReleaseName)
-                // Reset the stored variables
-                folderToReleaseId = null;
-                $itemToDelete = null;
-            } else {
-                console.error("Could not find folder ID or element to delete.");
-                confirmModal.hide(); // Hide modal even if error occurs
-            }
-        });
-
-        // Optional: Clear stored data when modal is closed without confirming
-        $('#confirmModal').on('hidden.bs.modal', function () {
-            if (folderToReleaseId !== null) { // Only reset if deletion wasn't confirmed
-                // console.log("Modal closed without confirmation, resetting.");
-                folderToReleaseId = null;
-                $itemToDelete = null;
-                folderToReleaseName = null;
-            }
-        });
-
         $('.btn-folder-delete').on('click', function(button) {
             folderToReleaseId = $(this).data('id')
             $itemToDelete = $('#div-folder-' + folderToReleaseId)
             folderToReleaseName = $('#div-folder-name-' + folderToReleaseId).text()
 
-            $('#confirmModalLabel').text('Release Folder')
-            $('#confirmModalMessage').html('Are you sure you want to release this folder?<br/><i>Folder and its contents still remain on your device</i><br/><br/>' + folderToReleaseName)
+            window.confirmModal(
+                'Release Folder',
+                'Are you sure you want to release this folder?<br/><i>Folder and its contents still remain on your device</i><br/><br/>' + folderToReleaseName,
+                () => {
+                    if (folderToReleaseId !== null && $itemToDelete) {
+                        let path = $('#code-folder-path-' + folderToReleaseId).text()
+                        console.log("Releasing folder with path:", path);
+                        window.releaseFolder(path)
 
-            // Show the modal
-            confirmModal.show();
+                        $itemToDelete.fadeOut(300, function() {
+                            $(this).remove();
+                        });
+
+
+                        window.showToast('Folder released:<br/>' + folderToReleaseName)
+                        // Reset the stored variables
+                        folderToReleaseId = null;
+                        $itemToDelete = null;
+                    } else {
+                        console.error("Could not find folder ID or element to delete.");
+                    }
+                }
+            )
         })
     }
 
