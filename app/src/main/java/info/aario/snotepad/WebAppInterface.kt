@@ -72,13 +72,6 @@ class WebAppInterface(private val activity: MainActivity) {
                     DocumentsContract.Document.COLUMN_DOCUMENT_ID // Still need this to build individual file URIs later
                 )
 
-                // Optional: You might want to remove the selection here and filter in Kotlin,
-                // as filtering within the query might not be universally supported by all providers.
-                // val selection = "${DocumentsContract.Document.COLUMN_MIME_TYPE} LIKE 'text/%'"
-                // val selectionArgs: Array<String>? = null
-                val selection: String? = null // Query all children first
-                val selectionArgs: Array<String>? = null
-
                 contentResolver.query(
                     childrenUri,
                     projection,
@@ -109,7 +102,7 @@ class WebAppInterface(private val activity: MainActivity) {
                         filesList.add(JSONObject().apply {
                             put("date", formattedDate)
                             put("filename", filename)
-                            if (scan && mimeType?.startsWith("text/", ignoreCase = true) == true) {
+                            if (scan && mimeType.startsWith("text/", ignoreCase = true) == true) {
                                 // Read content only if scan is true and it's a text file
                                 var fileContent = "Error reading content"
                                 val fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId)
@@ -260,7 +253,6 @@ class WebAppInterface(private val activity: MainActivity) {
         val currentDirectoryUri = Uri.parse(directoryUriString)
         var filename = basename(uriString)
         val safeFilename = filename.replace(Regex("[^a-zA-Z0-9._\\s()-]"), "_")
-        val fileUri = Uri.parse("$directoryUriString/$safeFilename")
         val escapedSafeFilename = escapeStringForJavaScript(safeFilename)
         val escapedUri = escapeStringForJavaScript(uriString)
         activity.lifecycleScope.launch(Dispatchers.IO) { // Launch coroutine on IO dispatcher
