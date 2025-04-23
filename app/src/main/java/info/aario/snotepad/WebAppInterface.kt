@@ -22,6 +22,8 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.provider.DocumentsContract
+import android.content.ContentResolver
 
 /**
  * Provides methods accessible from JavaScript running within the WebView.
@@ -48,69 +50,100 @@ class WebAppInterface(private val activity: MainActivity) {
     @JavascriptInterface
     fun initiateReadFolder(directoryUriString: String, scan: Boolean) {
         val directoryUri = Uri.parse(directoryUriString)
-        var functionName = "${if (scan) "scan" else "read"}FolderCallback"
+        val escapedUri = escapeStringForJavaScript(directoryUri.toString())
+        val functionName = "${if (scan) "scan" else "read"}FolderCallback"
         activity.lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val directory = DocumentFile.fromTreeUri(activity, directoryUri)
-                if (directory != null && directory.isDirectory && directory.canRead()) {
-                    val filesList = mutableListOf<JSONObject>()
-                    val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US) // Use Locale.US for consistency
+                val filesList = mutableListOf<JSONObject>()
+                val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+                val contentResolver = activity.contentResolver
+                // --- Step 1: Get the Document ID for the tree URI ---
+                val treeDocumentId = DocumentsContract.getTreeDocumentId(directoryUri)
+                // --- Step 2: Build the URI for querying children ---
+                val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(directoryUri, treeDocumentId)
 
-                    for (file in directory.listFiles()) {
-                        val mimeType = file.type // Get MIME type upfront
+                // Log the children URI for debugging
+                Log.d("WebAppInterface", "Querying children URI: $childrenUri")
 
-                        // Guard Clause: Skip this iteration if it's not a file,
-                        // or if the MIME type is null,
-                        // or if the MIME type doesn't start with "text/"
-                        if (!file.isFile || mimeType == null || !mimeType.startsWith("text/", ignoreCase = true)) {
-                            continue // Skip to the next item in listFiles()
+                val projection = arrayOf(
+                    DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+                    DocumentsContract.Document.COLUMN_MIME_TYPE,
+                    DocumentsContract.Document.COLUMN_DOCUMENT_ID // Still need this to build individual file URIs later
+                )
+
+                // Optional: You might want to remove the selection here and filter in Kotlin,
+                // as filtering within the query might not be universally supported by all providers.
+                // val selection = "${DocumentsContract.Document.COLUMN_MIME_TYPE} LIKE 'text/%'"
+                // val selectionArgs: Array<String>? = null
+                val selection: String? = null // Query all children first
+                val selectionArgs: Array<String>? = null
+
+                contentResolver.query(
+                    childrenUri,
+                    projection,
+                    null, // selection ; Null because filtering within the query might not be universally supported by all providers.
+                    null, // selectionArgs
+                    null // sortOrder ; Null because sorting happens in the web application itself
+                )?.use { cursor ->
+                    while (cursor.moveToNext()) {
+                        val filename = cursor.getString(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                        val lastModifiedMillis = cursor.getLong(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED))
+                        val mimeType = cursor.getString(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE))
+                        val documentId = cursor.getString(cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID))
+
+                        if (mimeType == null || !mimeType.startsWith("text/", ignoreCase = true)) {
+                            continue
                         }
 
-                        val lastModifiedMillis = file.lastModified()
+                        // Double-check if it's a file (some providers might return directories in the query)
+                        // You might need to construct a child URI and check its Document.COLUMN_FLAGS
+                        // or rely on the MIME type.
+
                         val formattedDate = if (lastModifiedMillis > 0) {
-                            // Convert milliseconds to Date and format
                             isoFormat.format(Date(lastModifiedMillis))
                         } else {
-                            "Unknown Date" // Handle cases where timestamp is 0 or unavailable
+                            "Unknown Date"
                         }
+
                         filesList.add(JSONObject().apply {
                             put("date", formattedDate)
-                            put("filename",  file.name)
-
-                            // Read and add file content only if scan is true
-                            if (scan) {
-                                var fileContent = "Error reading content" // Default error message
+                            put("filename", filename)
+                            if (scan && mimeType?.startsWith("text/", ignoreCase = true) == true) {
+                                // Read content only if scan is true and it's a text file
+                                var fileContent = "Error reading content"
+                                val fileUri = DocumentsContract.buildDocumentUriUsingTree(directoryUri, documentId)
                                 try {
-                                    // Use contentResolver for SAF URIs
-                                    activity.contentResolver.openInputStream(file.uri)?.use { inputStream ->
-                                        BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                                            // Read the entire file content. Be cautious with large files.
-                                            // Consider limiting the size or reading line by line if necessary.
+                                    contentResolver.openInputStream(fileUri)?.use { inputStream ->
+                                        java.io.BufferedReader(java.io.InputStreamReader(inputStream)).use { reader ->
                                             fileContent = reader.readText()
                                         }
                                     }
                                 } catch (e: Exception) {
-                                    Log.e("WebAppInterface", "Error reading file content for ${file.name}", e)
-                                    // Keep the default error message or customize
+                                    Log.e("WebAppInterface", "Error reading file content for $filename", e)
                                     fileContent = "Error reading content: ${e.message}"
                                 }
-                                put("content", fileContent) // Add content to JSON
+                                put("content", fileContent)
                             }
                         })
                     }
+
                     val filesJson = JSONArray(filesList).toString()
-                    // Use escapeStringForJavaScript from Utils.kt (ensure import)
                     val escapedJson = escapeStringForJavaScript(filesJson)
-                    val escapedUri = escapeStringForJavaScript(directoryUri.toString())
-                    withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) { // withContext is to ensure JavaScript callbacks are executed on the main thread.
                         activity.callJs("$functionName('$escapedUri', '$escapedJson')")
                     }
-                } else {
-                    activity.callJs("$functionName('Selected item is not a directory or cannot be read.', true)")
+                } ?: run {
+                    withContext(Dispatchers.Main) {
+                        activity.callJs("$functionName('$escapedUri', 'Error querying directory content.', true)")
+                    }
                 }
+
             } catch (e: Exception) {
                 Log.e("WebAppInterface", "Error listing files", e)
-                activity.callJs("$functionName('Error listing files: ${escapeStringForJavaScript(e.message ?: "Unknown error")}', true)")
+                withContext(Dispatchers.Main) {
+                    activity.callJs("$functionName('$escapedUri', 'Error listing files: ${escapeStringForJavaScript(e.message ?: "Unknown error")}', true)")
+                }
             }
         }
     }

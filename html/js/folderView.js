@@ -151,9 +151,9 @@
         )
     }
 
-    window.folderViewReadFolderCallback = (result, content, isError) => {
+    window.folderViewReadFolderCallback = (path, content, isError) => {
         if (isError) {
-            window.showToast(result, isError)
+            window.showToast(content, isError)
 
             return
         }
@@ -193,9 +193,9 @@
             if (fuse === null) {
                     // Initialize Fuse with the data and options
                     // This creates the index the first time.
-                    let scanSuccessHandler = (result, scannedData, isError) => {
+                    let scanSuccessHandler = (path, scannedData, isError) => {
                         if (isError) {
-                            window.showToast(result, isError)
+                            window.showToast(path, isError)
 
                             return
                         }

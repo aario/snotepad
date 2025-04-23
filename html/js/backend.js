@@ -130,7 +130,11 @@
     }
 
     window.readFolderCallback = (path, folderContentJson, isError) => {
-        callbacks['readFolder' + path](path, JSON.parse(folderContentJson), isError)
+        callbacks['readFolder' + path](
+            path,
+            isError ? folderContentJson : JSON.parse(folderContentJson),
+            isError
+        )
         delete callbacks['readFolder' + path]
     }
 
