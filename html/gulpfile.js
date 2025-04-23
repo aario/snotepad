@@ -166,8 +166,14 @@ function modules() {
  // Fuse.js
  var fuseJS = gulp.src('./node_modules/fuse.js/dist/fuse.min.js')
   .pipe(gulp.dest('./vendor/fuse.js'));
+ // jQuery UI (Copy the whole dist folder or just the necessary files)
+ var jqueryUI = gulp.src('./node_modules/jquery-ui-dist/jquery-ui.min.js') // Copy the minified file
+    .pipe(gulp.dest('./vendor/jquery-ui')); // Optional: Copy to vendor for consistency
+ // jQuery UI Touch Punch (Copy the file)
+ var touchPunch = gulp.src('./node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js')
+    .pipe(gulp.dest('./vendor/jquery-ui-touch-punch')); // Optional: Copy to vendor
 
- return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, easymde, hammerJS, fuseJS);
+ return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, easymde, hammerJS, fuseJS, jqueryUI, touchPunch);
 }
 
 // CSS task - Includes generated font CSS
@@ -222,9 +228,9 @@ function generateTemplatesJS(done) {
    const baseName = path.basename(file, '.html');
    const content = fs.readFileSync(filePath, 'utf8');
    const escapedContent = content
-          .replace(/\\/g, '\\\\')
-          .replace(/`/g, '\\`')
-          .replace(/\$\{/g, '\\${');
+         .replace(/\\/g, '\\\\')
+         .replace(/`/g, '\\`')
+         .replace(/\$\{/g, '\\${');
    templatesObject += `  "${baseName}": \`${escapedContent}\`,\n`;
   }
  });
@@ -241,33 +247,43 @@ function generateTemplatesJS(done) {
 }
 
 
-// JS task - (remains unchanged from previous version)
+// JS task - CORRECTED ORDER AND INCLUSION
 function js() {
- return gulp
-  .src([
-    './vendor/jquery/jquery.min.js',
-    './vendor/bootstrap/js/bootstrap.bundle.min.js',
-    './vendor/jquery-easing/jquery.easing.min.js',
-    './vendor/easymde/easymde.min.js',
-    './vendor/hammerjs/hammer.min.js',
-    './vendor/fuse.js/fuse.min.js',
-    generatedTemplatesJsPath,
-    paths.js.src,
-   ],
-   { allowEmpty: true }
-  )
-  .pipe(plumber())
-  .pipe(concat(paths.js.concatFile))
-  .pipe(header(banner, {
-   pkg: pkg
-  }))
-  .pipe(gulp.dest(paths.js.dest))
-  .pipe(uglify())
-  .pipe(rename({
-   suffix: paths.js.minSuffix
-  }))
-  .pipe(gulp.dest(paths.js.minifiedDest))
-  .pipe(browsersync.stream());
+  return gulp
+    .src([
+      // Core libraries first
+      './vendor/jquery/jquery.min.js',
+      // jQuery UI and Touch Punch *after* jQuery
+      './node_modules/jquery-ui-dist/jquery-ui.min.js', // Ensure this path is correct
+      './node_modules/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js', // Ensure this path is correct
+      // Other vendor scripts
+      './vendor/bootstrap/js/bootstrap.bundle.min.js',
+      './vendor/jquery-easing/jquery.easing.min.js',
+      './vendor/easymde/easymde.min.js',
+      './vendor/hammerjs/hammer.min.js',
+      './vendor/fuse.js/fuse.min.js',
+      // Your generated templates and custom scripts last
+      generatedTemplatesJsPath,
+      paths.js.src, // This includes your script with the .sortable() call
+     ],
+     { allowEmpty: true } // Allow empty if paths.js.src is empty initially
+    )
+    .pipe(plumber()) // Add plumber for error handling during concat/uglify
+    .pipe(concat(paths.js.concatFile))
+    .pipe(header(banner, {
+      pkg: pkg
+    }))
+    .pipe(gulp.dest(paths.js.dest)) // Save non-minified version for debugging
+    .pipe(uglify())
+    .on('error', function(err) { // Add error logging for uglify
+        console.error('Error during Uglify:', err.toString());
+        this.emit('end');
+    })
+    .pipe(rename({
+      suffix: paths.js.minSuffix
+    }))
+    .pipe(gulp.dest(paths.js.minifiedDest)) // Save minified version for production
+    .pipe(browsersync.stream());
 }
 
 function etc() {
@@ -287,16 +303,19 @@ function watchFiles() {
  gulp.watch("./scss/**/*.scss", css);
  // Watch the generated font CSS file as well, trigger css task if it changes (e.g., after googlefonts runs)
  gulp.watch(generatedFontCssPath, css);
- gulp.watch([paths.js.src, `!${generatedTemplatesJsPath}`], js);
- gulp.watch(paths.templates.src, gulp.series(generateTemplatesJS, js));
+ gulp.watch([paths.js.src, `!${generatedTemplatesJsPath}`], js); // Watch your custom JS
+ gulp.watch(paths.templates.src, gulp.series(generateTemplatesJS, js)); // Watch templates
  // Watch the font list file, regenerate fonts and then css if it changes
  gulp.watch(paths.googleFonts.src, gulp.series(googlefonts, css));
+ // Watch vendor JS files copied by 'modules' task? Usually not needed unless you modify them directly there.
+ // Watch HTML for BrowserSync reload
  gulp.watch("./**/*.html", browserSyncReload);
 }
 
 // Define complex tasks - Ensure googlefonts runs before css
 const vendor = gulp.series(clean, googlefonts, modules);
-const build = gulp.series(vendor, generateTemplatesJS, gulp.parallel(css, js, etc, fonts)); // css now depends on googlefonts completing first
+// Build task: Ensure vendor files are copied, templates generated, then CSS/JS/etc built
+const build = gulp.series(vendor, generateTemplatesJS, gulp.parallel(css, js, etc, fonts));
 const watch = gulp.series(build, gulp.parallel(watchFiles, browserSync));
 
 // Export tasks
@@ -309,3 +328,4 @@ exports.watch = watch;
 exports.default = build;
 exports.generateTemplatesJS = generateTemplatesJS;
 exports.googlefonts = googlefonts;
+exports.modules = modules; // Export modules task if needed separately

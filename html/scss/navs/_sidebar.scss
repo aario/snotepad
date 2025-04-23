@@ -399,9 +399,11 @@
         }
     }
 }
-// --- End Media Query Adjustments ---
 
-// --- Sidebar Scroll ---
-#accordionSidebar {
-  overflow-y: auto;
+.sidebar-folder-placeholder {
+    background-color: rgba(255, 0, 0, 0.5) !important; /* Red semi-transparent */
+    border: 2px dashed blue !important;
+    height: 40px; /* Or match item height */
+    visibility: visible !important;
+    display: block !important;
 }

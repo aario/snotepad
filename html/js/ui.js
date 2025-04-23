@@ -1,7 +1,6 @@
 (function($) {
     "use strict"; // Start of use strict
         function setNavBar(templateName, data) {
-            // Select the button with the ID 'sidebarToggleTop' using jQuery
             const $button = $("#btnBack");
 
             // Find all sibling elements that come *after* the button

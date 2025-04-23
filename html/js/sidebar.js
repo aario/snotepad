@@ -1,6 +1,74 @@
 (function($) {
     "use strict"; // Start of use strict
 
+    const sidebarFolderContainer = $('#accordionSidebar'); // The main UL element
+    const sortableItemsSelector = '.nav-item.sidebar-folder'; // Selector for the items to sort
+
+    // --- Function to save the current order ---
+    // This function remains separate as it's called by the sortable 'stop' event
+    function saveFolderOrder() {
+        const paths = [];
+        // Find the folder items *within the container* in their current order
+        sidebarFolderContainer.find(sortableItemsSelector).each(function() {
+            // Find the anchor tag inside the list item
+            const $link = $(this).find('a.sidebar-folder');
+            const folderId = $link.data('id');
+            // Find the hidden path div associated with this link
+            // Note: The hidden div is *inside* the <a> tag in your original HTML structure
+            const pathDivSelector = '#sidebar-folder-item-path-' + folderId;
+            const path = $link.find(pathDivSelector).text(); // Find within the link
+
+            paths.push(path);
+        });
+
+        window.writePreferences('paths', JSON.stringify(paths));
+        console.log('Saved folder order paths:', paths); // For debugging
+    }
+
+    function initializeSortable() {
+        // Check if sortable is already initialized and destroy it first
+        // This prevents issues if sidebarUpdateFolders is called multiple times
+        if (sidebarFolderContainer.hasClass('ui-sortable')) {
+            try {
+                sidebarFolderContainer.sortable('destroy');
+                console.log('Destroyed existing sortable instance.'); // Debugging
+            } catch (e) {
+                console.error('Error destroying sortable:', e);
+            }
+        }
+
+        // Initialize Sortable *after* items are potentially destroyed/re-added
+        sidebarFolderContainer.sortable({
+            items: sortableItemsSelector,
+            axis: 'y',
+            handle: 'a.sidebar-folder',
+            cursor: 'move',
+            opacity: 0.7,
+            placeholder: 'sidebar-folder-placeholder',
+            cancel: "span, i, .d-none", // Keep this from previous step if you added it
+            distance: 1, // Explicitly set default distance
+            delay: 0,    // Explicitly set default delay
+            start: function(event, ui) {
+                // *** This should now fire ***
+                console.log('Started dragging folder item...');
+                ui.item.addClass('dragging'); // Add class for visual feedback
+                // Ensure placeholder has the nav-item class for proper spacing/styling
+                ui.placeholder.addClass('nav-item sidebar-folder-placeholder');
+                // Set placeholder height dynamically
+                ui.placeholder.height(ui.item.outerHeight());
+            },
+            stop: function(event, ui) {
+                // *** This should now fire ***
+                console.log('Stopped dragging folder item...');
+                ui.item.removeClass('dragging'); // Remove visual feedback class
+                // Save the new order
+                saveFolderOrder();
+            }
+        });
+        console.log('Sortable initialized on #accordionSidebar.'); // Debugging
+    }
+
+
     // Toggle the side navigation
     $("#sidebarToggle, #sidebarToggleTop").on('click', function(e) {
         $("body").toggleClass("sidebar-toggled");
@@ -23,7 +91,7 @@
             $('.sidebar .collapse').collapse('hide');
         };
     });
-
+/*
     // Prevent the content wrapper from scrolling when the fixed side navigation hovered over
     $('body.fixed-nav .sidebar').on('mousewheel DOMMouseScroll wheel', function(e) {
         if ($(window).width() > 768) {
@@ -32,99 +100,108 @@
             this.scrollTop += (delta < 0 ? 1 : -1) * 30;
             e.preventDefault();
         }
-    });
+    });*/
 
+    // --- Function to Update Sidebar Folders (Called from Android/elsewhere) ---
     window.sidebarUpdateFolders = (paths) => {
+        console.log("sidebarUpdateFolders called with paths:", paths); // Debugging
         const $div = $("#sidebarFoldersBegin");
 
-        // Find all sibling elements that come *after* the button
-        // and remove them from the DOM.
-        $div.nextAll().remove();
+        // Clear existing folder items first
+        $div.nextAll(sortableItemsSelector).remove(); // Remove only the sortable items
 
-        // Insert the new HTML content provided in the 'template' variable
-        // immediately after the button.
-        let $lastElement = $div
+        // Insert the new HTML content provided in the 'paths' array
+        let $lastElement = $div;
         $.each(paths, (i, path) => {
-            let active = ''
-            let editorCurrentPath = window.getEditorCurrentPath()
-            if (editorCurrentPath !== null) {
-                if (path === window.dirname(editorCurrentPath)) {
-                    active = 'active'
-                }
-            } else {
-                let folderViewCurrentPath = window.getFolderViewCurrentPath()
-                if (folderViewCurrentPath !== null && path === folderViewCurrentPath) {
-                    active = 'active'
-                }
+            // Determine if the current path should be marked active
+            let active = '';
+            let editorCurrentPath = window.getEditorCurrentPath ? window.getEditorCurrentPath() : null;
+            let folderViewCurrentPath = window.getFolderViewCurrentPath ? window.getFolderViewCurrentPath() : null;
+            let currentDir = editorCurrentPath ? window.dirname(editorCurrentPath) : folderViewCurrentPath;
+
+            if (currentDir !== null && path === currentDir) {
+                active = 'active';
             }
 
-            const $newItem = $(
-                window.renderTemplate(
-                    {
-                        'basename': window.getHumanReadableBasename(path),
-                        'path': path,
-                        'id': i,
-                        'active': active
-                    },
-                    'sidebar-folder'
-                )
-            )
+            // Make sure necessary functions exist before calling them
+            const folderName = window.getHumanReadableBasename ? window.getHumanReadableBasename(path) : path.split('/').pop();
 
-            $lastElement.after(
-                $newItem
-            )
-            $lastElement = $newItem
-        })
-    }
+            // Render the template for the folder item
+            // Ensure 'window.renderTemplate' exists and works as expected
+            const folderHtml = window.renderTemplate ? window.renderTemplate(
+                {
+                    'basename': folderName,
+                    'path': path,
+                    'id': i, // Use index 'i' as the data-id for simplicity here
+                    'active': active
+                },
+                'sidebar-folder' // Template name
+            ) : ''; // Provide fallback or handle error if renderTemplate is missing
 
-    $(document).on('click', '.sidebar-folder', function(event) {
-        // Prevent the default link behavior (e.g., navigating to '#')
-        event.preventDefault();
+            if (folderHtml) {
+                 const $newItem = $(folderHtml);
+                 $lastElement.after($newItem);
+                 $lastElement = $newItem;
+            } else {
+                console.error("Could not render template for path:", path);
+            }
+        });
 
-        // 'this' refers to the specific '.sidebar-folder' link that was clicked.
-        let $clickedLink = $(this);
+        // --- Initialize Sortable *AFTER* items are added ---
+        initializeSortable();
+    };
+
+    sidebarFolderContainer.on('mousedown', 'a.sidebar-folder', function(evt) {
+        console.log('Test: Mousedown detected on a.sidebar-folder handle.');
+    });
+    // --- Click Handler for Folder Items ---
+    // Use event delegation on the container for dynamically added items
+    sidebarFolderContainer.on('click', 'a.sidebar-folder', function(event) {
+        // Prevent default link behavior only if it wasn't a drag operation
+        // jQuery UI sortable adds 'ui-sortable-helper' while dragging
+        if (!$(this).closest(sortableItemsSelector).hasClass('ui-sortable-helper')) {
+             event.preventDefault();
+
+             let $clickedLink = $(this);
+             let folderId = $clickedLink.data('id');
+             let pathDivSelector = '#sidebar-folder-item-path-' + folderId;
+             let pathValue = $clickedLink.find(pathDivSelector).text();
+
+             console.log("Folder clicked:", pathValue); // Debugging
+
+             // Update active state
+             // Remove 'active' from all .nav-item siblings, then add it to the clicked one's parent li
+             $clickedLink.closest(sortableItemsSelector) // Find the parent li.nav-item
+                 .siblings(sortableItemsSelector).removeClass('active') // Remove from siblings
+                 .end() // Go back to the clicked li.nav-item
+                 .addClass('active'); // Add class to the clicked one
+
+             // Also remove active from non-folder items like 'Settings' if needed
+             $clickedLink.closest(sortableItemsSelector).siblings('.nav-item:not(.sidebar-folder)').removeClass('active');
 
 
-        // Get the value from the 'data-id' attribute of the clicked link
-        let folderId = $clickedLink.data('id'); // e.g., "123"
-
-        // Construct the specific ID for the hidden div using the retrieved folderId
-        // This creates a selector like "#sidebar-folder-item-path-123"
-        let pathDivSelector = '#sidebar-folder-item-path-' + folderId;
-
-        // Find the specific hidden div using its ID, searching only *within*
-        // the clicked link's descendants for efficiency and context.
-        let $pathDiv = $clickedLink.find(pathDivSelector);
-
-        let pathValue = $pathDiv.text();
-
-        // Find the parent li.nav-item of the clicked link
-        let $parentLi = $(this).closest('li.nav-item');
-
-        // Find all li.nav-item elements within the same parent container 
-        //    (e.g., all direct children of the surrounding UL/OL)
-        //    and remove the 'active' class from all of them.
-        //    This ensures only one item is active at a time within this group.
-        $parentLi.parent().children('li.nav-item').removeClass('active');
-
-        // Add the 'active' class specifically to the parent li of the clicked link.
-        $parentLi.addClass('active');
-
-        // Display the path in an alert dialog
-        window.lunchFolderView(pathValue)
+             // Call your function to handle the folder click
+             if (window.lunchFolderView) {
+                 window.lunchFolderView(pathValue);
+             } else {
+                 console.warn("window.lunchFolderView function not found.");
+             }
+        }
+        // If it *was* part of a drag (ui-sortable-helper is present),
+        // the default action (following href="#") is usually harmless
+        // and already prevented by sortable itself.
     });
 
+    // --- Function to Hide Sidebar on Small Screens ---
     window.hideSidebar = () => {
         const $button = $("#sidebarToggleTop");
         var isSmallScreen = $button.is(':visible');
-        
-        // Check if the sidebar is currently shown (does not have 'toggled' class)
         var isSidebarVisible = !$('#accordionSidebar').hasClass('toggled');
 
-        // If it's a small screen AND the sidebar is visible
         if (isSmallScreen && isSidebarVisible) {
-            // Trigger a click on the button to hide the sidebar
             $button.trigger('click');
         }
-    }
+    };
+
+
 })(jQuery); // End of use strict
