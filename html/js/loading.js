@@ -6,7 +6,7 @@
         $loadingOverlay.removeClass('hidden');
     }
 
-    window.hideLoading = (prompt) => {
+    window.hideLoading = () => {
         $('#loading-overlay').addClass('hidden');
     }
 })(jQuery); // End of use strict
