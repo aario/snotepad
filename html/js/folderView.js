@@ -205,6 +205,7 @@
                         window.hideLoading()
                         performSearch(fuse, data, searchTerm)
                     }
+                    window.showLoading('Indexing folder...')
                     window.requestScanFolder(currentPath, scanSuccessHandler)
 
                     return
