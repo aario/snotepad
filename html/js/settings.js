@@ -98,6 +98,17 @@
                 }
             )
         })
+        sortable = new Sortable(($("#folders")[0]), {
+            onEnd: () => {
+                let paths = [];
+
+                $('#folders').find('.folder-path').each(function() {
+                    paths.push($(this).text())
+                })
+                window.writePreferences('paths', JSON.stringify(paths))
+                window.sidebarUpdateFolders(paths)
+            }
+        })
     }
 
     // --- NEW: Function to update the checked state of radio buttons ---

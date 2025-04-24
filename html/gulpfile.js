@@ -166,8 +166,11 @@ function modules() {
  // Fuse.js
  var fuseJS = gulp.src('./node_modules/fuse.js/dist/fuse.min.js')
   .pipe(gulp.dest('./vendor/fuse.js'));
+ // SortableJS
+ var sortableJS = gulp.src('./node_modules/sortablejs/Sortable.min.js')
+  .pipe(gulp.dest('./vendor/sortablejs'));
 
- return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, easymde, hammerJS, fuseJS);
+ return merge(bootstrapJS, bootstrapSCSS, chartJS, dataTables, fontAwesome, jquery, jqueryEasing, easymde, hammerJS, fuseJS, sortableJS);
 }
 
 // CSS task - Includes generated font CSS
@@ -251,6 +254,7 @@ function js() {
     './vendor/easymde/easymde.min.js',
     './vendor/hammerjs/hammer.min.js',
     './vendor/fuse.js/fuse.min.js',
+    './vendor/sortablejs/Sortable.min.js',
     generatedTemplatesJsPath,
     paths.js.src,
    ],
