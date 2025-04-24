@@ -80,6 +80,9 @@
             if (lastPath !== undefined && lastPath !== null) {
                 window.lunchFolderView(lastPath)
             }
+            $('#btn-welcome-add-folder').on('click', function() {
+                window.requestFolderSelection()
+            })
 
             window.hideLoading()
         });
@@ -105,7 +108,9 @@
 
     window.uiUpdateFolders = (paths) => {
         window.sidebarUpdateFolders(paths)
-        window.settingsUpdateFolders(paths)
+        window.getCurrentAction() === window.lunchSettings
+            window.settingsUpdateFolders(paths)
+        }
     }
 
 

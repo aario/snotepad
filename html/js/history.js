@@ -47,5 +47,9 @@
         currentAction['confirmExit'](confirmExitResultHandler)
     }
 
+    window.getCurrentAction = () => {
+        return history.at(-1)['actionHandler']
+    }
+
     $("#btnBack").on('click', window.handleBackPress)
 })(jQuery); // End of use strict

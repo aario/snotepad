@@ -40,6 +40,7 @@
 
         window.writePreferences('paths', JSON.stringify(paths))
         window.uiUpdateFolders(paths)
+        window.lunchFolderView(path)
     }
 
     window.requestScanFolder = (path, callback) => {
