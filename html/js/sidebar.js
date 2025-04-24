@@ -35,11 +35,8 @@
     });
 
     window.sidebarUpdateFolders = (paths) => {
+        $("#accordionSidebar").find(".sidebar-folder").remove();
         const $div = $("#sidebarFoldersBegin");
-
-        // Find all sibling elements that come *after* the button
-        // and remove them from the DOM.
-        $div.nextAll().remove();
 
         // Insert the new HTML content provided in the 'template' variable
         // immediately after the button.
@@ -127,4 +124,22 @@
             $button.trigger('click');
         }
     }
+    $('.sidebar-item-simple-page').on('click', function() {
+        // Inside the event handler, 'this' refers to the clicked element.
+        // Get the 'id' attribute of the clicked element.
+        var pageId = $(this).attr('id');
+
+        // Call the lunchPage function, passing the retrieved id as an argument.
+        // Ensure the lunchPage function is defined elsewhere in your code.
+        if (typeof lunchPage === 'function') {
+            lunchPage(pageId);
+        } else {
+            console.error('lunchPage function is not defined.');
+        }
+    });
+
+    $('.sidebar-item-simple-page').on('click', function() {
+        var pageId = $(this).attr('id');
+        lunchPage(pageId);
+    });
 })(jQuery); // End of use strict

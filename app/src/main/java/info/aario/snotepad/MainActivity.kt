@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.util.Log
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -72,8 +73,36 @@ class MainActivity : AppCompatActivity() {
             settings.domStorageEnabled = true
             settings.allowFileAccess = true
             settings.allowContentAccess = true
-            webViewClient = WebViewClient()
-            webChromeClient = WebChromeClient()
+
+            // Replace the default WebViewClient with one that intercepts http/https links
+            webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                    val url = request?.url ?: return false // Get the URL safely
+
+                    // Check if the URL scheme is http or https
+                    if (url.scheme == "http" || url.scheme == "https") {
+                        try {
+                            // Create an Intent to view the URL externally
+                            val intent = Intent(Intent.ACTION_VIEW, url)
+                            // Verify that the intent can be handled to avoid crashes
+                            if (intent.resolveActivity(packageManager) != null) {
+                                startActivity(intent) // Start the external browser or app
+                            } else {
+                                Log.w("MainActivity", "No application found to handle URL: $url")
+                                Toast.makeText(this@MainActivity, "No app found to open this link.", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                             Log.e("MainActivity", "Could not open external link: $url", e)
+                             Toast.makeText(this@MainActivity, "Could not open link.", Toast.LENGTH_SHORT).show()
+                        }
+                        return true // Indicate that we've handled the URL loading
+                    }
+                    // For other schemes (e.g., file://, javascript:), let the WebView handle it
+                    return false // Let the WebView load the URL internally
+                    // Alternatively: return super.shouldOverrideUrlLoading(view, request) which does the same for standard schemes
+                }
+            }
+
 
             // Instantiate the external WebAppInterface, passing this MainActivity instance
             addJavascriptInterface(WebAppInterface(this@MainActivity), "AndroidInterface")
