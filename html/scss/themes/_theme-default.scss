@@ -22,3 +22,23 @@
 //   --bs-tertiary-bg: #{darken($gray-900, 10%)};
 //   // ... other dark mode default overrides
 // }
+
+// Define SCSS variables for your default theme's dark mode
+$default-dark-primary: $blue; // Or your specific dark primary
+$default-dark-body-bg: $gray-900; // Or your specific dark background
+
+html[data-app-theme="default"] {
+  &[data-bs-theme="dark"] {
+    // Set the main Bootstrap CSS vars for this theme scope if needed
+    --bs-primary: #{$default-dark-primary};
+    --bs-body-bg: #{$default-dark-body-bg};
+    // ... other overrides
+
+    .card {
+      // Use SCSS variables or static colors for the override
+      --bs-card-cap-bg: #{mix($default-dark-primary, $default-dark-body-bg, 15%)}; // Correct SCSS
+      // Or use a direct variable: --bs-card-cap-bg: var(--bs-tertiary-bg); // Use Bootstrap's dark tertiary bg
+      // Or a static color: --bs-card-cap-bg: #2a2a35;
+    }
+  }
+}
