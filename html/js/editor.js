@@ -239,6 +239,15 @@
         // Perform the debounced search
         debouncedSearch(searchTerm.trim());
     });
+    $(document).on('focus', '.file-search-input', function() {
+        const searchTerm = $(this).val().trim();
+        if (searchTerm.length) {
+            performSearch(searchTerm)
+        }
+    })
+    $(document).on('blur', '.file-search-input', function() {
+        clearSearchHighlights()
+    })
 
     $('#btn-editor-toolbar').hide();
     // Function to check the toolbar's position and toggle the button
