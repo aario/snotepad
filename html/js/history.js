@@ -48,7 +48,12 @@
     }
 
     window.getCurrentAction = () => {
-        return history.at(-1)['actionHandler']
+        lastHistoryItem = history.at(-1)
+        if (lastHistoryItem === undefined) {
+            return null
+        }
+
+        return lastHistoryItem['actionHandler'] ?? null
     }
 
     $("#btnBack").on('click', window.handleBackPress)
