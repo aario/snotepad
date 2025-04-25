@@ -3,32 +3,67 @@
         callback(true)
     }
 
+    // --- Update UI Controls ---
+    const updateAppearanceUI = (selectedTheme, selectedMode) => {
+        // Update Theme Selector
+        const themeSelect = document.getElementById('themeSelect');
+        if (themeSelect) {
+            themeSelect.value = selectedTheme;
+        } else {
+            console.warn("Theme select element not found");
+        }
+
+        // Update Mode Radios
+        const modeRadio = document.querySelector(`input[name="ui-mode"][value="${selectedMode}"]`);
+        if (modeRadio) {
+            modeRadio.checked = true;
+        } else {
+             console.warn(`Mode radio for value "${selectedMode}" not found`);
+             // Fallback check 'auto' if invalid value somehow stored
+             const autoRadio = document.querySelector('input[name="ui-mode"][value="auto"]');
+             if (autoRadio) autoRadio.checked = true;
+        }
+    };
+
     window.lunchSettings = () => {
         console.log("lunchSettings function called!");
 
         window.setNavBar('navbar-settings', {});
 
         window.setPage('settings', {});
+
+        // --- Initialize Appearance ---
+        const initialTheme = window.getStoredTheme();
+        const initialMode = window.getStoredMode();
+        updateAppearanceUI(initialTheme, initialMode);
+
+        // --- Event Listener for Theme Selector ---
+        const themeSelect = document.getElementById('themeSelect');
+        if(themeSelect) {
+            themeSelect.addEventListener('change', (event) => {
+                const newTheme = event.target.value;
+                const currentMode = window.getStoredMode(); // Get current mode setting
+                window.setStoredTheme(newTheme);       // Store the new theme choice
+                window.applyAppearance(newTheme, currentMode); // Apply the new theme with current mode
+            });
+        } else {
+             console.error("Theme select element not found during event listener setup");
+        }
+
+
+        // --- Event Listeners for Mode Radio Buttons ---
+        document.querySelectorAll('input[name="ui-mode"]').forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const newMode = event.target.value;
+                const currentTheme = window.getStoredTheme(); // Get current theme setting
+                window.setStoredMode(newMode);         // Store the new mode choice
+                window.applyAppearance(currentTheme, newMode); // Apply the current theme with new mode
+            });
+        });
+
         $('#btn-add-folder').on('click', function() {
             window.requestFolderSelection()
         })
-
-
-        // Update radio buttons to reflect the initial theme (use stored theme or default 'auto')
-        updateRadioUI(window.getStoredTheme() || 'auto');
-
-
-        // --- Add event listeners to the theme radio buttons ---
-        document.querySelectorAll('input[name="theme"]')
-            .forEach(radio => {
-                radio.addEventListener('change', (event) => {
-                    // When a radio button is selected
-                    const theme = event.target.value;
-                    window.setStoredTheme(theme); // Store the user's explicit choice
-                    window.setTheme(theme);      // Apply the chosen theme immediately
-                    // No need to call updateRadioUI here, the browser handles checking the clicked radio
-                })
-            })
 
         window.settingsUpdateFolders(
             JSON.parse(
@@ -115,19 +150,6 @@
                 window.sidebarUpdateFolders(paths)
             }
         })
-    }
-
-    // --- NEW: Function to update the checked state of radio buttons ---
-    const updateRadioUI = (theme) => {
-        // Find the radio button whose value matches the theme and check it
-        const themeRadio = document.querySelector(`input[name="theme"][value="${theme}"]`);
-        if (themeRadio) {
-            themeRadio.checked = true;
-        } else {
-            // Fallback if somehow the theme value is invalid - check 'auto' maybe?
-            const autoRadio = document.querySelector('input[name="theme"][value="auto"]');
-            if (autoRadio) autoRadio.checked = true;
-        }
     }
 })(jQuery); // End of use strict
 

@@ -1,0 +1,89 @@
+// scss/themes/_theme-oceanic.scss
+// Defines variables for the Oceanic theme
+
+$ocean-blue: #0B7285;
+$ocean-teal: #0CA678;
+$ocean-sand: #F8F9FA; // Light sand
+$ocean-deep-blue: #104E5B;
+$ocean-dark-bg: #073B4C;
+$ocean-dark-text: #CED4DA;
+
+html[data-app-theme="oceanic"] {
+  // --- Light Mode ---
+  &[data-bs-theme="light"] {
+    --bs-primary: #{$ocean-blue};
+    --bs-primary-rgb: #{to-rgb($ocean-blue)};
+    --bs-secondary: #{$ocean-teal};
+    --bs-secondary-rgb: #{to-rgb($ocean-teal)};
+    --bs-body-bg: #{$ocean-sand};
+    --bs-body-color: #{$gray-800}; // Darker text on light sand
+    --bs-secondary-bg: #{mix($ocean-blue, $ocean-sand, 5%)};
+    --bs-tertiary-bg: #{mix($ocean-blue, $ocean-sand, 10%)};
+    --bs-border-color: #{mix($ocean-blue, $ocean-sand, 25%)};
+    --bs-heading-color: #{$ocean-deep-blue};
+
+    .card {
+        // --- Add Card Header Variables ---
+        --bs-card-cap-bg: #{mix($ocean-blue, $ocean-sand, 15%)}; // Example: A light mix
+        --bs-card-cap-color: #{darken($ocean-deep-blue, 10%)}; // Example: Darker heading text
+        // --- End Add Card Header Variables ---
+    }
+
+    --bs-link-color: #{$ocean-blue};
+    --bs-link-hover-color: #{darken($ocean-blue, 10%)};
+    .bg-gradient-primary { // Example: Update sidebar gradient
+        background-color: $ocean-blue;
+        background-image: linear-gradient(180deg, lighten($ocean-blue, 10%) 10%, $ocean-blue 100%);
+    }
+    .sidebar {
+        background-color: $ocean-blue; // Base sidebar bg
+         .nav-item .nav-link {
+             color: rgba(255, 255, 255, 0.8);
+             i { color: rgba(255, 255, 255, 0.4); }
+             &:hover, &.active { color: #fff; i { color: #fff; } }
+         }
+         hr.sidebar-divider { border-top-color: rgba(255, 255, 255, 0.2); }
+         .sidebar-heading { color: rgba(255, 255, 255, 0.5); }
+    }
+  }
+
+  // --- Dark Mode ---
+  &[data-bs-theme="dark"] {
+    --bs-primary: #{$ocean-teal}; // Use teal as primary in dark
+    --bs-primary-rgb: #{to-rgb($ocean-teal)};
+    --bs-secondary: #{$ocean-blue}; // Use blue as secondary
+    --bs-secondary-rgb: #{to-rgb($ocean-blue)};
+    --bs-body-bg: #{$ocean-dark-bg};
+    --bs-body-color: #{$ocean-dark-text};
+    --bs-secondary-bg: #{lighten($ocean-dark-bg, 5%)};
+    --bs-tertiary-bg: #{lighten($ocean-dark-bg, 10%)};
+    --bs-border-color: #{lighten($ocean-dark-bg, 15%)};
+    --bs-heading-color: #{lighten($ocean-dark-text, 15%)};
+
+    .card {
+        // --- Add Card Header Variables ---
+        --bs-card-cap-bg: #{mix($ocean-teal, $ocean-dark-bg, 15%)}; // Example: A light mix
+        --bs-card-cap-color: #{$ocean-deep-blue}; // Example: Darker heading text
+        // --- End Add Card Header Variables ---
+    }
+
+    // Specific component overrides if needed
+    --bs-link-color: #{$ocean-teal};
+    --bs-link-hover-color: #{lighten($ocean-teal, 15%)};
+     .bg-gradient-primary { // Example: Update sidebar gradient
+         background-color: $ocean-deep-blue;
+         background-image: linear-gradient(180deg, lighten($ocean-deep-blue, 10%) 10%, $ocean-deep-blue 100%);
+         background-size: cover;
+     }
+     .sidebar {
+         background-color: $ocean-deep-blue; // Base dark sidebar bg
+         .nav-item .nav-link {
+             color: rgba(255, 255, 255, 0.7);
+             i { color: rgba(255, 255, 255, 0.4); }
+             &:hover, &.active { color: #fff; i { color: #fff; } }
+         }
+          hr.sidebar-divider { border-top-color: rgba(255, 255, 255, 0.15); }
+          .sidebar-heading { color: rgba(255, 255, 255, 0.4); }
+     }
+  }
+}

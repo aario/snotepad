@@ -40,30 +40,6 @@
   }
 }
 
-
-// *** ADD THIS BLOCK FOR DARK THEME OVERRIDES ***
-[data-bs-theme="dark"] {
-  .card {
-     // Redefine card header variables for dark mode
-     // Use appropriate dark theme variables for the values
-     --bs-card-cap-bg: var(--bs-secondary-bg); // e.g., Use secondary background
-     // Or: --bs-card-cap-bg: var(--bs-tertiary-bg); // Or tertiary
-     // Or: --bs-card-cap-bg: rgba(var(--bs-body-bg-rgb), 0.5); // Or a semi-transparent version of body bg
-
-     --bs-card-cap-color: var(--bs-emphasis-color); // e.g., Use emphasis color for text
-     // Or: --bs-card-cap-color: var(--bs-light); // Or light color
-  }
-
-  // If collapsable header arrow needs different color in dark mode
-  .card-header[data-toggle="collapse"] {
-      &::after {
-          color: var(--bs-tertiary-color); // Adjust if needed
-      }
-  }
-}
-// *** END OF ADDED BLOCK ***
-
-
 // --- Card and Editor Scroll ---
 // Existing styles...
 .card.h-100 {

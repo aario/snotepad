@@ -1,92 +1,96 @@
 (function($) {
     "use strict"; // Start of use strict
-        function setNavBar(templateName, data) {
-            // Select the button with the ID 'sidebarToggleTop' using jQuery
-            const $button = $("#btnBack");
+    // --- Preference Keys ---
+    const THEME_STORAGE_KEY = 'app-theme';
+    const MODE_STORAGE_KEY = 'ui-mode'; // Assuming this is what getStoredTheme/setStoredTheme used
 
-            // Find all sibling elements that come *after* the button
-            // and remove them from the DOM.
-            $button.nextAll().remove();
+    function setNavBar(templateName, data) {
+        // Select the button with the ID 'sidebarToggleTop' using jQuery
+        const $button = $("#btnBack");
 
-            // Insert the new HTML content provided in the 'template' variable
-            // immediately after the button.
-            $button.after(
-                window.renderTemplate(
-                    data,
-                    templateName
-                )
-            );
-        }
+        // Find all sibling elements that come *after* the button
+        // and remove them from the DOM.
+        $button.nextAll().remove();
 
-        window.setNavBar = setNavBar
-
-        function setPage(templateName, data) {
-            const $page = $('#page')
-            $page.empty()
-            $page.html(
-                window.renderTemplate(
-                    data,
-                    templateName
-                )
-            );
-        }
-        window.setPage = setPage
-
-        function navigate(elementId) {
-            console.log("Navigate called with ID:", elementId); // For debugging
-
-            const prefix = 'sidebar-item-';
-
-            // Check if the ID starts with the expected prefix
-            if (elementId && elementId.startsWith(prefix)) {
-                // Extract the part after "sidebar-item-"
-                const key = elementId.substring(prefix.length);
-                console.log("Extracted key:", key); // For debugging
-
-                // Check if the extracted part is 'settings'
-                if (key === 'settings') {
-                    window.lunchSettings(); // Call the specific function for settings
-                } else {
-                    console.log("Key is not 'settings'."); // For debugging
-                    // You could add logic here for other keys if needed in the future
-                }
-            } else {
-                console.log("ID does not start with 'sidebar-item-' or is null."); // For debugging
-            }
-        }
-
-        // Wait for the DOM to be fully loaded before running jQuery code
-        $(document).ready(function() {
-            // Select the settings link by its ID and attach a click event handler
-            $('#sidebar-item-settings').on('click', function(event) {
-                // Prevent the default link behavior (e.g., following the '#' href)
-                event.preventDefault();
-
-                // Get the ID of the element that was clicked ('sidebar-item-settings')
-                const clickedElementId = this.id;
-
-                // Call the navigate function, passing the ID
-                navigate(clickedElementId);
-            });
-
-            window.sidebarUpdateFolders(
-                JSON.parse(
-                    window.readPreferences('paths')
-                )
+        // Insert the new HTML content provided in the 'template' variable
+        // immediately after the button.
+        $button.after(
+            window.renderTemplate(
+                data,
+                templateName
             )
+        );
+    }
 
-    
-            const lastPath = window.readPreferences('lastPath')
-            if (lastPath !== undefined && lastPath !== null) {
-                window.sidebarHighlightItem($('.sidebar .nav-link div:contains("' + lastPath + '")'))
-                window.lunchFolderView(lastPath)
+    window.setNavBar = setNavBar
+
+    function setPage(templateName, data) {
+        const $page = $('#page')
+        $page.empty()
+        $page.html(
+            window.renderTemplate(
+                data,
+                templateName
+            )
+        );
+    }
+    window.setPage = setPage
+
+    function navigate(elementId) {
+        console.log("Navigate called with ID:", elementId); // For debugging
+
+        const prefix = 'sidebar-item-';
+
+        // Check if the ID starts with the expected prefix
+        if (elementId && elementId.startsWith(prefix)) {
+            // Extract the part after "sidebar-item-"
+            const key = elementId.substring(prefix.length);
+            console.log("Extracted key:", key); // For debugging
+
+            // Check if the extracted part is 'settings'
+            if (key === 'settings') {
+                window.lunchSettings(); // Call the specific function for settings
+            } else {
+                console.log("Key is not 'settings'."); // For debugging
+                // You could add logic here for other keys if needed in the future
             }
-            $('#btn-welcome-add-folder').on('click', function() {
-                window.requestFolderSelection()
-            })
+        } else {
+            console.log("ID does not start with 'sidebar-item-' or is null."); // For debugging
+        }
+    }
 
-            window.hideLoading()
+    // Wait for the DOM to be fully loaded before running jQuery code
+    $(document).ready(function() {
+        // Select the settings link by its ID and attach a click event handler
+        $('#sidebar-item-settings').on('click', function(event) {
+            // Prevent the default link behavior (e.g., following the '#' href)
+            event.preventDefault();
+
+            // Get the ID of the element that was clicked ('sidebar-item-settings')
+            const clickedElementId = this.id;
+
+            // Call the navigate function, passing the ID
+            navigate(clickedElementId);
         });
+
+        window.sidebarUpdateFolders(
+            JSON.parse(
+                window.readPreferences('paths')
+            )
+        )
+
+
+        const lastPath = window.readPreferences('lastPath')
+        if (lastPath !== undefined && lastPath !== null) {
+            window.sidebarHighlightItem($('.sidebar .nav-link div:contains("' + lastPath + '")'))
+            window.lunchFolderView(lastPath)
+        }
+        $('#btn-welcome-add-folder').on('click', function() {
+            window.requestFolderSelection()
+        })
+
+        window.hideLoading()
+    });
 
     // Scroll to top button appear
     $(document).on('scroll', function() {
@@ -114,52 +118,70 @@
         }
     }
 
+    // --- Getters for Preferences ---
+    window.getStoredTheme = () => {
+        let theme = localStorage.getItem(THEME_STORAGE_KEY)
+        if (!theme) {
+            theme = 'default' // Default to 'default' theme
+        }
 
-
-
-
-  window.getStoredTheme = () => localStorage.getItem('theme')
-  window.setStoredTheme = theme => localStorage.setItem('theme', theme)
-
-  const getPreferredTheme = () => {
-    const storedTheme = window.getStoredTheme()
-    if (storedTheme) {
-      return storedTheme
+        return theme
     }
-    // Default to 'auto' if nothing is stored and system preference isn't dark.
-    // Or default to 'light' if you prefer.
-    // If system default is dark, 'auto' would resolve to 'dark' anyway in setTheme.
-    return 'auto'
-  }
 
-  window.setTheme = theme => {
-    if (theme === 'auto') {
-      // Check system preference and apply dark/light accordingly
-      document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
-    } else {
-      document.documentElement.setAttribute('data-bs-theme', theme)
+    window.getStoredMode = () => {
+        let mode = localStorage.getItem(MODE_STORAGE_KEY)
+        if (!mode) {
+            mode = 'auto' // Default to 'auto' mode
+        }
+
+        return mode
     }
-  }
 
-  // --- Apply the theme and update UI on initial load ---
-  const initialTheme = getPreferredTheme();
-  window.setTheme(initialTheme);
-  // Store 'auto' explicitly if it was the initial derived preference but not stored
-  if (!getStoredTheme() && initialTheme === 'auto') {
-       window.setStoredTheme('auto')
-  }
+    // --- Setters for Preferences ---
+    window.setStoredTheme = (theme) => localStorage.setItem(THEME_STORAGE_KEY, theme);
+    window.setStoredMode = (mode) => localStorage.setItem(MODE_STORAGE_KEY, mode);
 
-  // --- Listen for system theme changes AFTER initial load ---
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    const storedTheme = window.getStoredTheme()
-    // Only react to system changes if the user explicitly selected 'auto' or hasn't made a choice yet
-    if (storedTheme === 'auto' || !storedTheme) {
-      // Re-evaluate preferred theme (which checks system preference if theme is 'auto')
-      const newPreferred = getPreferredTheme();
-      window.setTheme(newPreferred);
-      // No UI update needed here for radio buttons, as the 'auto' radio should remain checked.
-      // If 'auto' wasn't stored and system changed, getPreferredTheme would return 'light'/'dark'
-      // but we likely still want 'auto' selected conceptually unless the user explicitly picks light/dark.
-    }
-  })
+    // --- Get Preferred Mode (Handles 'auto') ---
+    const getPreferredMode = () => {
+        const storedMode = getStoredMode();
+        if (storedMode && storedMode !== 'auto') {
+            return storedMode;
+        }
+        // Check system preference if 'auto' or not set
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    };
+
+    // --- Apply Theme and Mode to DOM ---
+    window.applyAppearance = (theme, mode) => {
+        const effectiveMode = (mode === 'auto') ? getPreferredMode() : mode;
+        console.log(`Applying Theme: ${theme}, Mode: ${mode}, Effective Mode: ${effectiveMode}`);
+
+        // Set theme attribute on body (or html)
+        document.documentElement.setAttribute('data-app-theme', theme);
+
+        // Set Bootstrap's theme attribute on html (recommended by Bootstrap)
+        document.documentElement.setAttribute('data-bs-theme', effectiveMode);
+
+        // Optional: Add theme-specific class to body if needed for non-variable styles
+        // document.body.classList.remove('theme-default', 'theme-oceanic', 'theme-forest', 'theme-sunset');
+        // document.body.classList.add(`theme-${theme}`);
+    };
+
+    // --- Initialize Appearance ---
+    const initialTheme = window.getStoredTheme(); // Default to 'default' theme
+    const initialMode = window.getStoredMode();   // Default to 'auto' mode
+    window.applyAppearance(initialTheme, initialMode);
+
+    // Add listener for system color scheme changes if mode is 'auto'
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const currentSelectedMode = getStoredMode() || 'auto';
+        if (currentSelectedMode === 'auto') {
+            const currentTheme = getStoredTheme() || 'default';
+            window.applyAppearance(currentTheme, 'auto'); // Re-apply to update effective mode
+            // If settings page is visible, update the UI radios (optional)
+            if(document.getElementById('page')?.dataset?.pageName === 'settings') { // Example check
+                updateAppearanceUI(currentTheme, 'auto');
+            }
+        }
+    });
 })(jQuery); // End of use strict

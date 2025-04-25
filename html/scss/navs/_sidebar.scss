@@ -6,8 +6,8 @@
     width: $sidebar-collapsed-width + 3;
     min-height: 100vh;
     // --- Base Styles from original .sidebar-dark ---
-    background-color: $blue; // Assuming $blue is your desired base background from _variables.scss
-    color: rgba(255, 255, 255, 0.8); // Default text color (fade-out($white, 0.2))
+    background-color: var(--bs-primary);
+    color: var(--sidebar-text-color, rgba(255, 255, 255, 0.8)); // Default light text on dark bg
 
     .nav-item {
         position: relative;
@@ -20,24 +20,25 @@
             text-align: center;
             padding: 0.75rem 1rem;
             width: $sidebar-collapsed-width;
-            color: rgba(255, 255, 255, 0.8); // (fade-out($white, 0.2))
+            color: var(--sidebar-link-color, var(--sidebar-text-color, rgba(255, 255, 255, 0.8))); // Use variables
 
             i {
-                color: rgba(255, 255, 255, 0.3); // (fade-out($white, 0.7))
+                // Use a slightly muted version of the link color or a dedicated variable
+                color: var(--sidebar-icon-color, rgba(255, 255, 255, 0.4)); // Example variable
             }
 
             &:active,
             &:focus,
             &:hover {
-                color: $white; // Use direct white or var(--bs-white)
+                color: var(--sidebar-link-hover-color, var(--bs-white, #fff)); // Use variables
                 i {
-                    color: $white; // Use direct white or var(--bs-white)
+                    color: var(--sidebar-icon-hover-color, var(--bs-white, #fff)); // Use variables
                 }
             }
 
             // Accordion Arrow Icon Color
             &[data-toggle="collapse"]::after {
-                 color: rgba(255, 255, 255, 0.5); // (fade-out($white, 0.5))
+                 color: var(--sidebar-arrow-color, rgba(255, 255, 255, 0.5)); // Use variable
             }
 
 
@@ -50,10 +51,10 @@
         &.active {
             .nav-link {
                 font-weight: 700;
-                color: $white; // Use direct white or var(--bs-white)
+                color: var(--sidebar-link-active-color, var(--bs-white, #fff)); // Use variable
 
                 i {
-                    color: $white; // Use direct white or var(--bs-white)
+                    color: var(--sidebar-icon-active-color, var(--bs-white, #fff)); // Use variable
                 }
             }
         }
@@ -70,7 +71,7 @@
                 border-radius: $border-radius;
                 box-shadow: $box-shadow;
                 // Use theme variables for the inner part
-                background-color: var(--bs-body-bg);
+                background-color: var(--bs-body-bg); // Use standard BS var
             }
         }
 
@@ -94,32 +95,32 @@
                     text-transform: uppercase;
                     font-weight: 800;
                     font-size: 0.65rem;
-                    color: var(--bs-secondary-color); // Theme variable
+                    color: var(--bs-secondary-color); // Theme variable (Bootstrap standard)
                 }
 
                 .collapse-item {
                     padding: 0.5rem 1rem;
                     margin: 0 0.5rem;
                     display: block;
-                    color: var(--bs-body-color); // Theme variable
+                    color: var(--bs-body-color); // Theme variable (Bootstrap standard)
                     text-decoration: none;
                     border-radius: $border-radius;
                     white-space: nowrap;
 
                     &:hover {
-                        background-color: var(--bs-tertiary-bg); // Theme variable
-                        color: var(--bs-emphasis-color); // Theme variable
+                        background-color: var(--bs-tertiary-bg); // Theme variable (Bootstrap standard)
+                        color: var(--bs-emphasis-color); // Theme variable (Bootstrap standard)
                     }
 
                     &:active {
-                        background-color: var(--bs-secondary-bg); // Theme variable
-                        color: var(--bs-emphasis-color); // Theme variable
+                        background-color: var(--bs-secondary-bg); // Theme variable (Bootstrap standard)
+                        color: var(--bs-emphasis-color); // Theme variable (Bootstrap standard)
                     }
 
                     &.active {
-                        color: var(--bs-primary); // Theme variable (or maybe var(--bs-link-color)?)
+                        color: var(--bs-primary); // Theme variable (Bootstrap standard)
                         font-weight: 700;
-                        background-color: transparent;
+                        background-color: transparent; // Keep transparent
                     }
                 }
             }
@@ -132,21 +133,21 @@
         text-align: center;
         margin-bottom: 1rem;
         cursor: pointer;
-        background-color: rgba(255, 255, 255, 0.2); // (fade-out($white, 0.8)) - Adjusted for better visibility maybe?
+        background-color: var(--sidebar-toggle-bg, rgba(255, 255, 255, 0.2)); // Use variable
 
         &::after {
             font-weight: 900;
             content: '\f104';
             font-family: 'Font Awesome 5 Free';
             margin-right: 0.1rem;
-            color: rgba(255, 255, 255, 0.5); // (fade-out($white, 0.5))
+            color: var(--sidebar-toggle-arrow-color, rgba(255, 255, 255, 0.5)); // Use variable
         }
 
         &:hover {
             text-decoration: none;
-            background-color: rgba(255, 255, 255, 0.25); // (fade-out($white, 0.75))
+            background-color: var(--sidebar-toggle-hover-bg, rgba(255, 255, 255, 0.25)); // Use variable
             &::after {
-                 color: rgba(255, 255, 255, 0.75); // Brighter arrow on hover
+                 color: var(--sidebar-toggle-arrow-hover-color, rgba(255, 255, 255, 0.75)); // Use variable
             }
         }
 
@@ -163,11 +164,11 @@
             content: '\f105';
             font-family: 'Font Awesome 5 Free';
             margin-left: 0.25rem;
-            color: rgba(255, 255, 255, 0.5); // (fade-out($white, 0.5))
+            color: var(--sidebar-toggle-arrow-color, rgba(255, 255, 255, 0.5)); // Re-use variable
         }
         &:hover { // Hover on the wrapper when toggled
              #sidebarToggle::after { // Need to target the pseudo-element within
-                 color: rgba(255, 255, 255, 0.75);
+                 color: var(--sidebar-toggle-arrow-hover-color, rgba(255, 255, 255, 0.75)); // Re-use variable
              }
          }
 
@@ -186,7 +187,9 @@
         text-transform: uppercase;
         letter-spacing: 0.05rem;
         z-index: 1;
-        color: $white; // Use direct white or var(--bs-white)
+        color: var(--sidebar-brand-color, var(--bs-white, #fff)); // Use variable
+        // Background should be the same as the main sidebar background
+        background-color: inherit; // Inherit from .sidebar
 
         .sidebar-brand-icon {
             display: flex;
@@ -206,7 +209,8 @@
 
     hr.sidebar-divider {
         margin: 0 1rem 1rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.15); // (fade-out($white, 0.85))
+        // Use a specific variable or a translucent version of a theme color
+        border-top: 1px solid var(--sidebar-divider-color, rgba(255, 255, 255, 0.15)); // Use variable
     }
 
     .sidebar-heading {
@@ -215,7 +219,7 @@
         font-weight: 800;
         font-size: 0.65rem;
         @extend .text-uppercase;
-        color: rgba(255, 255, 255, 0.4); // (fade-out($white, 0.6))
+        color: var(--sidebar-heading-color, rgba(255, 255, 255, 0.4)); // Use variable
     }
 
     .sidebar-card {
@@ -225,12 +229,12 @@
         align-items: center;
         font-size: $font-size-sm;
         border-radius: $border-radius;
-        color: rgba(255, 255, 255, 0.8); // fade-out($white, 0.2)
+        color: var(--sidebar-card-text-color, rgba(255, 255, 255, 0.8)); // Use variable
         margin-left: 1rem;
         margin-right: 1rem;
         margin-bottom: 1rem;
         padding: 1rem;
-        background-color: rgba(0, 0, 0, 0.1); // fade-out($black, 0.9) -> transparent black
+        background-color: var(--sidebar-card-bg, rgba(0, 0, 0, 0.1)); // Use variable (default dark transparent)
         .sidebar-card-illustration {
             height: 3rem;
             display: block;
@@ -240,104 +244,11 @@
         }
         p {
             font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5); // fade-out($white, 0.5)
+            color: var(--sidebar-card-muted-text-color, rgba(255, 255, 255, 0.5)); // Use variable
         }
     }
 }
 // --- End Base Styles ---
-
-
-// --- Dark Theme Overrides ---
-[data-bs-theme="dark"] {
-    .sidebar {
-        // --- Dark Theme Specific Styles ---
-        background-color: var(--bs-dark); // Use Bootstrap dark variable
-        color: var(--bs-secondary-color); // Default text color for dark theme sidebar
-
-        .nav-item {
-            .nav-link {
-                color: var(--bs-secondary-color); // Default link color
-
-                i {
-                    color: var(--bs-tertiary-color); // Subtle icon color
-                }
-
-                &:active,
-                &:focus,
-                &:hover {
-                    color: var(--bs-light);
-                    i {
-                        color: var(--bs-light);
-                    }
-                }
-
-                // Accordion Arrow Icon Color
-                &[data-toggle="collapse"]::after {
-                    color: var(--bs-tertiary-color);
-                }
-            }
-
-            &.active {
-                .nav-link {
-                    color: var(--bs-light);
-                    i {
-                        color: var(--bs-light);
-                    }
-                }
-            }
-            
-            // Accordion inner already uses theme vars, should be fine.
-        }
-
-        #sidebarToggle {
-            background-color: var(--bs-secondary-bg); // Dark theme bg for toggle
-
-            &::after {
-                color: var(--bs-tertiary-color); // Dark theme arrow color
-            }
-
-            &:hover {
-                background-color: var(--bs-tertiary-bg); // Dark theme hover bg
-                &::after {
-                    color: var(--bs-secondary-color); // Dark theme hover arrow color
-                }
-            }
-        }
-        
-         &.toggled {
-             #sidebarToggle::after {
-                 color: var(--bs-tertiary-color); // Dark theme arrow color
-             }
-             &:hover { // Hover on the wrapper when toggled
-                 #sidebarToggle::after { // Need to target the pseudo-element within
-                      color: var(--bs-secondary-color); // Dark theme hover arrow color
-                 }
-             }
-         }
-
-
-        .sidebar-brand {
-            color: var(--bs-light); // Brand text color in dark mode
-            // Icon itself doesn't change color usually
-        }
-
-        hr.sidebar-divider {
-            border-top-color: var(--bs-border-color-translucent); // Dark theme border
-        }
-
-        .sidebar-heading {
-            color: var(--bs-tertiary-color); // Subtle heading in dark mode
-        }
-
-        .sidebar-card {
-             // Adjust if needed, but the original might be fine if always dark inside
-             // background-color: rgba(var(--bs-black-rgb), 0.2); // Slightly darker if needed
-             // color: var(--bs-secondary-color);
-             // p { color: var(--bs-tertiary-color); }
-        }
-    }
-}
-// --- End Dark Theme Overrides ---
 
 
 // --- Media Query adjustments (Mostly layout, colors handled above) ---

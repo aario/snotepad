@@ -1,52 +1,168 @@
-// Sass/SCSS version for EasyMDE height within .card-body
+// scss/_editor.scss
+// Theme-aware styling for EasyMDE / CodeMirror
 
+// --- Base Editor Sizing (Keep existing flex/height styles) ---
 .card-body { // Target specifically within card-body
-  // Styles applied to both the EasyMDE wrapper and the CodeMirror instance
-  // These make the editor components attempt to fill the flexible card-body
   .EasyMDEContainer,
   .CodeMirror {
-    flex-grow: 1;      // Allow growing within the card-body flex container
-    min-height: 200px; // Optional: ensure a minimum usable height
-    // height: 100%;   // IMPORTANT: REMOVE or comment out fixed height
-    border: none;      // Optional: remove border if it looks odd
-    display: flex;     // Ensure CodeMirror itself is flex container for its children
+    flex-grow: 1;
+    min-height: 200px;
+    border: none; // Keep border none unless desired
+    display: flex;
     flex-direction: column;
   }
 
-  // Styles applied specifically to the scrolling area within CodeMirror
   .CodeMirror {
     .CodeMirror-scroll {
-       min-height: 150px; // Optional: minimum height for the scrollable text area
-       // height: 100%;   // IMPORTANT: REMOVE or comment out fixed height
-       flex-grow: 1; // Make scroll area fill CodeMirror
-       position: relative; // Usually needed for CodeMirror internals
+      min-height: 150px;
+      flex-grow: 1;
+      position: relative;
     }
-    // Ensure gutters, etc., don't prevent shrinking/growing
-    .CodeMirror-gutters {
-        height: auto !important; // Let it size to content
+    .CodeMirror-gutters { height: auto !important; }
+  }
+}
+// --- End Base Sizing ---
+
+
+// --- Theme-Aware Editor Styles ---
+
+// Base styles (Applied by default, uses vars for Light Mode / Themed Light Mode)
+.editor-toolbar {
+  // Use theme variables for background and border
+  background-color: var(--bs-tertiary-bg); // Slightly off-main background
+  border: 1px solid var(--bs-border-color);
+  border-bottom: none; // Often looks better without bottom border if attached to editor
+
+  button, a.fa { // Toolbar buttons
+    color: var(--bs-secondary-color); // Use secondary text color
+    border: 1px solid transparent !important; // Make border transparent initially
+    background-color: transparent;
+
+    &:hover, &.active {
+      // Use theme variables for hover/active state
+      background-color: var(--bs-secondary-bg);
+      border-color: var(--bs-border-color-translucent) !important; // Subtle border on hover
+      color: var(--bs-emphasis-color); // Emphasized text color
     }
-    .CodeMirror-sizer {
-        // Sizer usually handles width/height based on content
-    }
+  }
+
+  i.separator {
+    border-left: 1px solid var(--bs-border-color); // Use theme border color
+    border-right: 1px solid var(--bs-border-color);
+    color: transparent; // Make separator icon invisible
   }
 }
 
+.CodeMirror {
+  // Use theme variables for background, text, and border
+  background-color: var(--bs-body-bg); // Editor bg matches body bg
+  color: var(--bs-body-color);         // Editor text matches body text
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius); // Match card rounding if needed
+}
+
+.CodeMirror-gutters {
+  // Use a slightly different background, theme variable
+  background-color: var(--bs-secondary-bg);
+  border-right: 1px solid var(--bs-border-color);
+  color: var(--bs-secondary-color); // Line numbers color
+}
+
+.CodeMirror-cursor {
+  // Use theme variable for border color (often opposite of bg)
+  border-left: 1px solid var(--bs-emphasis-color);
+}
+
+.CodeMirror-selected {
+  // Use a theme variable, often primary with transparency
+  background-color: rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.CodeMirror-activeline-background {
+   // Use a subtle background, maybe tertiary or transparent light/dark
+   background-color: var(--bs-tertiary-bg);
+   // Or use transparency: background-color: rgba(var(--bs-emphasis-color-rgb), 0.07);
+}
+
+.editor-statusbar {
+  // Use theme variables, often matches toolbar
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-secondary-color);
+  border: 1px solid var(--bs-border-color);
+  border-top: none; // Often looks better without top border
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius); // Match card rounding
+}
+
+// Editor Preview Area (uses theme variables for HTML elements)
+.editor-preview, .editor-preview-side {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  border: 1px solid var(--bs-border-color);
+  padding: 1rem; // Add some padding
+
+  h1, h2, h3, h4, h5, h6 { color: var(--bs-heading-color); border-bottom-color: var(--bs-border-color); }
+  a { color: var(--bs-link-color); &:hover { color: var(--bs-link-hover-color); } }
+  code { color: var(--bs-code-color); background-color: var(--bs-secondary-bg); padding: .2em .4em; border-radius: .25rem;}
+  pre { background-color: var(--bs-secondary-bg); border: 1px solid var(--bs-border-color); padding: 1rem; border-radius: .375rem; code { background-color: transparent; padding: 0; border: none; } }
+  blockquote { color: var(--bs-secondary-color); border-left: .25rem solid var(--bs-border-color); padding-left: 1rem; margin-left: 0; }
+  hr { border-top-color: var(--bs-border-color-translucent); }
+  table { th, td { border-color: var(--bs-border-color); } }
+}
+
+// Fullscreen adjustments (ensure it uses theme vars too)
+.EasyMDEContainer.fullscreen {
+   background-color: var(--bs-body-bg); // Fullscreen bg matches theme
+   border-color: var(--bs-border-color);
+   z-index: 1050; // Adjust z-index as needed (above navbars, below modals typically)
+}
+
+
+// --- Dark Mode Overrides for Editor ---
+// These styles apply ONLY when data-bs-theme="dark" is set on HTML
+// They assume the base styles above are using the correct variables.
+// We only need to override specific things if the standard dark variables don't look right.
+html[data-bs-theme="dark"] {
+
+  .CodeMirror-cursor {
+    // Ensure cursor is visible on dark background
+    border-left-color: var(--bs-light); // Use light color directly maybe
+  }
+
+  .CodeMirror-selected {
+      // Adjust selection if default primary is too dark/light
+      // background-color: rgba(var(--bs-info-rgb), 0.4); // Example: use info color
+  }
+
+  // Preview area adjustments if needed for dark mode
+  .editor-preview, .editor-preview-side {
+     // Example: Maybe make code blocks slightly different
+     // pre, code { background-color: var(--bs-dark-subtle); } // Requires Bootstrap 5.3+ dark subtle vars
+  }
+
+  // You might not need many overrides here if the base styles correctly
+  // use variables like --bs-body-bg, --bs-tertiary-bg, --bs-border-color etc.
+  // as these are already defined correctly for dark mode by Bootstrap/your themes.
+}
+// --- End Dark Mode Overrides ---
+
+
+// --- Other existing styles ---
 .search-highlight {
-    background-color: yellow;
-    /* Add other styles as needed, e.g., */
-    /* color: black; */
-    /* border: 1px solid orange; */
+    background-color: yellow; // Keep simple or use a specific variable
+    color: black;
 }
 
 .fixed-editor-toolbar {
   position: fixed;
-  top: 4.5rem; /* Adjust if your topbar height variable is different */
+  top: 4.5rem; /* Adjust based on your topbar height */
   width: auto;
-  background: white; /* Or use a theme variable like var(--bs-body-bg) for light mode */
-  border: 1px solid #ced4da; /* Or use a theme variable like var(--bs-border-color) */
-  z-index: 1000; /* Ensure it's above content but potentially below modals */
-  /* Add padding or other styling as needed */
+  // Use theme variables
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  z-index: 1000;
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Optional shadow */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); // Shadow might need theme adjustment
 }

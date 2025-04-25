@@ -2,30 +2,43 @@
 <div class="col mb-4">
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex">
-            <h6 class="pl-5 mt-2 font-weight-bold">Theme</h6>
+            <h6 class="pl-5 mt-2 font-weight-bold">Appearance</h6>
         </div>
         <div class="card-body">
-            <div id="theme-radios" class="mb-3">
+            <div class="mb-3">
+                <label for="themeSelect" class="form-label fw-bold">Theme</label>
+                <select class="form-select" id="themeSelect">
+                    <option value="default">Default</option>
+                    <option value="oceanic">Oceanic</option>
+                    <option value="forest">Forest</option>
+                    <option value="sunset">Sunset</option>
+                </select>
+            </div>
+
+            <hr> <div class="mb-1">
+                 <span class="form-label fw-bold">Mode</span>
+            </div>
+            <div id="ui-mode-radios" class="mb-3">
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="theme" id="theme-light" value="light" data-bs-theme-value="light">
-                    <label class="form-check-label" for="theme-light">
+                    <input class="form-check-input" type="radio" name="ui-mode" id="ui-mode-light" value="light">
+                    <label class="form-check-label" for="ui-mode-light">
                         <i class="bi bi-sun-fill me-1"></i> Light
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="theme" id="theme-dark" value="dark" data-bs-theme-value="dark">
-                    <label class="form-check-label" for="theme-dark">
+                    <input class="form-check-input" type="radio" name="ui-mode" id="ui-mode-dark" value="dark">
+                    <label class="form-check-label" for="ui-mode-dark">
                         <i class="bi bi-moon-stars-fill me-1"></i> Dark
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="theme" id="theme-auto" value="auto" data-bs-theme-value="auto">
-                    <label class="form-check-label" for="theme-auto">
+                    <input class="form-check-input" type="radio" name="ui-mode" id="ui-mode-auto" value="auto">
+                    <label class="form-check-label" for="ui-mode-auto">
                         <i class="bi bi-circle-half me-1"></i> Auto
                     </label>
                 </div>
             </div>
-        </div>
+             </div>
     </div>
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex">

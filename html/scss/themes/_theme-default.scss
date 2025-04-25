@@ -1,0 +1,24 @@
+// scss/themes/_theme-default.scss
+// Defines variables for the default theme
+
+// No specific overrides needed here if it just uses standard Bootstrap
+// variables defined via _variables.scss and the core Bootstrap SCSS.
+// You could explicitly define variables here if you want the default
+// theme to have unique colors different from raw Bootstrap.
+
+// Example (Optional - only if default needs specific overrides):
+// body[data-bs-theme="light"][data-app-theme="default"] {
+//   --bs-primary: #{$blue}; // Your original blue from _variables.scss
+//   --bs-body-bg: #{$white};
+//   --bs-body-color: #{$gray-600};
+//   // ... other light mode default overrides
+// }
+
+// body[data-bs-theme="dark"][data-app-theme="default"] {
+//   --bs-primary: #{$blue}; // Keep same primary or adjust for dark
+//   --bs-body-bg: #{$gray-900}; // Your original dark bg
+//   --bs-body-color: #{$gray-300}; // Adjust text color for dark
+//   --bs-secondary-bg: #{darken($gray-900, 5%)};
+//   --bs-tertiary-bg: #{darken($gray-900, 10%)};
+//   // ... other dark mode default overrides
+// }

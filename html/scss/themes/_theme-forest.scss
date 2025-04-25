@@ -1,0 +1,71 @@
+// scss/themes/_theme-forest.scss
+// Defines variables for the Forest theme
+
+$forest-green: #2F9E44;
+$forest-brown: #8D6E63;
+$forest-light-bg: #F1F3F5;
+$forest-dark-green: #2B7A39;
+$forest-dark-bg: #343A40; // Dark grey/brown
+$forest-dark-text: #E9ECEF;
+
+html[data-app-theme="forest"] {
+  // --- Light Mode ---
+  &[data-bs-theme="light"] {
+    --bs-primary: #{$forest-green};
+    --bs-primary-rgb: #{to-rgb($forest-green)};
+    --bs-secondary: #{$forest-brown};
+    --bs-secondary-rgb: #{to-rgb($forest-brown)};
+    --bs-body-bg: #{$forest-light-bg};
+    --bs-body-color: #{$gray-700};
+    --bs-secondary-bg: #{mix($forest-green, $forest-light-bg, 5%)};
+    --bs-tertiary-bg: #{mix($forest-green, $forest-light-bg, 10%)};
+    --bs-border-color: #{mix($forest-green, $forest-light-bg, 25%)};
+    --bs-heading-color: #{$forest-dark-green};
+
+    .card {
+        // --- Add Card Header Variables ---
+        --bs-card-cap-bg: #{mix($forest-green, $forest-light-bg, 15%)}; // Example: A light mix
+        --bs-card-cap-color: #{darken($forest-dark-green, 10%)}; // Example: Darker heading text
+        // --- End Add Card Header Variables ---
+    }
+
+    --bs-link-color: #{$forest-green};
+    --bs-link-hover-color: #{darken($forest-green, 10%)};
+
+    .bg-gradient-primary {
+        background-color: $forest-green;
+        background-image: linear-gradient(180deg, lighten($forest-green, 10%) 10%, $forest-green 100%);
+    }
+     .sidebar { background-color: $forest-green; /* Adjust text colors as needed */ }
+  }
+
+  // --- Dark Mode ---
+  &[data-bs-theme="dark"] {
+    --bs-primary: #{lighten($forest-green, 10%)}; // Lighter green for dark primary
+    --bs-primary-rgb: #{to-rgb(lighten($forest-green, 10%))};
+    --bs-secondary: #{lighten($forest-brown, 15%)}; // Lighter brown
+    --bs-secondary-rgb: #{to-rgb(lighten($forest-brown, 15%))};
+    --bs-body-bg: #{$forest-dark-bg};
+    --bs-body-color: #{$forest-dark-text};
+    --bs-secondary-bg: #{lighten($forest-dark-bg, 5%)};
+    --bs-tertiary-bg: #{lighten($forest-dark-bg, 10%)};
+    --bs-border-color: #{lighten($forest-dark-bg, 15%)};
+    --bs-heading-color: #{lighten($forest-dark-text, 15%)};
+
+    .card {
+        // --- Add Card Header Variables ---
+        --bs-card-cap-bg: #{mix(lighten($forest-green, 10%), $forest-dark-bg, 15%)}; // Example: A light mix
+        --bs-card-cap-color: #{$forest-dark-green}; // Example: Darker heading text
+        // --- End Add Card Header Variables ---
+    }
+
+    --bs-link-color: #{lighten($forest-green, 15%)};
+    --bs-link-hover-color: #{lighten($forest-green, 25%)};
+
+    .bg-gradient-primary {
+        background-color: $forest-dark-green;
+        background-image: linear-gradient(180deg, lighten($forest-dark-green, 10%) 10%, $forest-dark-green 100%);
+    }
+    .sidebar { background-color: $forest-dark-green; /* Adjust text colors as needed */ }
+  }
+}

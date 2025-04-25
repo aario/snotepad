@@ -1,0 +1,76 @@
+// scss/themes/_theme-sunset.scss
+// Defines variables for the Sunset theme
+
+$sunset-orange: #F76707;
+$sunset-purple: #7048E8;
+$sunset-red: #E03131;
+$sunset-light-bg: #FFF8E1; // Creamy light
+$sunset-dark-bg: #212529; // Very dark grey
+$sunset-dark-purple: #49299A;
+$sunset-dark-text: #F8F9FA;
+
+html[data-app-theme="sunset"] {
+  // --- Light Mode ---
+  &[data-bs-theme="light"] {
+    --bs-primary: #{$sunset-orange};
+    --bs-primary-rgb: #{to-rgb($sunset-orange)};
+    --bs-secondary: #{$sunset-purple};
+    --bs-secondary-rgb: #{to-rgb($sunset-purple)};
+    --bs-danger: #{$sunset-red}; // Example: Tie theme color to semantic color
+    --bs-danger-rgb: #{to-rgb($sunset-red)};
+    --bs-body-bg: #{$sunset-light-bg};
+    --bs-body-color: #{darken(desaturate($sunset-orange, 30%), 30%)}; // Muted dark orange text
+    --bs-secondary-bg: #{mix($sunset-orange, $sunset-light-bg, 5%)};
+    --bs-tertiary-bg: #{mix($sunset-orange, $sunset-light-bg, 10%)};
+    --bs-border-color: #{mix($sunset-orange, $sunset-light-bg, 25%)};
+    --bs-heading-color: #{$sunset-red};
+
+    .card {
+        // --- Add Card Header Variables ---
+        --bs-card-cap-bg: #{mix($sunset-orange, $sunset-light-bg, 15%)}; // Example: A light mix
+        --bs-card-cap-color: #{darken($sunset-red, 10%)}; // Example: Darker heading text
+        // --- End Add Card Header Variables ---
+    }
+
+    --bs-link-color: #{$sunset-purple};
+    --bs-link-hover-color: #{darken($sunset-purple, 10%)};
+
+    .bg-gradient-primary {
+        background-color: $sunset-orange;
+        background-image: linear-gradient(180deg, lighten($sunset-orange, 10%) 10%, $sunset-orange 100%);
+    }
+     .sidebar { background-color: $sunset-orange; /* Adjust text colors as needed */ }
+  }
+
+  // --- Dark Mode ---
+  &[data-bs-theme="dark"] {
+    --bs-primary: #{lighten($sunset-orange, 15%)}; // Lighter orange
+    --bs-primary-rgb: #{to-rgb(lighten($sunset-orange, 15%))};
+    --bs-secondary: #{$sunset-purple};
+    --bs-secondary-rgb: #{to-rgb($sunset-purple)};
+    --bs-danger: #{lighten($sunset-red, 10%)};
+    --bs-danger-rgb: #{to-rgb(lighten($sunset-red, 10%))};
+    --bs-body-bg: #{$sunset-dark-bg};
+    --bs-body-color: #{$sunset-dark-text};
+    --bs-secondary-bg: #{lighten($sunset-dark-bg, 5%)};
+    --bs-tertiary-bg: #{lighten($sunset-dark-bg, 10%)};
+    --bs-border-color: #{lighten($sunset-dark-bg, 15%)};
+    --bs-heading-color: #{lighten($sunset-dark-text, 15%)};
+
+    .card {
+        // --- Add Card Header Variables ---
+        --bs-card-cap-bg: #{mix(lighten($sunset-orange, 15%), $sunset-dark-bg, 15%)}; // Example: A light mix
+        --bs-card-cap-color: #{$sunset-red}; // Example: Darker heading text
+        // --- End Add Card Header Variables ---
+    }
+
+    --bs-link-color: #{lighten($sunset-orange, 20%)};
+    --bs-link-hover-color: #{lighten($sunset-orange, 30%)};
+
+     .bg-gradient-primary {
+         background-color: $sunset-dark-purple;
+         background-image: linear-gradient(180deg, lighten($sunset-dark-purple, 10%) 10%, $sunset-dark-purple 100%);
+     }
+     .sidebar { background-color: $sunset-dark-purple; /* Adjust text colors as needed */ }
+  }
+}

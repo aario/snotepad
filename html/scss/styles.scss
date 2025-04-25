@@ -4,6 +4,8 @@
 // Import Bootstrap
 @import "../vendor/bootstrap/scss/bootstrap.scss";
 
+@import "themes.scss";
+
 // Import the main FontAwesome SCSS file
 $fa-font-path: "fonts";
 @import "../vendor/fontawesome-free/scss/fontawesome.scss"; // Or all.scss, etc.
