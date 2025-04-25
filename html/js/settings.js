@@ -39,7 +39,7 @@
         window.hideSidebar()
         window.historyPush(
             window.lunchSettings,
-            null,
+            [],
             confirmExit
         )
     }

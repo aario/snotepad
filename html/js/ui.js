@@ -108,7 +108,7 @@
 
     window.uiUpdateFolders = (paths) => {
         window.sidebarUpdateFolders(paths)
-        window.getCurrentAction() === window.lunchSettings
+        if (window.getCurrentAction() === window.lunchSettings) {
             window.settingsUpdateFolders(paths)
         }
     }
