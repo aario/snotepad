@@ -98,7 +98,13 @@
                 }
             )
         })
-        sortable = new Sortable(($("#folders")[0]), {
+        // Destroy previous instance if it exists to prevent duplicates
+        if (window.settingsSortableInstance) {
+             window.settingsSortableInstance.destroy();
+        }
+        window.settingsSortableInstance = new Sortable(($("#folders")[0]), {
+            handle: '.drag-handle',
+            animation: 150,
             onEnd: () => {
                 let paths = [];
 
