@@ -1,18 +1,20 @@
 <div class="mb-4" id="div-file-{id}">
     <div class="card border-left-primary shadow h-100 py-2">
-        <div class="card-body">
-            <div class="row no-gutters align-items-center">
-                <div class="col mr-2 div-file-open" data-id="{id}">
+        <div class="card-body pt-0">
+            <div class="row align-items-center ms-1 me-1">
+                <div class="col-auto ms-auto">
+                    <a href="#" data-id="{id}" class="btn-sm btn-danger btn-circle float-right btn-delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="row no-gutters align-items-center card-item-row">
+                <div class="col mr-2 card-item-details div-file-open">
                     <div id="div-filename-{id}" class="text-xs font-weight-bold mb-1">{basename}</div>
                     <div class="h6 mb-0 text-gray-800">
                         <code>{date}</code>
                         <div class="d-none" id="div-file-path-{id}">{path}</div>
                     </div>
-                </div>
-                <div class="col-auto">
-                    <a href="#" data-id="{id}" class="btn-sm btn-danger btn-circle float-right btn-file-delete">
-                        <i class="fas fa-trash"></i>
-                    </a>
                 </div>
             </div>
         </div>

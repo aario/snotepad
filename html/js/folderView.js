@@ -56,7 +56,7 @@
         let $itemToDelete = null; // Variable to store the jQuery element to remove
         let fileToDeleteName = null
 
-        $('.btn-file-delete').on('click', function(button) {
+        $('.btn-delete').on('click', function(button) {
             fileToDeleteId = $(this).data('id')
             $itemToDelete = $('#div-file-' + fileToDeleteId)
             fileToDeleteName = $('#div-filename-' + fileToDeleteId).text()

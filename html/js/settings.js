@@ -104,7 +104,7 @@
         let $itemToDelete = null; // Variable to store the jQuery element to remove
         let folderToReleaseName = null
 
-        $('.btn-folder-delete').on('click', function(button) {
+        $('.btn-delete').on('click', function(button) {
             folderToReleaseId = $(this).data('id')
             $itemToDelete = $('#div-folder-' + folderToReleaseId)
             folderToReleaseName = $('#div-folder-name-' + folderToReleaseId).text()

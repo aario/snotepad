@@ -1,18 +1,22 @@
 <div class="mb-4" id="div-folder-{id}">
     <div class="card border-left-primary shadow h-100 py-2">
-        <div class="card-body">
-            <div class="row no-gutters align-items-center">
-                <div class="col-auto pe-2"> <i class="fas fa-grip-vertical drag-handle" style="cursor: grab;"></i> </div>
-                <div class="col mr-2">
-                    <div class="text-xs font-weight-bold mb-1" id="div-folder-name-{id}">{basename}</div>
-                    <div class="h6 mb-0 text-gray-800">
-                        <code class="folder-path" id="code-folder-path-{id}">{path}</code>
-                    </div>
+        <div class="card-body pt-0">
+            <div class="row align-items-center ms-1 me-1">
+                <div class="col-auto drag-handle">
+                    <i class="fas fa-grip-vertical" style="cursor: grab;"></i>
                 </div>
-                <div class="col-auto">
-                    <a href="#" data-id="{id}" class="btn-sm btn-danger btn-circle float-right btn-folder-delete">
+                <div class="col-auto ms-auto">
+                    <a href="#" data-id="{id}" class="btn-sm btn-danger btn-circle btn-delete">
                         <i class="fas fa-trash"></i>
                     </a>
+                </div>
+            </div>
+            <div class="row no-gutters align-items-center card-item-row">
+                <div class="col mr-2 card-item-details">
+                    <div class="text-xs font-weight-bold mb-1" id="div-folder-name-0">{basename}</div>
+                    <div class="h6 mb-0 text-gray-800">
+                        <code class="folder-path" id="code-folder-path-0">{path}</code>
+                    </div>
                 </div>
             </div>
         </div>
