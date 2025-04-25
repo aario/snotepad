@@ -78,6 +78,7 @@
     
             const lastPath = window.readPreferences('lastPath')
             if (lastPath !== undefined && lastPath !== null) {
+                window.sidebarHighlightItem($('.sidebar .nav-link div:contains("' + lastPath + '")'))
                 window.lunchFolderView(lastPath)
             }
             $('#btn-welcome-add-folder').on('click', function() {

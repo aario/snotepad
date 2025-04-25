@@ -1,11 +1,12 @@
 (function($) {
     "use strict"; // Start of use strict
+    const sidebar = $("#accordionSidebar")
 
     // Toggle the side navigation
     $("#sidebarToggle, #sidebarToggleTop").on('click', function(e) {
         $("body").toggleClass("sidebar-toggled");
-        $(".sidebar").toggleClass("toggled");
-        if ($(".sidebar").hasClass("toggled")) {
+        sidebar.toggleClass("toggled");
+        if (sidebar.hasClass("toggled")) {
             $('.sidebar .collapse').collapse('hide');
         };
     });
@@ -17,9 +18,9 @@
         };
 
         // Toggle the side navigation when window is resized below 480px
-        if ($(window).width() < 480 && !$(".sidebar").hasClass("toggled")) {
+        if ($(window).width() < 480 && !sidebar.hasClass("toggled")) {
             $("body").addClass("sidebar-toggled");
-            $(".sidebar").addClass("toggled");
+            sidebar.addClass("toggled");
             $('.sidebar .collapse').collapse('hide');
         };
     });
@@ -35,7 +36,7 @@
     });
 
     window.sidebarUpdateFolders = (paths) => {
-        $("#accordionSidebar").find(".sidebar-folder").remove();
+        sidebar.find(".sidebar-folder").remove();
         const $div = $("#sidebarFoldersBegin");
 
         // Insert the new HTML content provided in the 'template' variable
@@ -74,6 +75,25 @@
         })
     }
 
+    window.sidebarHighlightItem = ($item) => {
+        // Find the parent li.nav-item of the clicked link
+        let $parentLi = $item.closest('li.nav-item')
+
+        // Find all li.nav-item elements within the same parent container 
+        //    (e.g., all direct children of the surrounding UL/OL)
+        //    and remove the 'active' class from all of them.
+        //    This ensures only one item is active at a time within this group.
+        sidebar.children('li.nav-item').removeClass('active')
+
+        // Add the 'active' class specifically to the parent li of the clicked link.
+        $parentLi.addClass('active')
+    }
+
+    $(document).on('click', ".sidebar .nav-link", function(event) {
+        // Prevent the default link behavior (e.g., navigating to '#')
+        event.preventDefault();
+        window.sidebarHighlightItem($(this))
+    })
     $(document).on('click', '.sidebar-folder', function(event) {
         // Prevent the default link behavior (e.g., navigating to '#')
         event.preventDefault();
@@ -94,18 +114,6 @@
         let $pathDiv = $clickedLink.find(pathDivSelector);
 
         let pathValue = $pathDiv.text();
-
-        // Find the parent li.nav-item of the clicked link
-        let $parentLi = $(this).closest('li.nav-item');
-
-        // Find all li.nav-item elements within the same parent container 
-        //    (e.g., all direct children of the surrounding UL/OL)
-        //    and remove the 'active' class from all of them.
-        //    This ensures only one item is active at a time within this group.
-        $parentLi.parent().children('li.nav-item').removeClass('active');
-
-        // Add the 'active' class specifically to the parent li of the clicked link.
-        $parentLi.addClass('active');
 
         // Display the path in an alert dialog
         window.lunchFolderView(pathValue)
