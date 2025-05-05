@@ -1,0 +1,2 @@
+git push origin --delete $1
+git tag -d $1
