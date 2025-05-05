@@ -1,0 +1,274 @@
+// scss/_style-neomorphism.scss
+
+// Neomorphism styles - Applied only when data-app-style="neomorphism"
+html[data-app-style="neomorphism"] {
+
+  // --- Configuration ---
+  $neo-blur: 10px;
+  $neo-distance: 5px; // Can increase slightly (e.g., 6px) if needed
+  $neo-border-radius: 12px;
+
+  // Shadow colors - Increased dark opacity slightly
+  --neo-shadow-light: rgba(255, 255, 255, 0.7);
+  --neo-shadow-dark: rgba(0, 0, 0, 0.2); // Increased from 0.15
+
+  // --- Base body adjustments ---
+  // FORCE CONTRAST: Set a body background different from the card background
+  body {
+    // Use tertiary background for the body, assuming it differs from secondary used in cards.
+    background-color: var(--bs-tertiary-bg);
+    // -- OR -- Use a typical neomorphism background color if BS vars are too similar:
+    // background-color: #e0e5ec; // Example light grey often used
+  }
+
+  // --- Helper Mixin ---
+  // Apply !important correctly to the whole property value
+  @mixin neo-shadow($inset: false) {
+    $shadow-type: if($inset, inset, '');
+    box-shadow:
+      #{$shadow-type} $neo-distance $neo-distance $neo-blur var(--neo-shadow-dark),
+      #{$shadow-type} (-$neo-distance) (-$neo-distance) $neo-blur var(--neo-shadow-light) !important; // !important at the very end
+  }
+
+  // --- Apply Styles to Elements ---
+
+  // General container elements (cards, modals, etc.)
+  // Using the specific .card rule below now primarily
+  .modal-content,
+  .topbar,
+  .sidebar,
+  .dropdown-menu,
+  .toast {
+    border-radius: $neo-border-radius;
+    border: none;
+    // Use secondary-bg, which should now contrast with the tertiary body background
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    @include neo-shadow(false); // Apply outer shadow
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  // --- Card Specific Styling ---
+  // Ensure this overrides Bootstrap's .shadow if present
+  .card {
+    border-radius: $neo-border-radius;
+    border: none;
+    background-color: var(--bs-secondary-bg); // Card background
+    color: var(--bs-body-color);
+    margin-bottom: var(--bs-card-spacer-y, 1rem);
+    @include neo-shadow(false); // Apply outer shadow (with !important from mixin)
+    transition: box-shadow 0.2s ease-in-out;
+
+    // Resetting default Bootstrap shadow just in case, although mixin's !important should win
+    &.shadow {
+       box-shadow: none; // Reset BS shadow first
+       @include neo-shadow(false); // Then apply ours
+    }
+  }
+
+  // Specific overrides for components within the neomorphism style
+  .sidebar {
+    background-color: var(--bs-primary);
+    color: var(--sidebar-text-color, rgba(255, 255, 255, 0.8));
+    // Mixin applies shadow + !important
+  }
+  .topbar {
+    background-color: var(--bs-tertiary-bg); // Topbar might match body bg now
+    color: var(--bs-body-color);
+     // Mixin applies shadow + !important
+  }
+
+  // Elements that look "pressed in" (input fields, selects)
+  .form-control,
+  .form-select {
+    border-radius: $neo-border-radius;
+    border: none;
+    // Inputs usually match the main background they are "pressed into"
+    background-color: var(--bs-tertiary-bg); // Match the new body background
+    // -- OR -- If using the hardcoded body background:
+    // background-color: #e0e5ec;
+    color: var(--bs-body-color);
+    @include neo-shadow(true); // Apply inset shadow (with !important)
+    transition: box-shadow 0.2s ease-in-out;
+
+    &:focus {
+      background-color: var(--bs-tertiary-bg); // Keep background on focus
+      // Focus shadow combines inset neo shadow and BS ring
+      box-shadow:
+        inset $neo-distance $neo-distance $neo-blur var(--neo-shadow-dark),
+        inset (-$neo-distance) (-$neo-distance) $neo-blur var(--neo-shadow-light),
+        0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important; // Add !important if needed to override mixin
+    }
+  }
+
+  // Buttons (Ensure background provides contrast)
+  .btn {
+    border-radius: $neo-border-radius;
+    border: none;
+    font-weight: 600;
+    // Button base background (Ensure this contrasts with body)
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-emphasis-color);
+    @include neo-shadow(false); // Outer shadow (with !important)
+    transition: box-shadow 0.15s ease-in-out, transform 0.1s ease-in-out;
+
+    &:hover {
+      transform: translateY(-1px);
+      // Re-apply shadow to ensure it persists on hover
+      @include neo-shadow(false);
+    }
+
+    &:active,
+    &.active {
+      transform: translateY(1px);
+      background-color: var(--bs-secondary-bg); // Keep base background consistent
+      color: var(--bs-emphasis-color);
+      @include neo-shadow(true); // Inset shadow (with !important)
+      // Mixin handles the !important now
+    }
+
+    &:focus {
+       // Combine neo-shadow with focus ring
+       // Add important here if the mixin's important isn't enough for focus state
+       box-shadow:
+        $neo-distance $neo-distance $neo-blur var(--neo-shadow-dark),
+        (-$neo-distance) (-$neo-distance) $neo-blur var(--neo-shadow-light),
+        0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important;
+    }
+
+    // --- Specific Button Colors ---
+    // (Keep existing color definitions)
+    &.btn-primary { background-color: var(--bs-primary); color: var(--bs-white); }
+    &.btn-secondary { background-color: var(--bs-secondary); color: var(--bs-emphasis-color); } // Adjust text color if secondary is light
+    &.btn-success { background-color: var(--bs-success); color: var(--bs-white); }
+    &.btn-danger { background-color: var(--bs-danger); color: var(--bs-white); }
+    &.btn-warning { background-color: var(--bs-warning); color: var(--bs-black); }
+    &.btn-info { background-color: var(--bs-info); color: var(--bs-white); }
+    &.btn-light { background-color: var(--bs-light); color: var(--bs-black); }
+    &.btn-dark { background-color: var(--bs-dark); color: var(--bs-white); }
+    &.btn-link {
+       box-shadow: none !important; // Ensure link has no shadow forcefully
+       background-color: transparent;
+       color: var(--bs-link-color);
+        &:hover, &:active, &:focus {
+            box-shadow: none !important;
+            background-color: transparent;
+        }
+     }
+
+     // Active state shadow handled by mixin's !important
+     &.btn-primary:active { background-color: var(--bs-primary); @include neo-shadow(true); }
+     &.btn-secondary:active { background-color: var(--bs-secondary); @include neo-shadow(true); }
+     // ... etc for other colors ...
+  }
+
+
+  // Card Specifics (Header/Body remain mostly the same)
+  .card {
+    .card-header {
+      border-radius: $neo-border-radius $neo-border-radius 0 0;
+      border-bottom: none;
+      // Header background (Ensure contrast with card body's bg if needed)
+      background-color: var(--bs-tertiary-bg); // Could match body bg now
+      color: var(--bs-heading-color);
+      padding: 0.75rem 1.25rem;
+      box-shadow: none; // Ensure header itself is flat
+    }
+
+    .card-body {
+       background-color: transparent; // Takes card's main background
+       border-radius: 0 0 $neo-border-radius $neo-border-radius;
+       padding: 1.25rem;
+    }
+    // Folder example remains the same, will inherit the working shadow via mixin
+     #folders .card {
+       background-color: var(--bs-tertiary-bg); // May need adjustment if body is also tertiary
+       @include neo-shadow(false);
+        margin-bottom: 1.5rem;
+     }
+     // ... rest of #folders styles ...
+  }
+
+  // Navs Specifics (Non-sidebar)
+  .nav:not(.sidebar .nav) .nav-item { // Make selector more specific
+      .nav-link {
+         border-radius: $neo-border-radius;
+         margin: 2px 5px;
+         transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+         box-shadow: none; // Start flat
+
+         &:hover {
+            background-color: var(--bs-tertiary-bg); // Use the body background for hover?
+             box-shadow: none;
+         }
+
+         &.active {
+             background-color: var(--bs-tertiary-bg); // Match hover/body background
+             @include neo-shadow(true); // Inset shadow (with !important)
+             font-weight: bold;
+             color: var(--bs-primary);
+             i { color: var(--bs-primary); }
+         }
+      }
+  }
+
+  // Sidebar specifics (nav link active state uses mixin)
+   .sidebar {
+      .nav-item .nav-link {
+         margin: 2px 0;
+         color: var(--sidebar-link-color, var(--sidebar-text-color, rgba(255, 255, 255, 0.8)));
+         i { color: var(--sidebar-icon-color, rgba(255, 255, 255, 0.4)); }
+         border-radius: $neo-border-radius; // Add radius to sidebar links too
+         box-shadow: none; // Start flat
+         transition: box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
+
+
+         &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--sidebar-link-hover-color, var(--bs-white, #fff));
+            i { color: var(--sidebar-icon-hover-color, var(--bs-white, #fff)); }
+            box-shadow: none;
+         }
+         &.active {
+             background-color: transparent; // Active link transparent
+             @include neo-shadow(true); // Inset shadow (with !important)
+             color: var(--sidebar-link-active-color, var(--bs-white, #fff));
+             i { color: var(--sidebar-icon-active-color, var(--bs-white, #fff)); }
+         }
+      }
+      // ... rest of sidebar styles ...
+   }
+
+
+  // --- Tables (Optional) ---
+  .table {
+    // Styles remain optional
+  }
+
+  // --- Adjustments for Dark Mode ---
+  &[data-bs-theme="dark"] {
+    // Redefine shadow colors
+    --neo-shadow-light: rgba(255, 255, 255, 0.1);
+    --neo-shadow-dark: rgba(0, 0, 0, 0.5); // Keep darker shadow for dark mode
+
+    // FORCE CONTRAST in dark mode
+    body {
+      // Ensure dark body is different from dark secondary/tertiary used by elements
+      background-color: var(--bs-dark); // Example: use Bootstrap's dark variable
+      // -- OR -- Use a specific dark color:
+      // background-color: #333;
+    }
+     // Ensure element backgrounds contrast with the dark body
+     .card, .btn, .modal-content, .dropdown-menu, .toast {
+         background-color: var(--bs-body-bg); // Use BS dark mode body-bg for elements?
+         // -- OR -- Use tertiary, assuming it's lighter than bs-dark
+         // background-color: var(--bs-tertiary-bg);
+     }
+     .form-control, .form-select {
+         background-color: var(--bs-dark); // Match the new dark body for inset effect
+         // -- OR -- background-color: #333; // Match specific dark color
+     }
+     // Adjust other components as needed for dark mode contrast
+     .topbar { background-color: var(--bs-body-bg); } // Match element color
+  }
+}

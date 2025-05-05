@@ -4,13 +4,20 @@
     }
 
     // --- Update UI Controls ---
-    const updateAppearanceUI = (selectedTheme, selectedMode) => {
+    const updateAppearanceUI = (selectedTheme, selectedStyle, selectedMode) => {
         // Update Theme Selector
         const themeSelect = document.getElementById('themeSelect');
         if (themeSelect) {
             themeSelect.value = selectedTheme;
         } else {
             console.warn("Theme select element not found");
+        }
+
+        const styleSelect = document.getElementById('styleSelect');
+        if (styleSelect) {
+            styleSelect.value = selectedStyle;
+        } else {
+            console.warn("Style select element not found");
         }
 
         // Update Mode Radios
@@ -34,30 +41,46 @@
 
         // --- Initialize Appearance ---
         const initialTheme = window.getStoredTheme();
+        const initialStyle = window.getStoredStyle();
         const initialMode = window.getStoredMode();
-        updateAppearanceUI(initialTheme, initialMode);
+        updateAppearanceUI(initialTheme, initialStyle, initialMode);
 
         // --- Event Listener for Theme Selector ---
         const themeSelect = document.getElementById('themeSelect');
         if(themeSelect) {
             themeSelect.addEventListener('change', (event) => {
                 const newTheme = event.target.value;
+                const currentStyle = window.getStoredStyle();
                 const currentMode = window.getStoredMode(); // Get current mode setting
                 window.setStoredTheme(newTheme);       // Store the new theme choice
-                window.applyAppearance(newTheme, currentMode); // Apply the new theme with current mode
+                window.applyAppearance(newTheme, currentStyle, currentMode); // Apply the new theme with current mode
             });
         } else {
              console.error("Theme select element not found during event listener setup");
         }
 
+        // --- Event Listener for Style Selector ---
+        const styleSelect = document.getElementById('styleSelect');
+        if(styleSelect) {
+            styleSelect.addEventListener('change', (event) => {
+                const currentTheme = window.getStoredTheme();
+                const newStyle = event.target.value;
+                const currentMode = window.getStoredMode(); // Get current mode setting
+                window.setStoredStyle(newStyle);       // Store the new theme choice
+                window.applyAppearance(currentTheme, newStyle, currentMode); // Apply the new theme with current mode
+            });
+        } else {
+             console.error("Style select element not found during event listener setup");
+        }
 
         // --- Event Listeners for Mode Radio Buttons ---
         document.querySelectorAll('input[name="ui-mode"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 const newMode = event.target.value;
+                const currentStyle = window.getStoredStyle();
                 const currentTheme = window.getStoredTheme(); // Get current theme setting
                 window.setStoredMode(newMode);         // Store the new mode choice
-                window.applyAppearance(currentTheme, newMode); // Apply the current theme with new mode
+                window.applyAppearance(currentTheme, currentStyle, newMode); // Apply the current theme with new mode
             });
         });
 

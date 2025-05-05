@@ -2,6 +2,7 @@
     "use strict"; // Start of use strict
     // --- Preference Keys ---
     const THEME_STORAGE_KEY = 'app-theme';
+    const STYLE_STORAGE_KEY = 'app-style';
     const MODE_STORAGE_KEY = 'ui-mode'; // Assuming this is what getStoredTheme/setStoredTheme used
 
     function setNavBar(templateName, data) {
@@ -128,6 +129,16 @@
         return theme
     }
 
+    // --- Getters for Preferences ---
+    window.getStoredStyle = () => {
+        let style = localStorage.getItem(STYLE_STORAGE_KEY)
+        if (!style) {
+            style = 'default' // Default to 'default' theme
+        }
+
+        return style
+    }
+
     window.getStoredMode = () => {
         let mode = localStorage.getItem(MODE_STORAGE_KEY)
         if (!mode) {
@@ -139,6 +150,7 @@
 
     // --- Setters for Preferences ---
     window.setStoredTheme = (theme) => localStorage.setItem(THEME_STORAGE_KEY, theme);
+    window.setStoredStyle = (style) => localStorage.setItem(STYLE_STORAGE_KEY, style);
     window.setStoredMode = (mode) => localStorage.setItem(MODE_STORAGE_KEY, mode);
 
     // --- Get Preferred Mode (Handles 'auto') ---
@@ -151,37 +163,34 @@
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     };
 
-    // --- Apply Theme and Mode to DOM ---
-    window.applyAppearance = (theme, mode) => {
+    // --- Apply Theme, Style and Mode to DOM ---
+    window.applyAppearance = (theme, style, mode) => {
         const effectiveMode = (mode === 'auto') ? getPreferredMode() : mode;
-        console.log(`Applying Theme: ${theme}, Mode: ${mode}, Effective Mode: ${effectiveMode}`);
+        console.log(`Applying Theme: ${theme}, Style: ${style}, Mode: ${mode}, Effective Mode: ${effectiveMode}`);
 
         // Set theme attribute on body (or html)
         document.documentElement.setAttribute('data-app-theme', theme);
 
+        // Set style attribute on body (or html)
+        document.documentElement.setAttribute('data-app-style', style);
+
         // Set Bootstrap's theme attribute on html (recommended by Bootstrap)
         document.documentElement.setAttribute('data-bs-theme', effectiveMode);
-
-        // Optional: Add theme-specific class to body if needed for non-variable styles
-        // document.body.classList.remove('theme-default', 'theme-oceanic', 'theme-forest', 'theme-sunset');
-        // document.body.classList.add(`theme-${theme}`);
     };
 
     // --- Initialize Appearance ---
     const initialTheme = window.getStoredTheme(); // Default to 'default' theme
+    const initialStyle = window.getStoredStyle(); // Default to 'default' style
     const initialMode = window.getStoredMode();   // Default to 'auto' mode
-    window.applyAppearance(initialTheme, initialMode);
+    window.applyAppearance(initialTheme, initialStyle, initialMode);
 
     // Add listener for system color scheme changes if mode is 'auto'
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         const currentSelectedMode = getStoredMode() || 'auto';
         if (currentSelectedMode === 'auto') {
             const currentTheme = getStoredTheme() || 'default';
-            window.applyAppearance(currentTheme, 'auto'); // Re-apply to update effective mode
-            // If settings page is visible, update the UI radios (optional)
-            if(document.getElementById('page')?.dataset?.pageName === 'settings') { // Example check
-                updateAppearanceUI(currentTheme, 'auto');
-            }
+            const currentStyle = getStoredStyle() || 'default';
+            window.applyAppearance(currentTheme, currentStyle, 'auto'); // Re-apply to update effective mode
         }
     });
 })(jQuery); // End of use strict

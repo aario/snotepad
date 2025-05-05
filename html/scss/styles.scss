@@ -30,3 +30,6 @@ $fa-font-path: "fonts";
 @import "editor.scss";
 @import "toast.scss";
 @import "splash.scss";
+
+// Import the new style partial LAST
+@import "styles/neomorphism.scss"; // <--- ADD THIS LINE
